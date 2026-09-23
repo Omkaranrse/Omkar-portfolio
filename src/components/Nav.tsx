@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import avatarImg from '@/images/portrait.jpg';
+import LiquidGlassButton from './LiquidGlassButton';
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
@@ -38,10 +39,11 @@ export default function Nav() {
   }, [open]);
 
   const navLinks = [
-    { label: 'Work', href: '/#work', index: '01' },
-    { label: 'About', href: '/#about', index: '02' },
-    { label: 'Experience', href: '/#experience', index: '03' },
-    { label: 'Contact', href: '/#contact', index: '04' },
+    { label: 'Experience', href: '/#experience', index: '01' },
+    { label: 'Work', href: '/#work', index: '02' },
+    { label: 'Skills', href: '/#skills', index: '03' },
+    { label: 'About', href: '/#about', index: '04' },
+    { label: 'Contact', href: '/#contact', index: '05' },
   ];
 
   return (
@@ -57,8 +59,8 @@ export default function Nav() {
               <Image
                 src={avatarImg}
                 alt="Omkar Anarse"
-                width={28}
-                height={28}
+                width={32}
+                height={32}
                 className="floating-nav-avatar-img"
               />
             </div>
@@ -75,14 +77,17 @@ export default function Nav() {
               </li>
             ))}
             <li>
-              <a
+              <LiquidGlassButton
                 href="/Omkar.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="floating-nav-link floating-nav-link--action"
+                newTab
+                size="sm"
+                icon="diagonal"
+                tint="rgba(235, 76, 42, 0.2)"
+                textColor="var(--accent)"
+                style={{ marginLeft: 4 }}
               >
-                Resume ↗
-              </a>
+                Resume
+              </LiquidGlassButton>
             </li>
           </ul>
 

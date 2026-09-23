@@ -4,6 +4,9 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { projects, type Project } from '@/data/projects';
 
+import ApertureCard from './ApertureCard';
+import LiquidGlassButton from './LiquidGlassButton';
+
 type FilterCategory = 'All' | 'AI Systems' | 'Mobile' | 'System Design';
 
 export default function Work() {
@@ -35,67 +38,53 @@ export default function Work() {
           <div className="work-title-row">
             <h2 className="work-title">Engineering projects &amp; systems.</h2>
             <p className="work-subtitle">
-              Click any project below to read the complete technical case study, architecture flow, and engineering decisions.
+              Hover over cards for 3D depth and click to read the complete technical case study and architecture breakdown.
             </p>
           </div>
 
-          {/* ── Filter Pills ── */}
-          <div className="work-filters" role="tablist" aria-label="Filter projects by domain">
-            {filterOptions.map((filter) => (
-              <button
-                key={filter}
-                type="button"
-                role="tab"
-                aria-selected={activeFilter === filter}
-                className={`filter-pill ${activeFilter === filter ? 'is-active' : ''}`}
-                onClick={() => setActiveFilter(filter)}
-              >
-                <span>{filter}</span>
-                {filter === 'All' ? (
-                  <span className="filter-count">{projects.length}</span>
-                ) : (
-                  <span className="filter-count">
-                    {projects.filter((p) => getDomain(p) === filter).length}
+          {/* ── Liquid Glass Filter Pills ── */}
+          <div className="work-filters" role="tablist" aria-label="Filter projects by domain" style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {filterOptions.map((filter) => {
+              const isActive = activeFilter === filter;
+              const count = filter === 'All' ? projects.length : projects.filter((p) => getDomain(p) === filter).length;
+              return (
+                <LiquidGlassButton
+                  key={filter}
+                  size="sm"
+                  surface={isActive ? 'dark' : 'dark'}
+                  material={isActive ? 'frosted' : 'clear'}
+                  tint={isActive ? 'rgba(235, 76, 42, 0.35)' : 'rgba(255, 255, 255, 0.08)'}
+                  textColor={isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.7)'}
+                  onClick={() => setActiveFilter(filter)}
+                  style={{
+                    boxShadow: isActive ? '0 0 16px rgba(235, 76, 42, 0.3)' : undefined,
+                  }}
+                >
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <span>{filter}</span>
+                    <span
+                      style={{
+                        fontSize: '0.6875rem',
+                        fontFamily: 'var(--font-mono), monospace',
+                        opacity: 0.75,
+                        background: 'rgba(255, 255, 255, 0.12)',
+                        padding: '1px 6px',
+                        borderRadius: 9999,
+                      }}
+                    >
+                      {count}
+                    </span>
                   </span>
-                )}
-              </button>
-            ))}
+                </LiquidGlassButton>
+              );
+            })}
           </div>
         </header>
 
-        {/* ── Summary Project Cards Grid ── */}
+        {/* ── Aperture 3D Project Cards Grid ── */}
         <div className="work-cards-grid reveal">
           {filteredProjects.map((project) => (
-            <Link
-              key={project.id}
-              href={`/projects/${project.id}`}
-              className="project-summary-card"
-              aria-label={`Open case study for ${project.title}`}
-            >
-              <div className="psc-top">
-                <span className="psc-number">{project.number}</span>
-                <span className="psc-year">{project.year}</span>
-              </div>
-
-              <div className="psc-main">
-                <span className="psc-category">{project.category}</span>
-                <h3 className="psc-title">{project.title}</h3>
-                <p className="psc-desc">{project.shortDesc}</p>
-              </div>
-
-              <div className="psc-footer">
-                <div className="psc-tags">
-                  {project.focusPoints.slice(0, 2).map((tag) => (
-                    <span key={tag} className="psc-tag">{tag}</span>
-                  ))}
-                </div>
-
-                <span className="psc-action">
-                  <span>View Case Study</span>
-                  <span className="psc-arrow">→</span>
-                </span>
-              </div>
-            </Link>
+            <ApertureCard key={project.id} project={project} />
           ))}
         </div>
 

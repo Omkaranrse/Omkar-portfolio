@@ -1,18 +1,37 @@
+'use client';
+
+import LanyardCard from './LanyardCard';
+import avatarImg from '@/images/portrait.jpg';
+
 export default function Experience() {
-  const entries = [
+  const experiences = [
     {
-      period: '2024 — Present',
-      role: 'MCA Student',
-      org: 'K.J. Somaiya Institute of Management',
+      companyName: 'Metaphi',
+      role: 'Flutter Developer',
+      period: 'Current · 1+ Month',
+      type: 'Current Role',
       description:
-        'Pursuing a Master of Computer Applications with a focus on AI systems, machine learning, and mobile engineering. Building production-grade projects across the AI and mobile stack.',
+        'Building scalable mobile experiences and state architecture with Flutter and Dart, integrating backend APIs and modern UI workflows.',
+      techStack: ['Flutter', 'Dart', 'Riverpod', 'Clean Arch', 'REST APIs'],
+      backCardText: 'METAPHI',
+      backCardColor: '#3b82f6',
+      profileImage: avatarImg,
+      tapeColor: '#ffffff',
+      tapeRotation: -4,
     },
     {
-      period: '2021 — 2024',
-      role: 'B.Sc. Computer Science',
-      org: 'University of Mumbai',
+      companyName: 'My Job Park',
+      role: 'Flutter Developer',
+      period: '3 Years · Part-time',
+      type: 'Part-time',
       description:
-        'Graduated with a Bachelor of Science in Computer Science. Developed foundational skills in algorithms, data structures, databases, and software engineering.',
+        'Engineered cross-platform mobile apps for job seekers and recruiters, implementing responsive design token systems and real-time state management.',
+      techStack: ['Flutter', 'Dart', 'Firebase', 'State Mgmt', 'UI/UX'],
+      backCardText: 'MYJOBPARK',
+      backCardColor: 'var(--accent)',
+      profileImage: avatarImg,
+      tapeColor: '#f3f4f6',
+      tapeRotation: 5,
     },
   ];
 
@@ -20,24 +39,20 @@ export default function Experience() {
     <section id="experience" className="exp-section">
       <div className="wrap">
         <header className="exp-header reveal">
-          <span className="exp-eyebrow">Background</span>
-          <h2 className="exp-title">Experience &amp; Education.</h2>
+          <div className="exp-header-top">
+            <span className="exp-eyebrow">Work History</span>
+            <span className="exp-count">02 ROLES</span>
+          </div>
+          <h2 className="exp-title">Professional Experience.</h2>
+          <p className="exp-subtitle">
+            Hover to inspect badge details or click any lanyard card to trigger swing physics.
+          </p>
         </header>
 
-        <div className="exp-list">
-          {entries.map((entry, i) => (
-            <div key={i} className="exp-entry reveal">
-              <div className="exp-entry-left">
-                <span className="exp-period">{entry.period}</span>
-              </div>
-              <div className="exp-entry-right">
-                <div className="exp-entry-header">
-                  <h3 className="exp-role">{entry.role}</h3>
-                  <span className="exp-org">{entry.org}</span>
-                </div>
-                <p className="exp-desc">{entry.description}</p>
-              </div>
-            </div>
+        {/* ── Interactive Lanyard Drop Cards Grid ── */}
+        <div className="lanyard-cards-grid reveal">
+          {experiences.map((exp, i) => (
+            <LanyardCard key={i} {...exp} />
           ))}
         </div>
       </div>

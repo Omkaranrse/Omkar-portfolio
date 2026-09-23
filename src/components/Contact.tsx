@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import LiquidGlassButton from './LiquidGlassButton';
 
 export default function Contact() {
   const email = 'omkaranarse1906@gmail.com';
@@ -70,19 +71,25 @@ export default function Contact() {
               collaborations. If you&apos;re building something interesting, reach out.
             </p>
 
-            {/* Quick Email Copy Button */}
-            <div className="contact-quick-copy">
-              <button
-                type="button"
-                className="copy-email-btn"
+            {/* Quick Email Copy Liquid Glass Button */}
+            <div className="contact-quick-copy" style={{ marginTop: 24 }}>
+              <LiquidGlassButton
+                size="md"
+                surface="dark"
+                material="frosted"
+                tint="rgba(235, 76, 42, 0.3)"
+                icon={copied ? 'check' : 'copy'}
+                iconPosition="left"
+                textColor="#ffffff"
                 onClick={handleCopyEmail}
-                aria-label="Copy email address to clipboard"
+                style={{
+                  boxShadow: copied
+                    ? '0 0 20px rgba(34, 197, 94, 0.4)'
+                    : '0 8px 24px rgba(0, 0, 0, 0.3)',
+                }}
               >
-                <span className="copy-icon" aria-hidden="true">
-                  {copied ? '✓' : '📋'}
-                </span>
-                <span>{copied ? 'Email Copied to Clipboard!' : 'Copy Email Address'}</span>
-              </button>
+                {copied ? 'Email Copied to Clipboard!' : 'Copy Email Address'}
+              </LiquidGlassButton>
             </div>
           </div>
 

@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { projects, type Project } from '@/data/projects';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import LiquidGlassButton from '@/components/LiquidGlassButton';
 
 interface ProjectPageProps {
   params: Promise<{
@@ -59,27 +60,39 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         {/* ── Top Header Navigation Bar ── */}
         <div className="project-detail-hero">
           <div className="wrap">
-            <div className="pd-breadcrumbs">
-              <Link href="/#work" className="pd-back-link">
-                <span className="pd-back-arrow">←</span>
-                <span>Back to All Projects</span>
-              </Link>
-              <div className="pd-pagination-pills">
-                <Link
+            <div className="pd-breadcrumbs" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+              <LiquidGlassButton
+                href="/#work"
+                size="sm"
+                icon="arrow"
+                iconPosition="left"
+                material="frosted"
+                surface="dark"
+                textColor="#ffffff"
+              >
+                Back to All Projects
+              </LiquidGlassButton>
+
+              <div className="pd-pagination-pills" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <LiquidGlassButton
                   href={`/projects/${prevProject.id}`}
-                  className="pd-nav-btn"
-                  aria-label={`Previous project: ${prevProject.title}`}
+                  size="sm"
+                  surface="dark"
+                  material="clear"
+                  textColor="rgba(255, 255, 255, 0.8)"
                 >
                   ← Previous
-                </Link>
-                <span className="pd-nav-divider">/</span>
-                <Link
+                </LiquidGlassButton>
+
+                <LiquidGlassButton
                   href={`/projects/${nextProject.id}`}
-                  className="pd-nav-btn"
-                  aria-label={`Next project: ${nextProject.title}`}
+                  size="sm"
+                  surface="dark"
+                  material="clear"
+                  textColor="rgba(255, 255, 255, 0.8)"
                 >
                   Next →
-                </Link>
+                </LiquidGlassButton>
               </div>
             </div>
 
@@ -147,20 +160,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
                 {/* Links */}
                 {project.links.length > 0 && (
-                  <div className="pd-links">
+                  <div className="pd-links" style={{ marginTop: 24 }}>
                     {project.links.map((link) => (
-                      <a
+                      <LiquidGlassButton
                         key={link.label}
                         href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="pd-link-btn"
+                        newTab
+                        size="md"
+                        icon="diagonal"
+                        tint="rgba(235, 76, 42, 0.3)"
+                        textColor="#ffffff"
                       >
-                        <span>View {link.label} Repository</span>
-                        <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-                          <path d="M2 10L10 2M10 2H4M10 2V8" />
-                        </svg>
-                      </a>
+                        View {link.label} Repository
+                      </LiquidGlassButton>
                     ))}
                   </div>
                 )}

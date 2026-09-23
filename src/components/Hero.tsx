@@ -1,11 +1,62 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import heroPhoto from '@/images/hero.png';
+import LiquidGlassButton from './LiquidGlassButton';
+import HeroDock from './HeroDock';
 
 export default function Hero() {
+  const [liveTime, setLiveTime] = useState<string>('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const weekday = now.toLocaleDateString('en-US', { weekday: 'short' });
+      const day = now.getDate();
+      const month = now.toLocaleDateString('en-US', { month: 'short' });
+      let hours = now.getHours();
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      setLiveTime(`${weekday} ${day} ${month}  ${hours}:${minutes} ${ampm}`);
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section id="hero" className="hero-editorial-section">
+      {/* ── Vertical Tools Dock (Right-Side macOS Magnification) ── */}
+      <HeroDock />
+
+      {/* ── Top-Right Live Date & Time ── */}
+      {liveTime && (
+        <div
+          className="hero-live-clock"
+          style={{
+            position: 'absolute',
+            top: 28,
+            right: 'clamp(20px, 4vw, 48px)',
+            zIndex: 20,
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif',
+            fontSize: '0.9375rem',
+            fontWeight: 500,
+            color: '#FFFFFF',
+            letterSpacing: '-0.01em',
+            whiteSpace: 'pre',
+            pointerEvents: 'none',
+            userSelect: 'none',
+          }}
+          aria-label="Current date and time"
+        >
+          {liveTime}
+        </div>
+      )}
+
       {/* ── Background Base Image (Crisp & Natural) ── */}
       <div className="hero-bg-wrapper">
         <Image
@@ -25,8 +76,16 @@ export default function Hero() {
 
           {/* 01: Minimal Greeting */}
           <div className="hero-editorial-intro">
-            <span className="hero-editorial-wave" aria-hidden="true">👋</span>
-            <span className="hero-editorial-greeting">
+            <span className="hero-editorial-wave" aria-hidden="true">
+              👋
+            </span>
+
+            <span
+              className="hero-editorial-greeting"
+              style={{
+                fontSize: '1.25rem',
+              }}
+            >
               Hey, I&apos;m <strong>Omkar Anarse</strong>
             </span>
           </div>
@@ -39,35 +98,32 @@ export default function Hero() {
           {/* 03: Supporting Statement */}
           <div className="hero-editorial-copy">
             <p className="hero-editorial-lead">
-              I build AI systems and digital products that solve real-world problems.
-            </p>
-            <p className="hero-editorial-subtext">
-              From AI-powered backends and RAG pipelines to modern web and mobile experiences.
+              Full-stack developer building AI, web, and mobile apps that actually ship and solve real-world problems.
             </p>
           </div>
 
-          {/* 04: Interactive CTAs & Metadata */}
-          <div className="hero-actions-row">
-            <div className="hero-cta-group">
-              <a href="#work" className="hero-btn hero-btn--primary">
-                <span>View Selected Work</span>
-                <span className="hero-btn-arrow" aria-hidden="true">↓</span>
-              </a>
-              <a href="#contact" className="hero-btn hero-btn--ghost">
-                <span>Get in Touch</span>
-                <span className="hero-btn-arrow" aria-hidden="true">→</span>
-              </a>
-            </div>
+          {/* 04: Interactive Liquid Glass CTAs */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
+            <LiquidGlassButton
+              href="#work"
+              size="md"
+              icon="arrow"
+              tint="rgba(235, 76, 42, 0.4)"
+              textColor="#ffffff"
+            >
+              View Selected Work
+            </LiquidGlassButton>
 
-            <div className="hero-editorial-meta-tag">
-              <span>AI</span>
-              <span className="hero-meta-dot" aria-hidden="true">·</span>
-              <span>WEB</span>
-              <span className="hero-meta-dot" aria-hidden="true">·</span>
-              <span>MOBILE</span>
-              <span className="hero-meta-dot" aria-hidden="true">·</span>
-              <span>PRODUCT ENGINEERING</span>
-            </div>
+            <LiquidGlassButton
+              href="#contact"
+              size="md"
+              material="clear"
+              surface="dark"
+              icon="diagonal"
+              textColor="#ffffff"
+            >
+              Get in Touch
+            </LiquidGlassButton>
           </div>
 
         </div>
@@ -75,4 +131,3 @@ export default function Hero() {
     </section>
   );
 }
-
