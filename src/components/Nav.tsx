@@ -13,10 +13,14 @@ export default function Nav() {
     const handleScroll = () => {
       const y = window.scrollY;
       const heroEl = document.getElementById('hero');
-      const heroBottom = heroEl ? heroEl.offsetHeight : window.innerHeight;
-
-      setScrolled(y > 30);
-      setIsDarkHero(y < heroBottom - 80);
+      if (heroEl) {
+        const heroBottom = heroEl.offsetHeight;
+        setScrolled(y > 30);
+        setIsDarkHero(y < heroBottom - 80);
+      } else {
+        setScrolled(y > 30);
+        setIsDarkHero(false);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -34,10 +38,10 @@ export default function Nav() {
   }, [open]);
 
   const navLinks = [
-    { label: 'Work', href: '#work', index: '01' },
-    { label: 'About', href: '#about', index: '02' },
-    { label: 'Experience', href: '#experience', index: '03' },
-    { label: 'Contact', href: '#contact', index: '04' },
+    { label: 'Work', href: '/#work', index: '01' },
+    { label: 'About', href: '/#about', index: '02' },
+    { label: 'Experience', href: '/#experience', index: '03' },
+    { label: 'Contact', href: '/#contact', index: '04' },
   ];
 
   return (
@@ -48,7 +52,7 @@ export default function Nav() {
           aria-label="Main Navigation"
         >
           {/* Brand with avatar */}
-          <a href="#hero" className="floating-nav-brand">
+          <a href="/" className="floating-nav-brand">
             <div className="floating-nav-avatar">
               <Image
                 src={avatarImg}

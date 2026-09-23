@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { projects } from '@/data/projects';
 
 export default function Overview() {
@@ -11,7 +12,7 @@ export default function Overview() {
 
         <div className="overview-grid">
           {projects.map((p) => (
-            <a href={`#${p.id}`} className="ov-card reveal" key={p.id}>
+            <Link href={`/projects/${p.id}`} className="ov-card reveal" key={p.id}>
               <div className="ov-card-top">
                 <div className="ov-thumb" style={{ background: p.thumbColor }}>
                   {p.thumbLabel}
@@ -20,7 +21,7 @@ export default function Overview() {
               </div>
               <h3>{p.title}</h3>
               <p>{p.meta.split('•')[0].trim()}</p>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

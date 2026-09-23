@@ -6,7 +6,7 @@ import heroPhoto from '@/images/hero.png';
 export default function Hero() {
   return (
     <section id="hero" className="hero-editorial-section">
-      {/* ── Background Base Image ── */}
+      {/* ── Background Base Image (Crisp & Natural) ── */}
       <div className="hero-bg-wrapper">
         <Image
           src={heroPhoto}
@@ -17,14 +17,13 @@ export default function Hero() {
           unoptimized
           className="hero-bg-img"
         />
-        <div className="hero-editorial-gradient" aria-hidden="true" />
       </div>
 
-      {/* ── Main Hero Content ── */}
-      <div className="wrap hero-editorial-container">
-        <div className="hero-editorial-content reveal">
+      {/* ── Main Hero Content (Shifted Left to Edge · Clean Space) ── */}
+      <div className="hero-editorial-container">
+        <div className="hero-editorial-content reveal in">
 
-          {/* 01: Small Introduction */}
+          {/* 01: Minimal Greeting */}
           <div className="hero-editorial-intro">
             <span className="hero-editorial-wave" aria-hidden="true">👋</span>
             <span className="hero-editorial-greeting">
@@ -47,15 +46,28 @@ export default function Hero() {
             </p>
           </div>
 
-          {/* 04: Metadata Tag */}
-          <div className="hero-editorial-meta-tag">
-            <span>AI</span>
-            <span className="hero-meta-dot" aria-hidden="true">·</span>
-            <span>WEB</span>
-            <span className="hero-meta-dot" aria-hidden="true">·</span>
-            <span>MOBILE</span>
-            <span className="hero-meta-dot" aria-hidden="true">·</span>
-            <span>PRODUCT ENGINEERING</span>
+          {/* 04: Interactive CTAs & Metadata */}
+          <div className="hero-actions-row">
+            <div className="hero-cta-group">
+              <a href="#work" className="hero-btn hero-btn--primary">
+                <span>View Selected Work</span>
+                <span className="hero-btn-arrow" aria-hidden="true">↓</span>
+              </a>
+              <a href="#contact" className="hero-btn hero-btn--ghost">
+                <span>Get in Touch</span>
+                <span className="hero-btn-arrow" aria-hidden="true">→</span>
+              </a>
+            </div>
+
+            <div className="hero-editorial-meta-tag">
+              <span>AI</span>
+              <span className="hero-meta-dot" aria-hidden="true">·</span>
+              <span>WEB</span>
+              <span className="hero-meta-dot" aria-hidden="true">·</span>
+              <span>MOBILE</span>
+              <span className="hero-meta-dot" aria-hidden="true">·</span>
+              <span>PRODUCT ENGINEERING</span>
+            </div>
           </div>
 
         </div>
@@ -63,3 +75,4 @@ export default function Hero() {
     </section>
   );
 }
+

@@ -2,16 +2,20 @@ import { projects, type Project } from '@/data/projects';
 
 interface ProjectCardProps {
   project: Project;
+  onSelectProject?: (id: string) => void;
 }
 
-export default function ProjectCard({ project }: ProjectCardProps) {
+export default function ProjectCard({ project, onSelectProject }: ProjectCardProps) {
   return (
-    <article className="cs-card reveal" id={project.id} aria-label={`Project: ${project.title}`}>
+    <article className="cs-card" id={project.id} aria-label={`Project deep dive: ${project.title}`}>
 
       {/* ── Header ─────────────────────────────── */}
       <div className="cs-header">
         <div className="cs-header-top">
-          <span className="cs-number" aria-hidden="true">{project.number}</span>
+          <div className="cs-header-badge-group">
+            <span className="cs-number" aria-hidden="true">{project.number}</span>
+            <span className="cs-active-badge">Active Case Study</span>
+          </div>
           <div className="cs-meta-row">
             <span className="cs-category">{project.category}</span>
             <span className="cs-sep" aria-hidden="true">·</span>
@@ -77,7 +81,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                   rel="noopener noreferrer"
                   className="cs-link"
                 >
-                  <span>{link.label}</span>
+                  <span>{link.label} Repository</span>
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                     <path d="M2 10L10 2M10 2H4M10 2V8" />
                   </svg>
@@ -137,19 +141,23 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </div>
 
-      {/* ── Footer project nav ─────────────────── */}
-      <footer className="cs-footer-nav" aria-label="Project navigation">
-        {projects.map((p) => (
-          <a
-            key={p.id}
-            href={`#${p.id}`}
-            className={`cs-footer-link${p.id === project.id ? ' cs-footer-link--active' : ''}`}
-            aria-current={p.id === project.id ? 'true' : undefined}
-          >
-            <span className="cs-footer-num">{p.number.replace('.', '')}</span>
-            <span className="cs-footer-title">{p.tagLabel}</span>
-          </a>
-        ))}
+      {/* ── Footer project switcher ─────────────────── */}
+      <footer className="cs-footer-nav" aria-label="Switch project case study">
+        {projects.map((p) => {
+          const isActive = p.id === project.id;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => onSelectProject?.(p.id)}
+              className={`cs-footer-link ${isActive ? 'cs-footer-link--active' : ''}`}
+              aria-current={isActive ? 'true' : undefined}
+            >
+              <span className="cs-footer-num">{p.number.replace('.', '')}</span>
+              <span className="cs-footer-title">{p.tagLabel}</span>
+            </button>
+          );
+        })}
       </footer>
 
     </article>
