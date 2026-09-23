@@ -8,10 +8,10 @@ export default function Work() {
         {/* Editorial section header */}
         <header className="work-header reveal">
           <div className="work-header-top">
-            <span className="work-eyebrow">Selected Work</span>
-            <span className="work-count">0{projects.length}</span>
+            <span className="work-eyebrow">Case Studies</span>
+            <span className="work-count">0{projects.length} PROJECTS</span>
           </div>
-          <h2 className="work-title">What I&apos;ve been building.</h2>
+          <h2 className="work-title">Featured systems &amp; engineering work.</h2>
         </header>
 
         {/* Project list */}
@@ -24,4 +24,3 @@ export default function Work() {
     </section>
   );
 }
-

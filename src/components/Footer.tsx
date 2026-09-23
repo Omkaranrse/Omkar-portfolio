@@ -8,7 +8,7 @@ export default function Footer() {
         {/* Left: name + tagline */}
         <div className="footer-brand">
           <span className="footer-name">Omkar Anarse</span>
-          <span className="footer-tagline">AI × Mobile × Product</span>
+          <span className="footer-tagline">AI · Mobile · Product Engineering</span>
         </div>
 
         {/* Center: social links */}
@@ -44,4 +44,3 @@ export default function Footer() {
     </footer>
   );
 }
-

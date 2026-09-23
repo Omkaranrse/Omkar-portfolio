@@ -17,13 +17,12 @@ export default function Hero() {
           unoptimized
           className="hero-bg-img"
         />
-        {/* Soft bottom blend fading seamlessly into the section below */}
-        <div className="hero-editorial-blend-bottom" aria-hidden="true" />
+        <div className="hero-editorial-gradient" aria-hidden="true" />
       </div>
 
       {/* ── Main Hero Content ── */}
-      <div className="hero-editorial-container">
-        <div className="hero-editorial-content">
+      <div className="wrap hero-editorial-container">
+        <div className="hero-editorial-content reveal">
 
           {/* 01: Small Introduction */}
           <div className="hero-editorial-intro">
@@ -33,7 +32,7 @@ export default function Hero() {
             </span>
           </div>
 
-          {/* 02: Main Statement (Unbounded Display Font) */}
+          {/* 02: Main Headline */}
           <h1 className="hero-editorial-headline">
             AI, WEB &amp; MOBILE SYSTEMS.
           </h1>
@@ -61,7 +60,6 @@ export default function Hero() {
 
         </div>
       </div>
-
     </section>
   );
 }

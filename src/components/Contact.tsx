@@ -9,14 +9,14 @@ export default function Contact() {
       label: 'GitHub',
       href: github,
       target: '_blank' as const,
-      note: 'See my work',
+      note: 'github.com/Omkaranrse',
       external: true,
     },
     {
       label: 'LinkedIn',
       href: linkedin,
       target: '_blank' as const,
-      note: 'Connect',
+      note: 'linkedin.com/in/omkar-anarse',
       external: true,
     },
     {
@@ -30,7 +30,7 @@ export default function Contact() {
       label: 'Resume',
       href: resume,
       target: '_blank' as const,
-      note: 'View / Download PDF',
+      note: 'View / Download PDF (Updated 2024)',
       external: true,
     },
   ];
@@ -49,7 +49,7 @@ export default function Contact() {
               useful.
             </h2>
             <p className="contact-sub">
-              Open to AI engineering roles, mobile projects, and product
+              Open to AI engineering roles, mobile systems projects, and product
               collaborations. If you&apos;re building something interesting, reach out.
             </p>
           </div>
@@ -89,4 +89,3 @@ export default function Contact() {
     </section>
   );
 }
-

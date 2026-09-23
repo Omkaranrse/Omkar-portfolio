@@ -4,13 +4,15 @@ export default function Experience() {
       period: '2024 — Present',
       role: 'MCA Student',
       org: 'K.J. Somaiya Institute of Management',
-      description: 'Pursuing a Master of Computer Applications with a focus on AI systems, machine learning, and mobile engineering. Building production-grade projects across the AI and mobile stack.',
+      description:
+        'Pursuing a Master of Computer Applications with a focus on AI systems, machine learning, and mobile engineering. Building production-grade projects across the AI and mobile stack.',
     },
     {
       period: '2021 — 2024',
       role: 'B.Sc. Computer Science',
       org: 'University of Mumbai',
-      description: 'Graduated with a Bachelor of Science in Computer Science. Developed foundational skills in algorithms, data structures, databases, and software engineering.',
+      description:
+        'Graduated with a Bachelor of Science in Computer Science. Developed foundational skills in algorithms, data structures, databases, and software engineering.',
     },
   ];
 
@@ -19,7 +21,7 @@ export default function Experience() {
       <div className="wrap">
         <header className="exp-header reveal">
           <span className="exp-eyebrow">Background</span>
-          <h2 className="exp-title">Experience.</h2>
+          <h2 className="exp-title">Experience &amp; Education.</h2>
         </header>
 
         <div className="exp-list">

@@ -7,7 +7,7 @@ import avatarImg from '@/images/portrait.jpg';
 export default function Nav() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isLight, setIsLight] = useState(false);
+  const [isDarkHero, setIsDarkHero] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,7 +16,7 @@ export default function Nav() {
       const heroBottom = heroEl ? heroEl.offsetHeight : window.innerHeight;
 
       setScrolled(y > 30);
-      setIsLight(y > heroBottom - 80);
+      setIsDarkHero(y < heroBottom - 80);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -24,90 +24,128 @@ export default function Nav() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Lock scroll when mobile overlay is open
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [open]);
+
+  const navLinks = [
+    { label: 'Work', href: '#work', index: '01' },
+    { label: 'About', href: '#about', index: '02' },
+    { label: 'Experience', href: '#experience', index: '03' },
+    { label: 'Contact', href: '#contact', index: '04' },
+  ];
+
   return (
-    <header className={`floating-nav-header ${scrolled ? 'is-scrolled' : ''}`}>
-      <nav
-        className={`floating-nav-pill ${isLight ? 'is-light' : ''}`}
-        aria-label="Main Navigation"
-      >
-        {/* Brand with avatar */}
-        <a href="#hero" className="floating-nav-brand">
-          <div className="floating-nav-avatar">
-            <Image
-              src={avatarImg}
-              alt="Omkar Anarse"
-              width={34}
-              height={34}
-              className="floating-nav-avatar-img"
-            />
-          </div>
-          <span className="floating-nav-name">OMKAR</span>
-        </a>
-
-        {/* Mobile menu toggle */}
-        <button
-          className="nav-toggle"
-          id="navToggle"
-          aria-label="Toggle navigation menu"
-          aria-expanded={open}
-          onClick={() => setOpen(!open)}
+    <>
+      <header className={`floating-nav-header ${scrolled ? 'is-scrolled' : ''}`}>
+        <nav
+          className={`floating-nav-pill ${isDarkHero ? 'is-dark-context' : ''}`}
+          aria-label="Main Navigation"
         >
-          <span className="toggle-bar"></span>
-          <span className="toggle-bar"></span>
-          <span className="toggle-bar"></span>
-        </button>
+          {/* Brand with avatar */}
+          <a href="#hero" className="floating-nav-brand">
+            <div className="floating-nav-avatar">
+              <Image
+                src={avatarImg}
+                alt="Omkar Anarse"
+                width={28}
+                height={28}
+                className="floating-nav-avatar-img"
+              />
+            </div>
+            <span className="floating-nav-name">OMKAR</span>
+          </a>
 
-        {/* Navigation links */}
-        <ul className={`floating-nav-links ${open ? 'is-open' : ''}`}>
-          <li>
+          {/* Desktop Navigation links */}
+          <ul className="floating-nav-links desktop-only">
+            {navLinks.map((link) => (
+              <li key={link.label}>
+                <a href={link.href} className="floating-nav-link">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a
+                href="/Omkar.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="floating-nav-link floating-nav-link--action"
+              >
+                Resume ↗
+              </a>
+            </li>
+          </ul>
+
+          {/* Mobile menu toggle */}
+          <button
+            className="nav-toggle"
+            id="navToggle"
+            aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+          >
+            <span
+              className="toggle-bar"
+              style={
+                open
+                  ? { transform: 'rotate(45deg) translate(4.5px, 4.5px)', backgroundColor: '#f5f5f7' }
+                  : undefined
+              }
+            />
+            <span
+              className="toggle-bar"
+              style={
+                open
+                  ? { transform: 'rotate(-45deg) translate(4.5px, -4.5px)', backgroundColor: '#f5f5f7' }
+                  : undefined
+              }
+            />
+          </button>
+        </nav>
+      </header>
+
+      {/* Considered Minimal Mobile Menu Overlay */}
+      <div
+        className={`mobile-menu-overlay ${open ? 'is-open' : ''}`}
+        aria-hidden={!open}
+      >
+        <nav className="mobile-menu-nav" aria-label="Mobile Navigation">
+          {navLinks.map((link) => (
             <a
-              href="#work"
-              className="floating-nav-link"
+              key={link.label}
+              href={link.href}
+              className="mobile-menu-item"
               onClick={() => setOpen(false)}
             >
-              Work
+              <span className="mobile-menu-label">{link.label}</span>
+              <span className="mobile-menu-index">{link.index}</span>
             </a>
-          </li>
-          <li>
-            <a
-              href="#about"
-              className="floating-nav-link"
-              onClick={() => setOpen(false)}
-            >
-              About
-            </a>
-          </li>
-          <li>
-            <a
-              href="#experience"
-              className="floating-nav-link"
-              onClick={() => setOpen(false)}
-            >
-              Experience
-            </a>
-          </li>
-          <li>
-            <a
-              href="/Omkar.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="floating-nav-link floating-nav-link--action"
-              onClick={() => setOpen(false)}
-            >
+          ))}
+          <a
+            href="/Omkar.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mobile-menu-item"
+            onClick={() => setOpen(false)}
+          >
+            <span className="mobile-menu-label" style={{ color: 'var(--accent)' }}>
               Resume
-            </a>
-          </li>
-          <li>
-            <a
-              href="#contact"
-              className="floating-nav-link"
-              onClick={() => setOpen(false)}
-            >
-              Contact
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </header>
+            </span>
+            <span className="mobile-menu-index">↗</span>
+          </a>
+        </nav>
+
+        <div className="mobile-menu-footer">
+          <span className="mobile-menu-sub">Omkar Anarse — AI &amp; Mobile Systems</span>
+          <span className="mobile-menu-sub">Mumbai, India</span>
+        </div>
+      </div>
+    </>
   );
 }

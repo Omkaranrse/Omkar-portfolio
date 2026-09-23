@@ -91,7 +91,7 @@ export const projects: Project[] = [
     focusPoints: ['RAG pipelines', 'Auth & backend', 'LangGraph'],
     stack: ['FastAPI', 'Next.js 15', 'LangChain', 'LangGraph', 'ChromaDB', 'Groq', 'PostgreSQL'],
     links: [
-      { label: 'GitHub', href: 'https://github.com/Omkaranrse' },
+      { label: 'GitHub', href: 'https://github.com/Omkaranrse/AI-Dataminds' },
     ],
     stage: 'Problem',
     thumbColor: '#2b6f6a',
@@ -144,7 +144,7 @@ export const projects: Project[] = [
     focusPoints: ['Clean Architecture', 'Multi-role routing', 'Design tokens'],
     stack: ['Flutter', 'Dart', 'Riverpod', 'Clean Architecture', 'Firebase'],
     links: [
-      { label: 'GitHub', href: 'https://github.com/Omkaranrse' },
+      { label: 'GitHub', href: 'https://github.com/Omkaranrse/aarogya' },
     ],
     stage: 'Build',
     thumbColor: '#3d5a99',
@@ -198,7 +198,7 @@ export const projects: Project[] = [
     focusPoints: ['Multi-agent design', 'Parallel writing', 'Observability'],
     stack: ['LangGraph', 'Python', 'Tavily', 'FLUX.1-schnell', 'Streamlit', 'PostgreSQL'],
     links: [
-      { label: 'GitHub', href: 'https://github.com/Omkaranrse' },
+      { label: 'GitHub', href: 'https://github.com/Omkaranrse/Multi-agent-blog-generation-flutter' },
     ],
     stage: 'Result',
     thumbColor: '#a0522d',
