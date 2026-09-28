@@ -6292,3 +6292,40 @@ h6 {
   font-size: 0.6875rem;
   color: var(--ink-faint);
 }
+
+/* ── Under Construction Fixed Badge (Right-Bottom 200x300) ── */
+.under-construction-badge {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 200px;
+  height: 300px;
+  z-index: 9998;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  user-select: none;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.22));
+}
+
+.under-construction-img {
+  width: 200px;
+  height: 300px;
+  object-fit: contain;
+  object-position: bottom right;
+}
+
+@media (max-width: 640px) {
+  .under-construction-badge {
+    width: 140px;
+    height: 210px;
+    right: 8px;
+    bottom: 8px;
+  }
+  .under-construction-img {
+    width: 140px;
+    height: 210px;
+  }
+}
+
