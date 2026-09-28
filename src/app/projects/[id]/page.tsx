@@ -15,6 +15,7 @@ import {
   TechStackMarquee,
   ProjectPager,
 } from '@/components/project-detail';
+import { AlertCircle, Target, Sparkles, CheckCircle2 } from 'lucide-react';
 
 interface ProjectPageProps {
   params: Promise<{
@@ -81,7 +82,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       >
         {/* Subtle crumpled paper texture overlay */}
         <div
-          className="fixed inset-0 pointer-events-none opacity-40 mix-blend-multiply z-0 bg-repeat"
+          className="fixed inset-0 pointer-events-none opacity-35 mix-blend-multiply z-0 bg-repeat"
           style={{
             backgroundImage: "url('/textures/crumpled-paper.jpg')",
             backgroundSize: '800px 800px',
@@ -107,17 +108,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             </div>
 
             {/* Deep Dive Content Sections (9 cols on md+, single col on mobile) */}
-            <div className="col-span-1 md:col-span-9 space-y-16 lg:space-y-20 min-w-0">
+            <div className="col-span-1 md:col-span-9 space-y-16 lg:space-y-24 min-w-0">
               {/* 3. Problem Section */}
               <section
                 id="problem"
                 aria-labelledby="problem-heading"
                 className="scroll-mt-28 space-y-4"
               >
-                <div className="space-y-1">
-                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                    01. THE PROBLEM
-                  </span>
+                <div className="space-y-1.5 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
+                    <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                      01. THE PROBLEM
+                    </span>
+                  </div>
                   <h2
                     id="problem-heading"
                     className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
@@ -126,14 +130,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </h2>
                 </div>
 
-                <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-[2px] p-6 sm:p-8 lg:p-10 shadow-[0_2px_8px_rgba(17,18,21,0.03)] hover:shadow-[0_8px_24px_rgba(17,18,21,0.06)] hover:-translate-y-0.5 transition-all duration-300">
-                  <blockquote className="border-l-3 border-[#eb4c2a] pl-5 sm:pl-6 my-2">
-                    <p className="font-sans text-lg sm:text-xl font-medium tracking-tight text-[#111215] leading-snug">
+                <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-[2px] p-6 sm:p-8 lg:p-10 shadow-[0_4px_20px_rgba(17,18,21,0.03)] hover:shadow-[0_10px_30px_rgba(17,18,21,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+                  <div className="flex items-center justify-between pb-4 mb-5 border-b border-[rgba(17,18,21,0.06)] font-mono text-[10px] text-[#8a8c98] uppercase tracking-wider">
+                    <span>CORE BOTTLENECK</span>
+                    <span className="text-[#eb4c2a] font-bold">CRITICAL FRICTION POINT</span>
+                  </div>
+
+                  <blockquote className="border-l-3 border-[#eb4c2a] pl-5 sm:pl-7 my-3">
+                    <p className="font-sans text-xl sm:text-2xl font-bold tracking-tight text-[#111215] leading-snug">
                       &ldquo;{problemLead}&rdquo;
                     </p>
                   </blockquote>
+
                   {problemRemainder && (
-                    <p className="mt-5 font-sans text-sm sm:text-base text-[#565862] leading-relaxed">
+                    <p className="mt-6 font-sans text-base text-[#565862] leading-relaxed pl-5 sm:pl-7">
                       {problemRemainder}
                     </p>
                   )}
@@ -146,10 +156,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 aria-labelledby="approach-heading"
                 className="scroll-mt-28 space-y-5"
               >
-                <div className="space-y-1">
-                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                    02. ENGINEERING APPROACH
-                  </span>
+                <div className="space-y-1.5 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
+                    <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                      02. ENGINEERING APPROACH
+                    </span>
+                  </div>
                   <h2
                     id="approach-heading"
                     className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
@@ -158,7 +171,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </h2>
                 </div>
 
-                <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-[2px] p-6 sm:p-8 lg:p-10 shadow-[0_2px_8px_rgba(17,18,21,0.03)] hover:shadow-[0_8px_24px_rgba(17,18,21,0.06)] transition-all duration-300">
+                <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-[2px] p-6 sm:p-8 lg:p-10 shadow-[0_4px_20px_rgba(17,18,21,0.03)] hover:shadow-[0_10px_30px_rgba(17,18,21,0.06)] transition-all duration-300">
                   <Timeline steps={project.approach} />
                 </div>
               </section>
@@ -169,10 +182,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 aria-labelledby="architecture-heading"
                 className="scroll-mt-28 space-y-5"
               >
-                <div className="space-y-1">
-                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                    03. ARCHITECTURE &amp; DATA FLOW
-                  </span>
+                <div className="space-y-1.5 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
+                    <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                      03. ARCHITECTURE &amp; DATA FLOW
+                    </span>
+                  </div>
                   <h2
                     id="architecture-heading"
                     className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
@@ -193,10 +209,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 aria-labelledby="decisions-heading"
                 className="scroll-mt-28 space-y-5"
               >
-                <div className="space-y-1">
-                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                    04. KEY TECHNICAL DECISIONS
-                  </span>
+                <div className="space-y-1.5 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
+                    <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                      04. KEY TECHNICAL DECISIONS
+                    </span>
+                  </div>
                   <h2
                     id="decisions-heading"
                     className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
@@ -214,15 +233,18 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 aria-labelledby="challenges-heading"
                 className="scroll-mt-28 space-y-5"
               >
-                <div className="space-y-1">
-                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                    05. THE HARD PART &amp; CHALLENGES
-                  </span>
+                <div className="space-y-1.5 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
+                    <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                      05. THE HARD PART &amp; CHALLENGES
+                    </span>
+                  </div>
                   <h2
                     id="challenges-heading"
                     className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
                   >
-                    Obstacles &amp; Resolutions
+                    Obstacles &amp; Solutions
                   </h2>
                 </div>
 
@@ -235,10 +257,13 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 aria-labelledby="result-heading"
                 className="scroll-mt-28 space-y-5"
               >
-                <div className="space-y-1">
-                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                    06. RESULT &amp; IMPACT
-                  </span>
+                <div className="space-y-1.5 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
+                    <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                      06. RESULT &amp; IMPACT
+                    </span>
+                  </div>
                   <h2
                     id="result-heading"
                     className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
@@ -260,15 +285,18 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 aria-labelledby="stack-heading"
                 className="scroll-mt-28 space-y-5"
               >
-                <div className="space-y-1">
-                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                    07. TECHNOLOGY STACK
-                  </span>
+                <div className="space-y-1.5 pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
+                    <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                      07. TECHNOLOGY STACK
+                    </span>
+                  </div>
                   <h2
                     id="stack-heading"
                     className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
                   >
-                    Tech &amp; Tooling
+                    Core Technologies &amp; Tooling
                   </h2>
                 </div>
 

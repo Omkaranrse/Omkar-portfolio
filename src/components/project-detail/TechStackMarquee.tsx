@@ -73,3 +73,6 @@ export function TechStackMarquee({ stack }: TechStackMarqueeProps) {
     </div>
   );
 }
+
+export default TechStackMarquee;
+
