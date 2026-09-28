@@ -1,44 +1,14 @@
 'use client';
 
 import LanyardCard from './LanyardCard';
-import avatarImg from '@/images/portrait.jpg';
+import { experiences } from '@/data/experience';
 
 export default function Experience() {
-  const experiences = [
-    {
-      companyName: 'Metaphi',
-      role: 'Flutter Developer',
-      period: 'Current · 1+ Month',
-      type: 'Current Role',
-      description:
-        'Building scalable mobile experiences and state architecture with Flutter and Dart, integrating backend APIs and modern UI workflows.',
-      techStack: ['Flutter', 'Dart', 'Riverpod', 'Clean Arch', 'REST APIs'],
-      backCardText: 'METAPHI',
-      backCardColor: '#3b82f6',
-      profileImage: avatarImg,
-      tapeColor: '#ffffff',
-      tapeRotation: -4,
-    },
-    {
-      companyName: 'My Job Park',
-      role: 'Flutter Developer',
-      period: '3 Years · Part-time',
-      type: 'Part-time',
-      description:
-        'Engineered cross-platform mobile apps for job seekers and recruiters, implementing responsive design token systems and real-time state management.',
-      techStack: ['Flutter', 'Dart', 'Firebase', 'State Mgmt', 'UI/UX'],
-      backCardText: 'MYJOBPARK',
-      backCardColor: 'var(--accent)',
-      profileImage: avatarImg,
-      tapeColor: '#f3f4f6',
-      tapeRotation: 5,
-    },
-  ];
 
   return (
     <section id="experience" className="exp-section">
       <div className="wrap">
-        <header className="exp-header reveal">
+        <header className="exp-header reveal-text">
           <div className="exp-header-top">
             <span className="exp-eyebrow">Work History</span>
             <span className="exp-count">02 ROLES</span>
@@ -49,10 +19,16 @@ export default function Experience() {
           </p>
         </header>
 
-        {/* ── Interactive Lanyard Drop Cards Grid ── */}
-        <div className="lanyard-cards-grid reveal">
+        {/* ── Interactive Lanyard Drop Cards Grid with Choreographed Stagger ── */}
+        <div className="lanyard-cards-grid reveal-stagger">
           {experiences.map((exp, i) => (
-            <LanyardCard key={i} {...exp} />
+            <div
+              key={i}
+              className="stagger-item"
+              style={{ '--stagger-index': Math.min(i, 4) } as React.CSSProperties}
+            >
+              <LanyardCard {...exp} />
+            </div>
           ))}
         </div>
       </div>

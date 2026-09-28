@@ -16,10 +16,10 @@ export default function Nav() {
       const heroEl = document.getElementById('hero');
       if (heroEl) {
         const heroBottom = heroEl.offsetHeight;
-        setScrolled(y > 30);
+        setScrolled(y > 60);
         setIsDarkHero(y < heroBottom - 80);
       } else {
-        setScrolled(y > 30);
+        setScrolled(y > 60);
         setIsDarkHero(false);
       }
     };
@@ -42,15 +42,17 @@ export default function Nav() {
     { label: 'Experience', href: '/#experience', index: '01' },
     { label: 'Work', href: '/#work', index: '02' },
     { label: 'Skills', href: '/#skills', index: '03' },
-    { label: 'About', href: '/#about', index: '04' },
-    { label: 'Contact', href: '/#contact', index: '05' },
+    { label: 'Contact', href: '/#contact', index: '04' },
   ];
 
   return (
     <>
+      {/* ── Hairline Scroll Progress Bar (Top Edge) ── */}
+      <div id="scroll-progress-bar" className="scroll-progress-bar" aria-hidden="true" />
+
       <header className={`floating-nav-header ${scrolled ? 'is-scrolled' : ''}`}>
         <nav
-          className={`floating-nav-pill ${isDarkHero ? 'is-dark-context' : ''}`}
+          className={`floating-nav-pill ${isDarkHero ? 'is-dark-context' : ''} ${scrolled ? 'is-scrolled' : ''}`}
           aria-label="Main Navigation"
         >
           {/* Brand with avatar */}

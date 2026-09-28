@@ -7,10 +7,10 @@ import GravityPills from './GravityPills';
 
 export default function Overview() {
   return (
-    <section id="skills" className="skills-section grid-bg">
+    <section id="skills" className="skills-section">
       <div className="wrap">
         {/* ── Header ── */}
-        <header className="skills-header reveal">
+        <header className="skills-header reveal-text">
           <div className="skills-header-top">
             <span className="skills-eyebrow">Stack &amp; Expertise</span>
             <span className="skills-count">
@@ -24,36 +24,30 @@ export default function Overview() {
           </p>
         </header>
 
-        {/* ── 01: 3D Stack Marquee Header ── */}
-        <div className="skills-block-header reveal" style={{ marginBottom: 16 }}>
-          <span className="skills-block-tag">01 · 3D Stack Marquee</span>
-          <span className="skills-block-hint">
-            Drag or hover to inspect magnification
-          </span>
-        </div>
-
         {/* ── 01: 3D Stack Marquee (Full Screen Width, NO Background) ── */}
-        <div className="skills-carousel-fullbleed reveal" style={{ marginBottom: 52 }}>
+        <div className="skills-carousel-fullbleed reveal">
           <Logo3DCarousel
             items={techStack}
-            itemHeight={46}
-            speed={26}
-            gap={28}
-            maxScale={1.5}
-            minScale={0.38}
-            maxBlur={2.5}
+            itemHeight={52}
+            speed={50}
+            gap={20}
+            maxScale={1.2}
+            minScale={0.95}
+            maxBlur={0}
+            blurStart={75}
+            blurEnd={92}
+            maxFrameWidth={1140}
+            pauseOnHover={false}
+            enableDrag={false}
             direction="left"
           />
         </div>
 
-        {/* ── 02: Interactive Gravity Pills (MONO) ── */}
+        {/* ── Interactive Gravity Pills ── */}
         <div className="skills-bubblepit-block reveal">
-          <div className="skills-block-header">
-            <span className="skills-block-tag">
-              02 · Interactive Gravity Pills
-            </span>
-            <span className="skills-block-hint">
-              Drag &amp; fling pills · 2D physics with real-time squish &amp; inertia
+          <div className="skills-block-header" style={{ justifyContent: 'center', marginBottom: 16 }}>
+            <span className="skills-block-tag" style={{ fontSize: '0.8125rem', letterSpacing: '0.06em' }}>
+              Skills
             </span>
           </div>
           <GravityPills

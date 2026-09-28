@@ -22,12 +22,14 @@ export interface Logo3DCarouselProps {
   speed?: number;
   direction?: 'left' | 'right';
   maxBlur?: number;
+  blurStart?: number;
   blurEnd?: number;
   pauseOnHover?: boolean;
   easingResponsiveness?: number;
   enableDrag?: boolean;
   minScale?: number;
   maxScale?: number;
+  maxFrameWidth?: number;
   style?: React.CSSProperties;
 }
 
@@ -68,13 +70,15 @@ export default function Logo3DCarousel({
   gap = 28,
   speed = 30,
   direction = 'left',
-  maxBlur = 3,
-  blurEnd = 60,
-  pauseOnHover = true,
+  maxBlur = 2,
+  blurStart = 72,
+  blurEnd = 92,
+  pauseOnHover = false,
   easingResponsiveness = 5,
-  enableDrag = true,
+  enableDrag = false,
   minScale = 0.35,
   maxScale = 1.5,
+  maxFrameWidth = 1140,
   style,
 }: Logo3DCarouselProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -114,7 +118,7 @@ export default function Logo3DCarousel({
       const widths: number[] = [];
       for (let i = 0; i < items.length; i++) {
         const pill = pillRefs.current[i];
-        const w = pill ? Math.max(pill.getBoundingClientRect().width, pill.offsetWidth, 110) : 120;
+        const w = pill ? Math.max(pill.getBoundingClientRect().width, pill.offsetWidth, 40) : 60;
         widths.push(w);
       }
       cachedWidthsRef.current = widths;
@@ -160,6 +164,7 @@ export default function Logo3DCarousel({
       const scaleConst = (maxScale - minScale) / 2;
       const avgScale = minScale + scaleConst;
       const scaleRange = maxScale - minScale;
+      const blurStartRadius = screenCenter * (blurStart / 100);
       const blurEndRadius = screenCenter * (blurEnd / 100);
       const dirMul = direction === 'right' ? -1 : 1;
 
@@ -178,6 +183,11 @@ export default function Logo3DCarousel({
       const wrapLen = wrapLengthRef.current;
       const maxW = Math.max(...widths) * 2;
       const minXBound = -maxW;
+
+      const frameRadius = maxFrameWidth ? maxFrameWidth / 2 : 570;
+      const visibleRadius = Math.min(screenCenter * (blurStart / 100), frameRadius);
+      const fadeDistance = Math.min(70, visibleRadius * 0.25);
+      const fadeStartRadius = visibleRadius - fadeDistance;
 
       for (let i = 0; i < renderCount; i++) {
         const pill = pillRefs.current[i];
@@ -202,35 +212,28 @@ export default function Logo3DCarousel({
           minScale,
         );
 
-        const centerX = screenCenter + warpedX;
-        const absDist = Math.abs(dist);
+        const screenDist = Math.abs(warpedX);
 
-        // Smoothstep blur
-        let blur = 0;
-        if (maxBlur > 0) {
-          if (blurEndRadius <= 0) blur = maxBlur;
-          else if (absDist >= blurEndRadius) blur = maxBlur;
-          else {
-            const p = absDist / blurEndRadius;
-            blur = p * p * (3 - 2 * p) * maxBlur;
-          }
-        }
-
-        const depthRatio =
-          scaleRange > 0 ? (finalScale - minScale) / scaleRange : 1;
-        const opacity = 0.3 + 0.7 * depthRatio;
-
-        const inView = centerX > -300 && centerX < containerWidth + 300;
-
-        if (inView) {
-          pill.style.display = '';
-          pill.style.transform = `translate(${centerX - w / 2}px, -50%) scale(${finalScale})`;
-          pill.style.opacity = String(opacity);
-          pill.style.filter =
-            blur > 0.1 ? `blur(${(blur / finalScale).toFixed(1)}px)` : 'none';
-        } else {
+        // Do not display logos where they blur and start to shrink (keep content strictly in frame)
+        if (screenDist >= visibleRadius) {
           pill.style.display = 'none';
+          pill.style.opacity = '0';
+          continue;
         }
+
+        const centerX = screenCenter + warpedX;
+
+        // Smooth cosine fade as it approaches the frame edge
+        let opacity = 1;
+        if (screenDist > fadeStartRadius) {
+          const fadeProgress = (screenDist - fadeStartRadius) / fadeDistance;
+          opacity = Math.max(0, 0.5 * (1 + Math.cos(fadeProgress * Math.PI)));
+        }
+
+        pill.style.display = '';
+        pill.style.transform = `translate(${centerX - w / 2}px, -50%) scale(${finalScale})`;
+        pill.style.opacity = opacity.toFixed(3);
+        pill.style.filter = 'none';
       }
 
       animationId = requestAnimationFrame(render);
@@ -265,11 +268,13 @@ export default function Logo3DCarousel({
     speed,
     direction,
     maxBlur,
+    blurStart,
     blurEnd,
     pauseOnHover,
     easingResponsiveness,
     minScale,
     maxScale,
+    maxFrameWidth,
     gap,
   ]);
 
@@ -317,9 +322,9 @@ export default function Logo3DCarousel({
         userSelect: 'none',
         WebkitUserSelect: 'none',
         WebkitMaskImage:
-          'linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)',
+          'linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)',
         maskImage:
-          'linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%)',
+          'linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)',
         ...style,
       }}
     >
@@ -344,16 +349,14 @@ export default function Logo3DCarousel({
               flexWrap: 'nowrap',
               width: 'auto',
               minWidth: 'max-content',
-              gap: 9,
+              gap: 10,
               height: itemHeight,
-              padding: '0 18px 0 12px',
+              padding: '0 6px',
               borderRadius: 9999,
               boxSizing: 'border-box',
-              background:
-                'linear-gradient(135deg, rgba(28, 32, 44, 0.95), rgba(16, 18, 26, 0.98))',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              boxShadow:
-                '0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
               whiteSpace: 'nowrap',
               overflow: 'visible',
               willChange: 'transform, opacity, filter',
@@ -366,20 +369,17 @@ export default function Logo3DCarousel({
             <img
               src={item.iconUrl}
               alt=""
-              width={22}
-              height={22}
+              width={28}
+              height={28}
               draggable={false}
               style={{
-                width: 22,
-                height: 22,
-                minWidth: 22,
-                minHeight: 22,
+                width: 28,
+                height: 28,
+                minWidth: 28,
+                minHeight: 28,
                 objectFit: 'contain',
                 flexShrink: 0,
                 display: 'inline-block',
-                ...(item.invertIcon
-                  ? { filter: 'brightness(0) invert(1)' }
-                  : {}),
               }}
               onError={(e) => {
                 // Hide broken icon gracefully
@@ -392,9 +392,9 @@ export default function Logo3DCarousel({
                 fontFamily:
                   '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 fontWeight: 600,
-                fontSize: 14,
+                fontSize: 17,
                 lineHeight: 1,
-                color: '#FFFFFF',
+                color: '#000000',
                 whiteSpace: 'nowrap',
                 overflow: 'visible',
                 flexShrink: 0,

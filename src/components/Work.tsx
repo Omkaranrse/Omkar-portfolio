@@ -30,7 +30,7 @@ export default function Work() {
       <div className="wrap">
 
         {/* ── Section Header ── */}
-        <header className="work-header reveal">
+        <header className="work-header reveal-text">
           <div className="work-header-top">
             <span className="work-eyebrow">Featured Work</span>
             <span className="work-count">0{projects.length} CASE STUDIES</span>
@@ -81,10 +81,16 @@ export default function Work() {
           </div>
         </header>
 
-        {/* ── Aperture 3D Project Cards Grid ── */}
-        <div className="work-cards-grid reveal">
-          {filteredProjects.map((project) => (
-            <ApertureCard key={project.id} project={project} />
+        {/* ── Aperture 3D Project Cards Grid with Choreographed Stagger ── */}
+        <div className="work-cards-grid reveal-stagger">
+          {filteredProjects.map((project, idx) => (
+            <div
+              key={project.id}
+              className="stagger-item"
+              style={{ '--stagger-index': Math.min(idx, 4) } as React.CSSProperties}
+            >
+              <ApertureCard project={project} />
+            </div>
           ))}
         </div>
 

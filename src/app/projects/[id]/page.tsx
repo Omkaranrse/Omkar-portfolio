@@ -62,7 +62,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <div className="wrap">
             <div className="pd-breadcrumbs" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
               <LiquidGlassButton
-                href="/#work"
+                href="/work"
                 size="sm"
                 icon="arrow"
                 iconPosition="left"

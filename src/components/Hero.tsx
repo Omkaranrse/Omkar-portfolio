@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import heroPhoto from '@/images/hero.png';
 import LiquidGlassButton from './LiquidGlassButton';
-import HeroDock from './HeroDock';
+
+import FlyingBirds from './FlyingBirds';
 
 export default function Hero() {
   const [liveTime, setLiveTime] = useState<string>('');
@@ -29,8 +30,7 @@ export default function Hero() {
 
   return (
     <section id="hero" className="hero-editorial-section">
-      {/* ── Vertical Tools Dock (Right-Side macOS Magnification) ── */}
-      <HeroDock />
+
 
       {/* ── Top-Right Live Date & Time ── */}
       {liveTime && (
@@ -45,7 +45,7 @@ export default function Hero() {
               '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif',
             fontSize: '0.9375rem',
             fontWeight: 500,
-            color: '#FFFFFF',
+            color: '#000000',
             letterSpacing: '-0.01em',
             whiteSpace: 'pre',
             pointerEvents: 'none',
@@ -69,6 +69,11 @@ export default function Hero() {
           className="hero-bg-img"
         />
       </div>
+
+
+
+      {/* ── Distant Black Birds Flying in Sky ── */}
+      <FlyingBirds />
 
       {/* ── Main Hero Content (Shifted Left to Edge · Clean Space) ── */}
       <div className="hero-editorial-container">
@@ -105,7 +110,7 @@ export default function Hero() {
           {/* 04: Interactive Liquid Glass CTAs */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
             <LiquidGlassButton
-              href="#work"
+              href="/work"
               size="md"
               icon="arrow"
               tint="rgba(235, 76, 42, 0.4)"

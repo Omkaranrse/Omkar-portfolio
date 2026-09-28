@@ -1,0 +1,85 @@
+# PORTFOLIO KNOWLEDGE BASE: OMKAR ANARSE
+
+## ABOUT OMKAR
+Omkar Anarse is an AI & Mobile Systems Engineer and MCA student based in Mumbai, India. He builds production-grade software spanning AI/ML engineering (RAG pipelines, LangGraph multi-agent architectures), cross-platform mobile systems with Flutter & Dart, and modern full-stack web applications. He focuses on building software that actually ships, solves real-world operational problems, and creates measurable impact.
+
+## EDUCATION
+- Degree: Master of Computer Applications (MCA)
+- Focus: Artificial Intelligence, Machine Learning Systems, Mobile & Distributed Architectures
+- Background: Rigorous computer science coursework covering algorithms, system design, database management, and intelligent systems.
+
+## CAREER INTERESTS & TARGET ROLES
+- AI Engineer / AI Systems Engineer
+- Machine Learning Systems Engineer
+- Full-Stack AI Engineer
+- Mobile Systems Engineer (Flutter, iOS / Swift)
+- Product Engineer
+Omkar is open to full-time roles, contracts, and engineering collaborations with teams building high-impact products.
+
+## CONTACT & SOCIAL LINKS
+- Email: omkaranarse1906@gmail.com
+- WhatsApp: +91 8356011246 (Direct chat link: https://wa.me/918356011246)
+- GitHub: https://github.com/Omkaranrse
+- LinkedIn: https://linkedin.com/in/omkar-anarse
+- Portfolio Website: https://omkaranarse.dev
+- Location: Mumbai, India
+- Availability: Open to AI engineering roles, mobile & web systems projects, and product collaborations.
+
+## WORK EXPERIENCE
+1. Metaphi
+   - Role: Flutter Developer
+   - Period: Current · 1+ Month
+   - Type: Current Role
+   - Focus: Building scalable mobile experiences and state architecture with Flutter and Dart, integrating backend APIs and modern UI workflows.
+   - Key Contributions: Architecting modular mobile interfaces with Clean Architecture and Riverpod; integrating asynchronous REST APIs; crafting fluid micro-animations and production-ready design token systems.
+   - Technologies: Flutter, Dart, Riverpod, Clean Architecture, REST APIs.
+
+2. My Job Park
+   - Role: Flutter Developer
+   - Period: 3 Years · Part-time
+   - Type: Part-time
+   - Focus: Engineered cross-platform mobile apps for job seekers and recruiters, implementing responsive design token systems and real-time state management.
+   - Key Contributions: Built and maintained cross-platform recruitment apps serving thousands of active users; implemented real-time messaging, notifications, and job search filtering with Firebase; designed responsive design tokens for iOS and Android.
+   - Technologies: Flutter, Dart, Firebase, State Management, UI/UX.
+
+## FEATURED PROJECTS
+1. Attendephi
+   - Description: Attendephi is an attendance and check-in platform built with Flutter and Firebase, featuring QR-based check-in, location verification (geofencing), and face verification.
+   - Technologies: Flutter, Firebase, Dart, QR Code Scanning, Geofencing, Face Verification.
+   - Category: Mobile Systems · Authentication & Attendance.
+
+2. DataMind AI
+   - Description: Upload any data (CSV, JSON, SQL) and interact with it through a conversational AI query layer — no dashboards, no manual charts.
+   - Key Details: Shipped production-grade authentication and FastAPI backend; layered a LangGraph multi-step reasoning agent and RAG pipeline with ChromaDB vector store; Next.js 15 streaming interface with Groq LLM inference.
+   - Technologies: Next.js 15, FastAPI, LangGraph, RAG, ChromaDB, Groq LLM, PostgreSQL, Python.
+   - Category: AI Engineering · Full Stack.
+
+3. Hospital & Clinic Platform (Aarogya)
+   - Description: Three linked Flutter applications — patient, doctor, and clinic admin — sharing a unified backend and covering the full clinical loop.
+   - Key Details: Clean Architecture, multi-role routing, comprehensive design tokens, appointment scheduling, and digital prescription workflows.
+   - Technologies: Flutter, Dart, Clean Architecture, REST APIs, Design Tokens.
+   - Category: Mobile Engineering · Healthcare Systems.
+
+4. Blog Research Agent
+   - Description: A LangGraph multi-agent pipeline that autonomously researches, drafts, evaluates quality, and tracks blog content.
+   - Key Details: Multi-agent coordination with LangGraph, parallel research node execution, automated fact checking, and end-to-end observability.
+   - Technologies: LangGraph, Python, LLM Orchestration, LangChain, Parallel Execution.
+   - Category: AI Systems · Multi-Agent.
+
+5. Taskify
+   - Description: A collaborative project management platform designed from concept to developer-ready specification with a resolved two-role data model.
+   - Key Details: Clean data modeling, role-based access control, sprint tracking, and real-time status management.
+   - Technologies: TypeScript, React/Next.js, Data Modeling, Role Design, Spec Writing.
+   - Category: Product Engineering · System Design.
+
+## TECHNICAL SKILLS & STACK
+- AI & Backend: Python, FastAPI, LangChain, LangGraph, RAG (Retrieval-Augmented Generation), LLM APIs (Groq, OpenAI, Gemini), ChromaDB, PostgreSQL, Redis, REST APIs.
+- Mobile: Flutter, Dart, Riverpod, Clean Architecture, Swift, SwiftUI, UIKit, Firebase, responsive design token systems.
+- Web: Next.js 15 (App Router), TypeScript, React 19, Tailwind CSS, Vanilla CSS, HTML5, modern Web APIs.
+- Tools & DevOps: Git, GitHub, Docker, Firebase, Supabase, Linux.
+
+## PHILOSOPHY & WORKFLOW
+1. Understand: Define the problem, target users, and technical constraints before writing code.
+2. Design: Shape the user experience and distributed system architecture simultaneously.
+3. Build: Implement robust, maintainable code iteratively with clean boundaries.
+4. Iterate: Continuously test, measure performance, and refine with real-world feedback.
