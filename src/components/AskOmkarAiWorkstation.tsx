@@ -5,6 +5,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import sceneImg from '@/images/home.png';
+import WorkstationAtmosphere from './WorkstationAtmosphere';
 
 export interface ChatMessage {
   id: string;
@@ -965,6 +966,9 @@ export default function AskOmkarAiWorkstation({
               }
             }}
           />
+
+          {/* ── Lively Ambient Atmosphere (Sunbeams, Fairy Lights, Orb Lamp Glow, Dust Motes) ── */}
+          <WorkstationAtmosphere />
 
           {/* ── .mac-screen (Starts at top edge, 6px corners, NO onClick handler on container) ── */}
           <div

@@ -1853,6 +1853,11 @@ h6 {
   margin-bottom: 0;
 }
 
+.aperture-3d-card:focus-visible {
+  outline: 2px solid var(--accent, #eb4c2a);
+  outline-offset: 4px;
+}
+
 @media (max-width: 860px) {
   .work-cards-grid {
     grid-template-columns: 1fr;
@@ -2629,6 +2634,263 @@ h6 {
       black 94%,
       transparent 100%
     );
+  }
+}
+
+/* ── 02b. Workstation Lively Atmosphere ── */
+.workstation-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Volumetric Sunbeams / God Rays */
+.sunbeam-shaft {
+  position: absolute;
+  pointer-events: none;
+  transform-origin: top right;
+  will-change: opacity, transform;
+}
+
+.sunbeam-shaft-1 {
+  top: -8%;
+  right: -6%;
+  width: 58%;
+  height: 115%;
+  background: linear-gradient(
+    132deg,
+    rgba(255, 238, 195, 0.45) 0%,
+    rgba(255, 218, 145, 0.24) 30%,
+    rgba(255, 195, 105, 0.09) 60%,
+    transparent 82%
+  );
+  filter: blur(20px);
+  mix-blend-mode: screen;
+  animation: sunbeamBreathe 11s ease-in-out infinite alternate;
+}
+
+.sunbeam-shaft-2 {
+  top: 8%;
+  right: 0%;
+  width: 44%;
+  height: 95%;
+  background: linear-gradient(
+    138deg,
+    rgba(255, 245, 215, 0.38) 0%,
+    rgba(255, 212, 135, 0.18) 38%,
+    transparent 78%
+  );
+  filter: blur(26px);
+  mix-blend-mode: screen;
+  animation: sunbeamBreathe 15s ease-in-out infinite alternate-reverse;
+}
+
+.sunbeam-window-glow {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28%;
+  height: 85%;
+  background: radial-gradient(
+    ellipse at 96% 12%,
+    rgba(255, 248, 220, 0.52) 0%,
+    rgba(255, 222, 155, 0.25) 35%,
+    transparent 72%
+  );
+  filter: blur(32px);
+  mix-blend-mode: screen;
+  animation: windowGlowPulse 9s ease-in-out infinite alternate;
+}
+
+/* Dappled Sunlight Caustics on Wall */
+.dappled-sunlight-wall {
+  position: absolute;
+  top: 4%;
+  left: 18%;
+  width: 65%;
+  height: 52%;
+  background: radial-gradient(
+    ellipse at 65% 42%,
+    rgba(255, 232, 178, 0.22) 0%,
+    rgba(255, 208, 140, 0.08) 50%,
+    transparent 72%
+  );
+  filter: blur(28px);
+  mix-blend-mode: overlay;
+  animation: dappleSway 13s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Fairy Lights Twinkling on Plant Shelf */
+.shelf-warmth-glow {
+  position: absolute;
+  left: 7%;
+  top: 14%;
+  width: 20%;
+  height: 24%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 185, 55, 0.36) 0%,
+    rgba(255, 145, 35, 0.14) 52%,
+    transparent 75%
+  );
+  filter: blur(22px);
+  mix-blend-mode: screen;
+  animation: shelfWarmthPulse 6.5s ease-in-out infinite alternate;
+}
+
+.fairy-light-spark {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change: opacity, transform, filter;
+  animation: fairyTwinkle ease-in-out infinite alternate;
+}
+
+/* Orb Lamp Breathing Aura */
+.orb-lamp-aura {
+  position: absolute;
+  left: 86.6%;
+  top: 67.2%;
+  width: 15%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 240, 190, 0.58) 0%,
+    rgba(255, 190, 95, 0.32) 35%,
+    rgba(255, 150, 50, 0.12) 60%,
+    transparent 75%
+  );
+  filter: blur(18px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: orbLampBreathe 7.5s ease-in-out infinite alternate;
+}
+
+/* Monstera Plant Gentle Sway Ripple */
+.plant-breeze-shimmer {
+  position: absolute;
+  left: 0;
+  top: 22%;
+  width: 25%;
+  height: 65%;
+  background: radial-gradient(
+    ellipse at 20% 50%,
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 70%
+  );
+  filter: blur(36px);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  animation: plantBreeze 10s ease-in-out infinite alternate;
+}
+
+/* Atmospheric Animations */
+@keyframes fairyTwinkle {
+  0% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(0.85);
+    filter: brightness(0.9);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(-50%, -50%) scale(1.12);
+    filter: brightness(1.25);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.4);
+    filter: brightness(1.45);
+  }
+}
+
+@keyframes orbLampBreathe {
+  0% {
+    opacity: 0.42;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  100% {
+    opacity: 0.88;
+    transform: translate(-50%, -50%) scale(1.14);
+  }
+}
+
+@keyframes sunbeamBreathe {
+  0% {
+    opacity: 0.36;
+    transform: rotate(0deg) scaleY(0.97);
+  }
+  50% {
+    opacity: 0.62;
+    transform: rotate(0.9deg) scaleY(1.03);
+  }
+  100% {
+    opacity: 0.46;
+    transform: rotate(-0.6deg) scaleY(1);
+  }
+}
+
+@keyframes windowGlowPulse {
+  0% {
+    opacity: 0.42;
+  }
+  100% {
+    opacity: 0.82;
+  }
+}
+
+@keyframes dappleSway {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.28;
+  }
+  50% {
+    transform: translate(14px, -8px) scale(1.05);
+    opacity: 0.58;
+  }
+  100% {
+    transform: translate(-10px, 6px) scale(0.97);
+    opacity: 0.32;
+  }
+}
+
+@keyframes shelfWarmthPulse {
+  0% {
+    opacity: 0.38;
+    transform: scale(0.94);
+  }
+  100% {
+    opacity: 0.82;
+    transform: scale(1.09);
+  }
+}
+
+@keyframes plantBreeze {
+  0% {
+    opacity: 0.18;
+    transform: skewX(0deg);
+  }
+  100% {
+    opacity: 0.42;
+    transform: skewX(-1.4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sunbeam-shaft,
+  .fairy-light-spark,
+  .orb-lamp-aura,
+  .dappled-sunlight-wall,
+  .shelf-warmth-glow,
+  .plant-breeze-shimmer {
+    animation: none !important;
+    opacity: 0.5 !important;
   }
 }
 

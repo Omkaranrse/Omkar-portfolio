@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import type { Project } from '@/data/projects';
 import LiquidGlassButton from './LiquidGlassButton';
@@ -19,6 +20,7 @@ interface ApertureCardProps {
 }
 
 export default function ApertureCard({ project }: ApertureCardProps) {
+  const router = useRouter();
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
   const pointerX = useMotionValue(0);
@@ -66,6 +68,7 @@ export default function ApertureCard({ project }: ApertureCardProps) {
 
   function handleMouseEnter() {
     setCardHovered(true);
+    router.prefetch(`/projects/${project.id}`);
     if (delayTimeoutRef.current) clearTimeout(delayTimeoutRef.current);
     delayTimeoutRef.current = setTimeout(() => {
       trackingActiveRef.current = true;
@@ -106,6 +109,30 @@ export default function ApertureCard({ project }: ApertureCardProps) {
 
   const primaryGithubLink = project.links.find((l) => l.label.toLowerCase().includes('github'));
 
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // If clicking an interactive button/link (like the Code button), let it handle its own action
+    const target = e.target as HTMLElement;
+    if (target.closest('a, button')) {
+      return;
+    }
+
+    const url = `/projects/${project.id}`;
+    if (e.metaKey || e.ctrlKey) {
+      window.open(url, '_blank');
+      return;
+    }
+
+    router.push(url);
+  };
+
+  const handleAuxClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.button === 1) {
+      const target = e.target as HTMLElement;
+      if (target.closest('a, button')) return;
+      window.open(`/projects/${project.id}`, '_blank');
+    }
+  };
+
   return (
     <div
       onMouseEnter={handleMouseEnter}
@@ -119,6 +146,16 @@ export default function ApertureCard({ project }: ApertureCardProps) {
       className="aperture-card-wrapper"
     >
       <motion.div
+        onClick={handleCardClick}
+        onAuxClick={handleAuxClick}
+        tabIndex={0}
+        role="link"
+        aria-label={`View ${project.title} case study`}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            router.push(`/projects/${project.id}`);
+          }
+        }}
         style={{
           width: '100%',
           height: '100%',
@@ -319,6 +356,7 @@ export default function ApertureCard({ project }: ApertureCardProps) {
                 surface="dark"
                 textColor="rgba(255, 255, 255, 0.75)"
                 padding="6px 12px"
+                onClick={(e) => e.stopPropagation()}
               >
                 Code
               </LiquidGlassButton>
@@ -342,6 +380,7 @@ export default function ApertureCard({ project }: ApertureCardProps) {
               tint="rgba(235, 76, 42, 0.35)"
               textColor="#ffffff"
               padding="7px 16px"
+              onClick={(e) => e.stopPropagation()}
             >
               Case Study
             </LiquidGlassButton>
