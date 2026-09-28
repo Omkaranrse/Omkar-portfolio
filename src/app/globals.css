@@ -2475,6 +2475,103 @@ h6 {
   opacity: 0.85;
 }
 
+/* ── Contact Section Content & Centered Header ── */
+.contact-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .contact-wrap {
+    padding: 0 20px;
+  }
+}
+
+.contact-section-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.contact-eyebrow-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.contact-eyebrow {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent, #eb4c2a);
+}
+
+.contact-status-annotation {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted, #4b5563);
+  text-transform: uppercase;
+  background: rgba(40, 32, 24, 0.045);
+  border: 1px solid rgba(40, 32, 24, 0.09);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.contact-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.75);
+  animation: status-dot-pulse 2s infinite ease-in-out;
+}
+
+@keyframes status-dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.85); }
+}
+
+.contact-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2.2rem, 4.4vw, 3.6rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: var(--ink, #111111);
+  margin: 0 0 14px 0;
+  text-align: center;
+}
+
+.contact-sub {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--ink-muted, #4b5563);
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.contact-dock-shelf {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    FULL-BLEED 16:9 WORKSTATION SCENE: PHOTO STAGE & TWO-STATE MAC WINDOW
    ═══════════════════════════════════════════════════════════════════════ */
