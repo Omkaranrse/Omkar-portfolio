@@ -59,7 +59,7 @@ export default function SectionToc() {
   };
 
   return (
-    <aside className="w-full">
+    <aside className="w-full sticky top-28">
       <div className="p-5 rounded-[4px] bg-white/95 backdrop-blur-md border border-[rgba(17,18,21,0.08)] shadow-[0_4px_24px_rgba(17,18,21,0.03),0_1px_3px_rgba(17,18,21,0.02)]">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-[rgba(17,18,21,0.08)]">

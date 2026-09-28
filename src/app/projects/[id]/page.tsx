@@ -78,7 +78,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
       <main
         id="main"
-        className="relative min-h-screen bg-[#f8f8f5] text-[#111215] overflow-x-hidden selection:bg-[#eb4c2a]/15 selection:text-[#111215]"
+        className="relative min-h-screen bg-[#f8f8f5] text-[#111215] overflow-x-clip selection:bg-[#eb4c2a]/15 selection:text-[#111215]"
       >
         {/* Subtle crumpled paper texture overlay */}
         <div
@@ -101,9 +101,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
         {/* 12-Column Centered Container (Max-Width 1200px) */}
         <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14">
             {/* 2. Sticky Left Mini Table of Contents (3 cols on md+, hidden <768px) */}
-            <div className="hidden md:block md:col-span-3 sticky top-28 self-start">
+            <div className="hidden md:block md:col-span-3">
               <SectionToc />
             </div>
 
