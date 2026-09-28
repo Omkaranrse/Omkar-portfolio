@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import sceneImg from '@/images/home.png';
 
@@ -31,13 +32,13 @@ export interface KeyDef {
   variant?: 'alpha' | 'modifier' | 'space' | 'enter' | 'arrow';
 }
 
-// ── 01. Placement Config (Edit ONLY this to align) ──
+// ── 01. Placement Config (Percentages of .scene-box) ──
 const SCENE = {
-  screen:   { x: 28.9, y: 19.4, w: 42.8, h: 37.4 },   // % of stage
-  keyboard: { x: 27.0, y: 75.5, w: 44.0, h: 17.5 },   // % of stage
+  screen:   { x: 28.9, y: 19.4, w: 42.8, h: 37.4 },
+  keyboard: { x: 27.0, y: 75.5, w: 44.0, h: 17.5 },
 };
 
-// ── 02. 5-Row 75% Mechanical Keyboard Layout (Unique Code per Key) ──
+// ── 02. 5-Row 75% Mechanical Keyboard Layout ──
 const KEYBOARD_LAYOUT: KeyDef[][] = [
   // Row 1: Numbers + 2u Backspace
   [
@@ -130,30 +131,65 @@ export default function AskOmkarAiWorkstation({
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [knobRotation, setKnobRotation] = useState(0);
   const [clockTime, setClockTime] = useState('9:41 AM');
+  const [mounted, setMounted] = useState(false);
 
   // State B (Expanded Modal Window)
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Debug mode (?debug=1)
+  // Debug mode (?debug=1, only when process.env.NODE_ENV !== 'production')
   const [isDebug, setIsDebug] = useState(false);
   const [imgNatural, setImgNatural] = useState<{ w: number; h: number }>({
     w: sceneImg.width || 1672,
     h: sceneImg.height || 941,
   });
+  const [railIntersects, setRailIntersects] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const expandedTextareaRef = useRef<HTMLTextAreaElement>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const screenRectRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const savedCaretPos = useRef<{ start: number; end: number }>({ start: 0, end: 0 });
 
-  // Check ?debug=1 from URL safely in client
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    setMounted(true);
+  }, []);
+
+  // Check ?debug=1 from URL safely in non-production
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       setIsDebug(params.get('debug') === '1');
     }
   }, []);
+
+  // Check if social rail intersects screen rect in debug mode
+  useEffect(() => {
+    if (!isDebug) return;
+    const checkIntersection = () => {
+      const railEl = document.querySelector('.social-rail');
+      const screenEl = screenRectRef.current;
+      if (railEl && screenEl) {
+        const r = railEl.getBoundingClientRect();
+        const s = screenEl.getBoundingClientRect();
+        const intersects = !(
+          r.right < s.left ||
+          r.left > s.right ||
+          r.bottom < s.top ||
+          r.top > s.bottom
+        );
+        setRailIntersects(intersects);
+        if (intersects) {
+          console.warn('[Debug] Warning: Social rail intersects screen rect!', { rail: r, screen: s });
+        }
+      }
+    };
+
+    checkIntersection();
+    window.addEventListener('resize', checkIntersection);
+    return () => window.removeEventListener('resize', checkIntersection);
+  }, [isDebug]);
 
   // Update live clock
   useEffect(() => {
@@ -182,22 +218,89 @@ export default function AskOmkarAiWorkstation({
     scrollToBottom(true);
   }, [messages, isThinking, scrollToBottom]);
 
-  // Lock body scroll and manage focus in State B
+  // Open & Close handlers for State B with focus & caret preservation
+  const handleOpenExpanded = useCallback(() => {
+    if (textareaRef.current) {
+      savedCaretPos.current = {
+        start: textareaRef.current.selectionStart || 0,
+        end: textareaRef.current.selectionEnd || 0,
+      };
+    }
+    setIsExpanded(true);
+  }, []);
+
+  const handleCloseExpanded = useCallback(() => {
+    if (expandedTextareaRef.current) {
+      savedCaretPos.current = {
+        start: expandedTextareaRef.current.selectionStart || 0,
+        end: expandedTextareaRef.current.selectionEnd || 0,
+      };
+    }
+    setIsExpanded(false);
+  }, []);
+
+  // Body scroll lock, focus trap, and caret restoration for State B
   useEffect(() => {
     if (isExpanded) {
-      previousFocusRef.current = document.activeElement as HTMLElement;
       const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
 
-      setTimeout(() => {
-        expandedTextareaRef.current?.focus();
-      }, 60);
+      const t = setTimeout(() => {
+        if (expandedTextareaRef.current) {
+          expandedTextareaRef.current.focus();
+          try {
+            expandedTextareaRef.current.setSelectionRange(
+              savedCaretPos.current.start,
+              savedCaretPos.current.end
+            );
+          } catch {
+            // Ignore selection error on non-focused elements
+          }
+        }
+      }, 50);
+
+      // Focus trap handler
+      const handleKeyDownTrap = (e: KeyboardEvent) => {
+        if (e.key === 'Tab' && modalRef.current) {
+          const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusable.length === 0) return;
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDownTrap);
 
       return () => {
         document.body.style.overflow = originalOverflow;
+        window.removeEventListener('keydown', handleKeyDownTrap);
+        clearTimeout(t);
       };
-    } else if (previousFocusRef.current) {
-      previousFocusRef.current.focus();
+    } else {
+      const t = setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          try {
+            textareaRef.current.setSelectionRange(
+              savedCaretPos.current.start,
+              savedCaretPos.current.end
+            );
+          } catch {
+            // Ignore selection error
+          }
+        }
+      }, 50);
+      return () => clearTimeout(t);
     }
   }, [isExpanded]);
 
@@ -291,13 +394,13 @@ export default function AskOmkarAiWorkstation({
     [soundEnabled]
   );
 
-  // Submit Handler: Wrapped in useCallback and opens State B
+  // Submit Handler: Opens State B automatically on first send
   const handleSubmit = useCallback(
     (customQuery?: string) => {
       const q = (customQuery ?? question).trim();
       if (!q || isThinking) return;
 
-      setIsExpanded(true); // Auto-open State B on first send
+      setIsExpanded(true);
       onSendQuestion(q);
       setQuestion('');
 
@@ -314,7 +417,6 @@ export default function AskOmkarAiWorkstation({
   // Physical keyboard synchronization
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't play switch sound on modifier-only key events
       if (e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') {
         setPressedKeys((prev) => ({ ...prev, [e.code]: true }));
         return;
@@ -332,7 +434,7 @@ export default function AskOmkarAiWorkstation({
       playSwitchAudio('press', variant);
 
       if (e.code === 'Escape') {
-        // Clear query input only, DO NOT close State B
+        // Escape is the virtual keyboard's Clear key: Clear query input only, DO NOT close State B
         setQuestion('');
         if (textareaRef.current) textareaRef.current.value = '';
         if (expandedTextareaRef.current) expandedTextareaRef.current.value = '';
@@ -491,271 +593,284 @@ export default function AskOmkarAiWorkstation({
     }
   };
 
-  // Image load aspect ratio checking for ?debug=1
   const imageRatio = imgNatural.w / imgNatural.h;
   const isRatioOff = Math.abs(imageRatio - 16 / 9) > 0.02;
 
   return (
-    <div className="workstation-root-wrapper">
-      {/* ── Debug Mode Banner & Outlines (?debug=1) ── */}
-      {isDebug && (
-        <div className="scene-debug-overlay" aria-live="polite">
-          <div className="debug-badge-title">🛠 SCENE DEBUG MODE (?debug=1)</div>
-          <div>Screen: x={SCENE.screen.x}%, y={SCENE.screen.y}%, w={SCENE.screen.w}%, h={SCENE.screen.h}%</div>
-          <div>Keyboard: x={SCENE.keyboard.x}%, y={SCENE.keyboard.y}%, w={SCENE.keyboard.w}%, h={SCENE.keyboard.h}%</div>
-          <div>Image Natural: {imgNatural.w} × {imgNatural.h} (Ratio: {imageRatio.toFixed(4)})</div>
-          {isRatioOff && (
-            <div className="scene-debug-warn">
-              ⚠️ scene image is not 16:9, SCENE values will be off
-            </div>
-          )}
-        </div>
-      )}
+    <>
+      {/* ── 01. Scene Root (Cover-Box Architecture) ── */}
+      <main className="scene-root" inert={isExpanded}>
+        {/* Debug Overlay (?debug=1, only in non-production) */}
+        {isDebug && (
+          <div className="scene-debug-overlay" aria-live="polite">
+            <div className="debug-badge-title">🛠 SCENE DEBUG MODE (?debug=1)</div>
+            <div>Screen: x={SCENE.screen.x}%, y={SCENE.screen.y}%, w={SCENE.screen.w}%, h={SCENE.screen.h}%</div>
+            <div>Keyboard: x={SCENE.keyboard.x}%, y={SCENE.keyboard.y}%, w={SCENE.keyboard.w}%, h={SCENE.keyboard.h}%</div>
+            <div>Image Natural: {imgNatural.w} × {imgNatural.h} (Ratio: {imageRatio.toFixed(4)})</div>
+            {isRatioOff && (
+              <div className="scene-debug-warn">
+                ⚠️ scene image is not 16:9, SCENE values will be off
+              </div>
+            )}
+            {railIntersects && (
+              <div className="scene-debug-warn">
+                ⚠️ Warning: Social rail bounding box intersects screen rect!
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* ── FULL-BLEED 16:9 STAGE ── */}
-      <div className="workstation-stage" style={{ aspectRatio: '16 / 9' }}>
-        {/* Background Scene Photo */}
-        <Image
-          src={sceneImg}
-          alt=""
+        {/* Blurred backdrop using static import blurDataURL */}
+        <div
+          className="scene-backdrop"
           aria-hidden="true"
-          fill
-          priority
-          placeholder="blur"
-          sizes="100vw"
-          quality={82}
-          className="stage-bg-image"
-          style={{ objectFit: 'cover' }}
-          onLoad={(e) => {
-            const img = e.currentTarget;
-            if (img.naturalWidth && img.naturalHeight) {
-              setImgNatural({ w: img.naturalWidth, h: img.naturalHeight });
-            }
-          }}
+          style={{ backgroundImage: `url(${sceneImg.blurDataURL})` }}
         />
 
-        {/* ── 01. The Mac Screen Rect (State A: Compact Launcher) ── */}
-        <div
-          className={`stage-screen-rect ${isDebug ? 'debug-outline' : ''}`}
-          style={{
-            left: `${SCENE.screen.x}%`,
-            top: `${SCENE.screen.y}%`,
-            width: `${SCENE.screen.w}%`,
-            height: `${SCENE.screen.h}%`,
-          }}
-          onClick={() => {
-            if (!isExpanded) setIsExpanded(true);
-          }}
-        >
-          {/* Subtle Glass Reflection & Inset Shadow */}
-          <div className="mac-screen-glass-reflection" aria-hidden="true" />
+        {/* 16:9 Cover Box */}
+        <div className="scene-box">
+          <Image
+            src={sceneImg}
+            alt=""
+            aria-hidden="true"
+            fill
+            priority
+            fetchPriority="high"
+            quality={80}
+            sizes="100vw"
+            placeholder="blur"
+            style={{ objectFit: 'cover' }}
+            onLoad={(e) => {
+              const img = e.currentTarget;
+              if (img.naturalWidth && img.naturalHeight) {
+                setImgNatural({ w: img.naturalWidth, h: img.naturalHeight });
+              }
+            }}
+          />
 
-          {/* Slim macOS Menu Bar (22px) */}
-          <div className="mac-screen-menubar" aria-hidden="true">
-            <div className="mac-menubar-left">
-              <span className="mac-menubar-brand">Omkar AI</span>
-              <span className="mac-menubar-item">File</span>
-              <span className="mac-menubar-item">Edit</span>
-              <span className="mac-menubar-item">View</span>
-            </div>
-            <div className="mac-menubar-right">
-              <span className="mac-menubar-clock">{clockTime}</span>
-            </div>
-          </div>
+          {/* ── .mac-screen (State A: Launcher) ── */}
+          <div
+            ref={screenRectRef}
+            className={`mac-screen ${isDebug ? 'debug-outline' : ''}`}
+            style={{
+              left: `${SCENE.screen.x}%`,
+              top: `${SCENE.screen.y}%`,
+              width: `${SCENE.screen.w}%`,
+              height: `${SCENE.screen.h}%`,
+            }}
+            onClick={handleOpenExpanded}
+          >
+            {/* Subtle Glass Reflection */}
+            <div className="mac-screen-glass-reflection" aria-hidden="true" />
 
-          {/* Maximized macOS Window */}
-          <div className="mac-screen-window-frame">
-            {/* Title Bar */}
-            <div className="mac-window-titlebar">
-              <div className="traffic-lights" aria-label="Window controls">
-                <button
-                  type="button"
-                  className="traffic-dot red"
-                  aria-label="Close"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setQuestion('');
-                  }}
-                />
-                <button
-                  type="button"
-                  className="traffic-dot yellow"
-                  aria-label="Minimize"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                />
-                <button
-                  type="button"
-                  className="traffic-dot green"
-                  aria-label="Expand to full screen"
-                  title="Expand to Full Screen"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsExpanded(true);
-                  }}
-                />
+            {/* Slim macOS Menu Bar */}
+            <div className="mac-screen-menubar" aria-hidden="true">
+              <div className="mac-menubar-left">
+                <span className="mac-menubar-brand">Omkar AI</span>
+                <span className="mac-menubar-item">File</span>
+                <span className="mac-menubar-item">Edit</span>
+                <span className="mac-menubar-item">View</span>
               </div>
-
-              {onBack && (
-                <button
-                  type="button"
-                  className="mac-nav-back-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onBack();
-                  }}
-                  aria-label="Go Back"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M19 12H5M12 19l-7-7 7-7" />
-                  </svg>
-                  <span>Back</span>
-                </button>
-              )}
-
-              <div className="mac-window-title">Omkar AI</div>
-
-              <div className="mac-window-tools">
-                <button
-                  type="button"
-                  className={`mac-tool-btn ${!soundEnabled ? 'is-muted' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSoundEnabled((prev) => !prev);
-                  }}
-                  title={soundEnabled ? 'Mute Mechanical Switch Audio' : 'Unmute Sound'}
-                  aria-label="Toggle mechanical switch audio"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                    {soundEnabled ? (
-                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
-                    ) : (
-                      <line x1="23" y1="9" x2="17" y2="15" />
-                    )}
-                  </svg>
-                </button>
-
-                <button
-                  type="button"
-                  className="mac-tool-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCopyEmail();
-                  }}
-                  title="Copy email: omkaranarse13@gmail.com"
-                  aria-label="Copy email address"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2" />
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                  </svg>
-                  <span className="tool-btn-label">{copiedEmail ? 'Copied' : 'Email'}</span>
-                </button>
+              <div className="mac-menubar-right">
+                <span className="mac-menubar-clock">{clockTime}</span>
               </div>
             </div>
 
-            {/* State A: Compact Launcher Content */}
-            <div className="state-a-compact-body">
-              <div className="compact-header-row">
-                <span className="compact-greeting">What would you like to know?</span>
-                <span className="compact-expand-hint" title="Click to expand">
-                  Click screen to expand ↗
-                </span>
-              </div>
-
-              {/* Kinetic Typed Query Preview Box */}
-              <div
-                className={`compact-query-box ${isFocused ? 'is-focused' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  textareaRef.current?.focus();
-                }}
-              >
-                <div className="compact-textarea-wrap">
-                  <textarea
-                    ref={textareaRef}
-                    rows={1}
-                    className="compact-textarea"
-                    placeholder="Ask about projects, stack, experience..."
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    aria-label="Ask Omkar AI a question"
-                  />
-                  {!question && (
-                    <span className="compact-kinetic-placeholder" aria-hidden="true">
-                      Type via keyboard or click preset below
-                      <span className="compact-blinking-cursor" />
-                    </span>
-                  )}
-                </div>
-
-                <button
-                  type="button"
-                  className="compact-send-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSubmit();
-                  }}
-                  disabled={!question.trim() || isThinking}
-                  aria-label="Send message"
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <line x1="22" y1="2" x2="11" y2="13" />
-                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* 4 Shortcut Chips */}
-              <div className="compact-chips-row">
-                {PRESET_PROMPTS.map((p, idx) => (
+            {/* Maximized macOS Window */}
+            <div className="mac-screen-window-frame">
+              {/* Window Title Bar */}
+              <div className="mac-window-titlebar">
+                <div className="traffic-lights" aria-label="Window controls">
                   <button
-                    key={`preset-${idx}`}
                     type="button"
-                    className="compact-chip-pill"
+                    className="traffic-dot red"
+                    aria-label="Clear query"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleSubmit(p.prompt);
+                      setQuestion('');
                     }}
+                  />
+                  <button
+                    type="button"
+                    className="traffic-dot yellow"
+                    aria-label="Minimize"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="traffic-dot green"
+                    aria-label="Expand to full screen"
+                    title="Expand to Full Screen"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenExpanded();
+                    }}
+                  />
+                </div>
+
+                {onBack && (
+                  <button
+                    type="button"
+                    className="mac-nav-back-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onBack();
+                    }}
+                    aria-label="Go Back"
                   >
-                    {p.label}
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M19 12H5M12 19l-7-7 7-7" />
+                    </svg>
+                    <span>Back</span>
                   </button>
-                ))}
+                )}
+
+                <div className="mac-window-title">Omkar AI</div>
+
+                <div className="mac-window-tools">
+                  <button
+                    type="button"
+                    className={`mac-tool-btn ${!soundEnabled ? 'is-muted' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSoundEnabled((prev) => !prev);
+                    }}
+                    title={soundEnabled ? 'Mute Mechanical Switch Audio' : 'Unmute Sound'}
+                    aria-label="Toggle mechanical switch audio"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                      {soundEnabled ? (
+                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+                      ) : (
+                        <line x1="23" y1="9" x2="17" y2="15" />
+                      )}
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="mac-tool-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopyEmail();
+                    }}
+                    title="Copy email: omkaranarse13@gmail.com"
+                    aria-label="Copy email address"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    <span className="tool-btn-label">{copiedEmail ? 'Copied' : 'Email'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* State A (launcher): Vertically centered group edge-to-edge */}
+              <div className="state-a-compact-body">
+                <div className="launcher-headline-wrap">
+                  <div className="launcher-text-col">
+                    <h2 className="launcher-title">Ask anything about Omkar.</h2>
+                    <p className="launcher-subtitle">Projects, stack, experience, roles.</p>
+                  </div>
+                  <span className="compact-expand-hint" title="Click screen to expand">
+                    Click screen to expand ↗
+                  </span>
+                </div>
+
+                {/* Query Input Box with single placeholder fix */}
+                <div
+                  className={`compact-query-box ${isFocused ? 'is-focused' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    textareaRef.current?.focus();
+                  }}
+                >
+                  <div className="compact-textarea-wrap">
+                    <textarea
+                      ref={textareaRef}
+                      rows={1}
+                      className="compact-textarea"
+                      placeholder=""
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      onFocus={() => setIsFocused(true)}
+                      onBlur={() => setIsFocused(false)}
+                      aria-label="Ask Omkar AI a question"
+                    />
+                    {!question && (
+                      <span className="compact-kinetic-placeholder" aria-hidden="true">
+                        Type via keyboard or click preset below
+                        <span className="compact-blinking-cursor" />
+                      </span>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    className="compact-send-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSubmit();
+                    }}
+                    disabled={!question.trim() || isThinking}
+                    aria-label="Send message"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <line x1="22" y1="2" x2="11" y2="13" />
+                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* 4 Shortcut Chips (wrap, never clip) */}
+                <div className="compact-chips-row">
+                  {PRESET_PROMPTS.map((p, idx) => (
+                    <button
+                      key={`preset-${idx}`}
+                      type="button"
+                      className="compact-chip-pill"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSubmit(p.prompt);
+                      }}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* ── 02. The Keyboard Rect (Live Over the Sage Mat) ── */}
-        <div
-          className={`stage-keyboard-rect ${isDebug ? 'debug-outline' : ''}`}
-          style={{
-            left: `${SCENE.keyboard.x}%`,
-            top: `${SCENE.keyboard.y}%`,
-            width: `${SCENE.keyboard.w}%`,
-            height: `${SCENE.keyboard.h}%`,
-          }}
-        >
-          {/* Isolated Perspective Container */}
-          <div className="cm-keyboard-perspective-wrap">
+          {/* ── .keyboard-wrap (Section 5) ── */}
+          <div
+            className={`keyboard-wrap ${isDebug ? 'debug-outline' : ''}`}
+            style={{
+              left: `${SCENE.keyboard.x}%`,
+              top: `${SCENE.keyboard.y}%`,
+              width: `${SCENE.keyboard.w}%`,
+              height: `${SCENE.keyboard.h}%`,
+            }}
+          >
+            {/* Brushed aluminium case shell with extruded lower edge & contact shadow */}
             <div
-              className="cm-keyboard-case"
+              className="keyboard-case-shell"
               role="application"
               aria-label="Mechanical keyboard 75 percent layout"
             >
-              {/* Keyboard Status Bar: Model, OLED Screen & Rotary Knob */}
-              <div className="workstation-keyboard-header">
-                <div className="workstation-keyboard-brand">
+              {/* Integrated Top Strip: LED + model label on left, OLED + knob on right */}
+              <div className="keyboard-top-strip">
+                <div className="keyboard-brand-group">
                   <span className="keyboard-led-dot" aria-hidden="true" />
-                  <span className="keyboard-model-name">OMKAR // MECH-75</span>
+                  <span className="keyboard-model-label">OMKAR // MECH-75</span>
                 </div>
 
-                <div className="workstation-keyboard-hardware">
-                  {/* OLED Query Counter */}
+                <div className="keyboard-controls-group">
+                  {/* OLED Query Character Counter */}
                   <div
                     className="cm-oled-screen"
                     title="Query Character Counter"
@@ -781,7 +896,7 @@ export default function AskOmkarAiWorkstation({
                 </div>
               </div>
 
-              {/* Keyboard Deck: 5 Rows of Real 3D Sculpted Keycaps */}
+              {/* 5 Rows of Keycaps */}
               <div className="cm-keyboard-deck">
                 {KEYBOARD_LAYOUT.map((row, rIdx) => (
                   <div
@@ -822,13 +937,119 @@ export default function AskOmkarAiWorkstation({
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ── STATE B: EXPANDED CENTERED WINDOW (POSITION: FIXED MODAL) ── */}
-      {isExpanded && (
+        {/* ── MOBILE VIEW (<640px) ── */}
+        <div className="workstation-mobile-view">
+          {/* Full-width Chat Card (State B content inline, no modal) */}
+          <div className="mobile-chat-card">
+            <div className="mac-window-titlebar">
+              <div className="traffic-lights">
+                <span className="traffic-dot red" />
+                <span className="traffic-dot yellow" />
+                <span className="traffic-dot green" />
+              </div>
+              <div className="mac-window-title">Omkar AI</div>
+              <button
+                type="button"
+                className="mac-tool-btn"
+                onClick={handleCopyEmail}
+                aria-label="Copy email"
+              >
+                <span className="tool-btn-label">{copiedEmail ? 'Copied' : 'Email'}</span>
+              </button>
+            </div>
+
+            <div className="mobile-chat-body">
+              {messages.length === 0 ? (
+                <div className="mobile-empty-state">
+                  <p>What would you like to know about Omkar?</p>
+                </div>
+              ) : (
+                <div className="messages-thread">
+                  {messages.map((m) => (
+                    <div key={m.id} className={`chat-bubble-row ${m.role === 'user' ? 'is-user' : 'is-ai'}`}>
+                      <div className="chat-bubble">
+                        <div className="bubble-text">{m.text}</div>
+                      </div>
+                    </div>
+                  ))}
+                  {isThinking && (
+                    <div className="chat-bubble-row is-ai">
+                      <div className="chat-bubble is-thinking-bubble">Thinking...</div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="mobile-chips-shelf">
+              {PRESET_PROMPTS.map((p, idx) => (
+                <button
+                  key={`m-chip-${idx}`}
+                  type="button"
+                  className="compact-chip-pill"
+                  onClick={() => handleSubmit(p.prompt)}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="mobile-input-bar">
+              <input
+                type="text"
+                className="mobile-input"
+                placeholder="Ask anything..."
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="compact-send-btn"
+                onClick={() => handleSubmit()}
+                disabled={!question.trim() || isThinking}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+
+          {/* Flat 2D Virtual Keyboard for Mobile (Keys >=30px) */}
+          <div className="mobile-flat-keyboard" role="application" aria-label="Virtual keyboard">
+            {KEYBOARD_LAYOUT.map((row, rIdx) => (
+              <div key={`m-row-${rIdx}`} className="mobile-keyboard-row">
+                {row.map((k) => (
+                  <button
+                    key={`m-${k.id}`}
+                    type="button"
+                    className={`mobile-keycap ${k.isAction ? 'is-action' : ''} ${
+                      pressedKeys[k.code] ? 'is-pressed' : ''
+                    }`}
+                    style={{ flex: k.width ?? 1 }}
+                    onClick={() => handleVirtualKey(k)}
+                    tabIndex={-1}
+                  >
+                    {isShiftActive && k.shiftChar && !k.isAction ? k.shiftChar : k.label}
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+
+      {/* ── State B: Expanded Modal Window (Rendered via createPortal to document.body) ── */}
+      {mounted && isExpanded && createPortal(
         <div
+          ref={modalRef}
           className="state-b-backdrop"
-          onClick={() => setIsExpanded(false)}
+          onClick={handleCloseExpanded}
           role="dialog"
           aria-modal="true"
           aria-label="Expanded AI Chat Console"
@@ -857,19 +1078,19 @@ export default function AskOmkarAiWorkstation({
                   type="button"
                   className="traffic-dot red"
                   aria-label="Close modal"
-                  onClick={() => setIsExpanded(false)}
+                  onClick={handleCloseExpanded}
                 />
                 <button
                   type="button"
                   className="traffic-dot yellow"
                   aria-label="Minimize modal"
-                  onClick={() => setIsExpanded(false)}
+                  onClick={handleCloseExpanded}
                 />
                 <button
                   type="button"
                   className="traffic-dot green"
                   aria-label="Toggle full screen"
-                  onClick={() => setIsExpanded(false)}
+                  onClick={handleCloseExpanded}
                 />
               </div>
 
@@ -893,7 +1114,7 @@ export default function AskOmkarAiWorkstation({
                 <button
                   type="button"
                   className="exit-fullscreen-btn"
-                  onClick={() => setIsExpanded(false)}
+                  onClick={handleCloseExpanded}
                   aria-label="Exit full screen"
                 >
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1061,124 +1282,9 @@ export default function AskOmkarAiWorkstation({
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-
-      {/* ── MOBILE VIEW (<640px): Soft-blurred background + full-width chat card + 2D flat keyboard ── */}
-      <div className="workstation-mobile-view">
-        <div className="mobile-bg-blur" aria-hidden="true">
-          <Image
-            src={sceneImg}
-            alt=""
-            fill
-            sizes="100vw"
-            quality={60}
-            className="mobile-bg-img"
-            style={{ objectFit: 'cover' }}
-          />
-        </div>
-
-        {/* Full-width Chat Card */}
-        <div className="mobile-chat-card">
-          <div className="mac-window-titlebar">
-            <div className="traffic-lights">
-              <span className="traffic-dot red" />
-              <span className="traffic-dot yellow" />
-              <span className="traffic-dot green" />
-            </div>
-            <div className="mac-window-title">Omkar AI</div>
-            <button
-              type="button"
-              className="mac-tool-btn"
-              onClick={handleCopyEmail}
-              aria-label="Copy email"
-            >
-              <span className="tool-btn-label">{copiedEmail ? 'Copied' : 'Email'}</span>
-            </button>
-          </div>
-
-          <div className="mobile-chat-body">
-            {messages.length === 0 ? (
-              <div className="mobile-empty-state">
-                <p>What would you like to know about Omkar?</p>
-              </div>
-            ) : (
-              <div className="messages-thread">
-                {messages.map((m) => (
-                  <div key={m.id} className={`chat-bubble-row ${m.role === 'user' ? 'is-user' : 'is-ai'}`}>
-                    <div className="chat-bubble">
-                      <div className="bubble-text">{m.text}</div>
-                    </div>
-                  </div>
-                ))}
-                {isThinking && (
-                  <div className="chat-bubble-row is-ai">
-                    <div className="chat-bubble is-thinking-bubble">Thinking...</div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="mobile-chips-shelf">
-            {PRESET_PROMPTS.map((p, idx) => (
-              <button
-                key={`m-chip-${idx}`}
-                type="button"
-                className="compact-chip-pill"
-                onClick={() => handleSubmit(p.prompt)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="mobile-input-bar">
-            <input
-              type="text"
-              className="mobile-input"
-              placeholder="Ask anything..."
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-              }}
-            />
-            <button
-              type="button"
-              className="compact-send-btn"
-              onClick={() => handleSubmit()}
-              disabled={!question.trim() || isThinking}
-            >
-              Send
-            </button>
-          </div>
-        </div>
-
-        {/* Flat 2D Virtual Keyboard for Mobile (Keys >=30px) */}
-        <div className="mobile-flat-keyboard" role="application" aria-label="Virtual keyboard">
-          {KEYBOARD_LAYOUT.map((row, rIdx) => (
-            <div key={`m-row-${rIdx}`} className="mobile-keyboard-row">
-              {row.map((k) => (
-                <button
-                  key={`m-${k.id}`}
-                  type="button"
-                  className={`mobile-keycap ${k.isAction ? 'is-action' : ''} ${
-                    pressedKeys[k.code] ? 'is-pressed' : ''
-                  }`}
-                  style={{ flex: k.width ?? 1 }}
-                  onClick={() => handleVirtualKey(k)}
-                >
-                  {isShiftActive && k.shiftChar && !k.isAction ? k.shiftChar : k.label}
-                </button>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+    </>
   );
 }

@@ -3,8 +3,8 @@
 import { useState, useCallback } from 'react';
 import Nav from '@/components/Nav';
 import AskOmkarAiWorkstation, { ChatMessage } from '@/components/AskOmkarAiWorkstation';
-import BackButton, { useSmartBack } from '@/components/BackButton';
-import SocialDock from '@/components/SocialDock';
+import { useSmartBack } from '@/components/BackButton';
+import SocialRail from '@/components/SocialRail';
 
 export default function AskAiPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -118,50 +118,14 @@ export default function AskAiPage() {
   return (
     <>
       <Nav />
-
-      <main id="main" className="ai-standalone-page">
-        {/* Normal-flow Header: Back pill at top-left, centered headline */}
-        <div className="ai-page-header-wrap">
-          <div className="ask-ai-top-nav">
-            <BackButton fallbackHref="/#contact" label="Back" />
-          </div>
-
-          <div className="ai-headline-block">
-            <span className="ai-eyebrow">ASK OMKAR AI</span>
-            <h1 className="ai-title">Ask anything about Omkar.</h1>
-            <p className="ai-sub">
-              Ask about projects, engineering stack, work experience, or roles wanted.
-              <br />
-              Powered by portfolio vector retrieval and interactive mechanical input.
-            </p>
-          </div>
-        </div>
-
-        {/* ── Full-Bleed 16:9 Stage (max 2200px, centered, edge fade above 2200px) ── */}
-        <div className="ai-stage-container">
-          <AskOmkarAiWorkstation
-            messages={messages}
-            isThinking={isThinking}
-            onSendQuestion={handleSendQuestion}
-            onBack={handleSmartBack}
-          />
-        </div>
-
-        {/* ── CONNECT Section ── */}
-        <div className="ai-page-footer-wrap">
-          <div className="contact-connect-stage">
-            <div className="contact-connect-header">
-              <span className="contact-connect-eyebrow">CONNECT</span>
-              <p className="contact-connect-sub">
-                Continue the conversation on your preferred platform.
-              </p>
-            </div>
-            <div className="contact-dock-area">
-              <SocialDock />
-            </div>
-          </div>
-        </div>
-      </main>
+      <h1 className="sr-only">Ask anything about Omkar</h1>
+      <AskOmkarAiWorkstation
+        messages={messages}
+        isThinking={isThinking}
+        onSendQuestion={handleSendQuestion}
+        onBack={handleSmartBack}
+      />
+      <SocialRail />
     </>
   );
 }

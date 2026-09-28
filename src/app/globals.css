@@ -336,7 +336,7 @@ h6 {
   top: 24px;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 40;
   display: flex;
   justify-content: center;
   padding: 0 24px;
@@ -2573,49 +2573,66 @@ h6 {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   FULL-BLEED 16:9 WORKSTATION SCENE: PHOTO STAGE & TWO-STATE MAC WINDOW
+   FULL-VIEWPORT SCENE ("COVER-BOX" ARCHITECTURE) & AI WORKSTATION
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── 01. Stage & Root Wrapper ── */
-.workstation-root-wrapper {
-  width: 100%;
+/* ── 01. Scene Root & Backdrop ── */
+.scene-root {
+  --h: max(100vh, 560px);
+  --h: max(100svh, 560px);
+  height: var(--h);
+  overflow: clip;
+  isolation: isolate;
   position: relative;
-}
-
-/* 16:9 Full-Bleed Stage (width 100vw, max-width 2200px, centered) */
-.workstation-stage {
   width: 100vw;
-  max-width: 2200px;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  overflow: hidden;
-  container-type: inline-size;
-  box-sizing: border-box;
+  background-color: #0b0f17;
 }
 
-/* Edge Fade above 2200px to blend seamlessly into cream background */
-@media (min-width: 2201px) {
-  .workstation-stage {
-    margin-left: auto;
-    margin-right: auto;
-    left: auto;
-    right: auto;
-    width: 2200px;
-    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-  }
-}
-
-.stage-bg-image {
+.scene-backdrop {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center bottom;
+  filter: blur(28px) saturate(1.05);
+  transform: scale(1.15);
   pointer-events: none;
-  user-select: none;
   z-index: 0;
 }
 
-/* ── 02. Debug Mode Outlines & Overlay (?debug=1) ── */
+/* ── 02. Scene Box (16:9 Cover Sizing) ── */
+.scene-box {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin-inline: auto;
+  aspect-ratio: 16 / 9;
+  width: max(calc(var(--h) * 16 / 9), min(100vw, calc(var(--h) * 2)));
+  z-index: 1;
+  /* NO transform/perspective/filter/contain on it. */
+}
+
+/* 6% horizontal mask-image fade on the box edges ONLY inside @media (min-aspect-ratio: 2/1) */
+@media (min-aspect-ratio: 2/1) {
+  .scene-box {
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 6%,
+      black 94%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 6%,
+      black 94%,
+      transparent 100%
+    );
+  }
+}
+
+/* ── 03. Scene Debug Overlay (?debug=1) ── */
 .scene-debug-overlay {
   position: absolute;
   top: 16px;
@@ -2650,10 +2667,10 @@ h6 {
   outline-offset: -2px;
 }
 
-/* ── 03. The Mac Screen Rect (State A: Compact Launcher) ── */
-.stage-screen-rect {
+/* ── 04. Mac Screen Rect (.mac-screen) ── */
+.mac-screen {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   container-type: inline-size;
   display: flex;
   flex-direction: column;
@@ -2662,17 +2679,15 @@ h6 {
   cursor: pointer;
 }
 
-/* Glass Reflection & Inset Screen Shadow */
 .mac-screen-glass-reflection {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 65%);
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 65%);
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
   pointer-events: none;
   z-index: 10;
 }
 
-/* macOS Menu Bar (22px) */
 .mac-screen-menubar {
   flex: 0 0 22px;
   height: 22px;
@@ -2685,7 +2700,7 @@ h6 {
   justify-content: space-between;
   padding: 0 10px;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
-  font-size: clamp(11px, 1.8cqi, 12px);
+  font-size: clamp(12px, 1.8cqw, 13px);
   color: #1c2233;
   user-select: none;
   z-index: 2;
@@ -2712,7 +2727,6 @@ h6 {
   color: #374151;
 }
 
-/* Maximized Window Frame */
 .mac-screen-window-frame {
   flex: 1;
   display: flex;
@@ -2725,7 +2739,6 @@ h6 {
   z-index: 1;
 }
 
-/* Window Title Bar */
 .mac-window-titlebar {
   flex: 0 0 32px;
   height: 32px;
@@ -2772,7 +2785,7 @@ h6 {
   background: rgba(255, 255, 255, 0.85);
   border-radius: 5px;
   padding: 2px 7px;
-  font-size: 0.72rem;
+  font-size: clamp(12px, 1.6cqw, 13px);
   font-weight: 600;
   color: #374151;
   cursor: pointer;
@@ -2787,7 +2800,7 @@ h6 {
 
 .mac-window-title {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
-  font-size: clamp(12px, 2.1cqi, 13px);
+  font-size: clamp(12px, 2.1cqw, 13px);
   font-weight: 600;
   color: #374151;
   text-align: center;
@@ -2809,7 +2822,7 @@ h6 {
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.85);
   color: #4b5563;
-  font-size: 0.72rem;
+  font-size: clamp(12px, 1.6cqw, 13px);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -2826,43 +2839,62 @@ h6 {
   background: rgba(240, 240, 240, 0.7);
 }
 
-/* State A: Compact Launcher Body */
+/* State A: Compact Launcher Body (Vertically Centered Group) */
 .state-a-compact-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(8px, 2.4cqi, 16px);
+  justify-content: center;
+  gap: clamp(8px, 2cqw, 16px);
+  padding: clamp(10px, 2.4cqw, 18px);
   box-sizing: border-box;
+  width: 100%;
 }
 
-.compact-header-row {
+.launcher-headline-wrap {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
 }
 
-.compact-greeting {
+.launcher-text-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.launcher-title {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, sans-serif;
-  font-size: clamp(14px, 2.8cqi, 19px);
+  font-size: clamp(14px, 3cqw, 20px);
   font-weight: 700;
   color: #111827;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.launcher-subtitle {
+  font-size: clamp(12px, 1.8cqw, 13.5px);
+  color: #565862;
+  line-height: 1.35;
+  margin: 0;
 }
 
 .compact-expand-hint {
-  font-size: clamp(10px, 1.8cqi, 12px);
+  font-size: clamp(12px, 1.6cqw, 12.5px);
   font-weight: 600;
   color: var(--accent);
-  opacity: 0.88;
+  opacity: 0.9;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .compact-query-box {
   background: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 9px;
-  padding: clamp(6px, 1.8cqi, 10px);
+  padding: clamp(6px, 1.6cqw, 10px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
@@ -2890,7 +2922,7 @@ h6 {
   outline: none;
   background: transparent;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
-  font-size: clamp(13px, 2.2cqi, 15px);
+  font-size: clamp(13px, 2cqw, 14.5px);
   line-height: 1.35;
   color: #111827;
   resize: none;
@@ -2902,7 +2934,7 @@ h6 {
   position: absolute;
   left: 0;
   pointer-events: none;
-  font-size: clamp(12px, 2cqi, 14px);
+  font-size: clamp(12px, 1.8cqw, 13px);
   color: #8e8e93;
   white-space: nowrap;
   overflow: hidden;
@@ -2952,17 +2984,11 @@ h6 {
   cursor: not-allowed;
 }
 
-/* 4 Shortcut Chips */
 .compact-chips-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.compact-chips-row::-webkit-scrollbar {
-  display: none;
 }
 
 .compact-chip-pill {
@@ -2970,9 +2996,9 @@ h6 {
   border: 1px solid rgba(0, 0, 0, 0.08);
   background: #F4F4F6;
   border-radius: 999px;
-  padding: clamp(3px, 0.9cqi, 5px) clamp(8px, 1.8cqi, 12px);
+  padding: clamp(3px, 0.8cqw, 5px) clamp(8px, 1.6cqw, 12px);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
-  font-size: clamp(11px, 1.8cqi, 12.5px);
+  font-size: clamp(12px, 1.6cqw, 12.5px);
   font-weight: 500;
   color: #374151;
   white-space: nowrap;
@@ -2986,72 +3012,72 @@ h6 {
   border-color: rgba(0, 0, 0, 0.18);
 }
 
-/* ── 04. The Keyboard Rect (Live Over the Sage Mat) ── */
-.stage-keyboard-rect {
+/* ── 05. Keyboard Rect & Case Shell ── */
+.keyboard-wrap {
   position: absolute;
+  perspective: 850px;
+  transform-origin: bottom center;
   z-index: 2;
   box-sizing: border-box;
 }
 
-.cm-keyboard-perspective-wrap {
-  width: 100%;
-  height: 100%;
-  perspective: 850px;
-  transform-origin: bottom center;
-}
-
-.cm-keyboard-case {
+.keyboard-case-shell {
   width: 100%;
   height: 100%;
   transform: rotateX(29deg);
   transform-origin: bottom center;
   transform-style: preserve-3d;
-  background: linear-gradient(180deg, #F9FAFB 0%, #E5E7EB 100%);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  padding: clamp(8px, 2.2cqw, 16px);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #F8F9FA 0%, #E7E9ED 70%, #D8DBE0 100%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 22px 42px rgba(25, 35, 25, 0.32),
-    0 4px 10px rgba(0, 0, 0, 0.12),
-    inset 0 1px 1px rgba(255, 255, 255, 0.95);
-  padding: 0.55cqw;
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.95),
+    0 7px 0 #AFB3BC,
+    0 16px 30px rgba(35, 48, 38, 0.35);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* Keyboard Header: Brand, OLED & Knob */
-.workstation-keyboard-header {
+.keyboard-top-strip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 4px 0.35cqw 4px;
+  padding-bottom: clamp(4px, 0.8cqw, 8px);
   user-select: none;
 }
 
-.workstation-keyboard-brand {
+.keyboard-brand-group {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .keyboard-led-dot {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #10B981;
   box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
 }
 
-.keyboard-model-name {
+.keyboard-model-label {
   font-family: var(--font-mono), monospace;
-  font-size: clamp(8px, 1.1cqw, 11px);
+  font-size: clamp(9px, 1.1cqw, 11px);
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #6B7280;
 }
 
-.workstation-keyboard-hardware {
+@media (max-width: 1280px) {
+  .keyboard-model-label {
+    display: none;
+  }
+}
+
+.keyboard-controls-group {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -3110,7 +3136,6 @@ h6 {
   border-radius: 1px;
 }
 
-/* Keyboard Deck & Keycaps (Sized with cqw so keys scale with stage) */
 .cm-keyboard-deck {
   background: #D5D8E0;
   border-radius: 8px;
@@ -3129,10 +3154,10 @@ h6 {
   align-items: stretch;
 }
 
-/* Keycaps: Real 3D Concave Dish & 4px Travel */
 .cm-keycap {
   position: relative;
-  height: clamp(34px, 2.8cqw, 46px);
+  min-height: 34px;
+  height: clamp(34px, 2.6cqw, 44px);
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -3155,7 +3180,6 @@ h6 {
   z-index: 1;
 }
 
-/* 1. White Alpha Keys */
 .cm-keycap,
 .cm-keycap.variant-alpha {
   background: radial-gradient(circle at 50% 45%, #ffffff 0%, #f7f8fa 100%);
@@ -3167,7 +3191,6 @@ h6 {
   color: #374151;
 }
 
-/* 2. Lavender/Purple Modifiers (Clear, Ctrl, Alt, Shift, Backspace) */
 .cm-keycap.is-modifier,
 .cm-keycap.variant-modifier {
   background: radial-gradient(circle at 50% 45%, #E3DDF0 0%, #DCD6EB 100%);
@@ -3184,7 +3207,6 @@ h6 {
   font-size: clamp(9px, 1.15cqw, 11.5px);
 }
 
-/* Shift Lit Active Glow */
 .cm-keycap.is-shift-lit {
   background: #ECE6FA !important;
   box-shadow:
@@ -3194,7 +3216,6 @@ h6 {
   color: #352654 !important;
 }
 
-/* 3. Light-Blue Spacebar */
 .cm-keycap.variant-space {
   background: radial-gradient(circle at 50% 45%, #CCE7F8 0%, #BEE0F5 100%);
   box-shadow:
@@ -3205,7 +3226,6 @@ h6 {
   color: #244b68;
 }
 
-/* 4. Purple/Blue Enter Key */
 .cm-keycap.variant-enter {
   background: radial-gradient(circle at 50% 45%, #9798EC 0%, #8B8CE8 100%);
   box-shadow:
@@ -3216,7 +3236,6 @@ h6 {
   color: #ffffff;
 }
 
-/* 5. Arrow Keys */
 .cm-keycap.variant-arrow {
   background: radial-gradient(circle at 50% 45%, #EDEAF6 0%, #E6E2F2 100%);
   box-shadow:
@@ -3227,7 +3246,6 @@ h6 {
   color: #483c66;
 }
 
-/* Keycap Pressed State (4px travel) */
 .cm-keycap.is-pressed,
 .cm-keycap:active {
   transform: translateZ(-3px) translateY(3.5px) !important;
@@ -3237,14 +3255,14 @@ h6 {
   filter: brightness(1.08);
 }
 
-/* ── 05. State B: Expanded Modal Window ── */
+/* ── 06. State B: Expanded Modal Window (createPortal) ── */
 .state-b-backdrop {
   position: fixed;
   inset: 0;
   z-index: 9999;
   background: rgba(14, 18, 25, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3270,6 +3288,7 @@ h6 {
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  font-size: 14px;
   animation: window-pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -3293,7 +3312,7 @@ h6 {
   border: 1px solid rgba(0, 0, 0, 0.12);
   background: rgba(240, 242, 245, 0.9);
   color: #374151;
-  font-size: 0.72rem;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -3304,7 +3323,6 @@ h6 {
   color: #111827;
 }
 
-/* Scrolling Chat Thread */
 .state-b-messages-scroll {
   flex: 1;
   overflow-y: auto;
@@ -3343,7 +3361,7 @@ h6 {
 }
 
 .empty-state-desc {
-  font-size: 0.9375rem;
+  font-size: 14px;
   line-height: 1.6;
   color: #6B7280;
 }
@@ -3371,7 +3389,7 @@ h6 {
   max-width: 82%;
   padding: 12px 16px;
   border-radius: 14px;
-  font-size: 0.9375rem;
+  font-size: 15px;
   line-height: 1.55;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
@@ -3394,7 +3412,7 @@ h6 {
   align-items: center;
   gap: 8px;
   margin-bottom: 4px;
-  font-size: 0.75rem;
+  font-size: 12px;
   opacity: 0.8;
 }
 
@@ -3403,12 +3421,11 @@ h6 {
   padding: 2px 8px;
   background: rgba(0, 0, 0, 0.06);
   border-radius: 4px;
-  font-size: 0.72rem;
+  font-size: 12px;
   display: inline-block;
   color: #4b5563;
 }
 
-/* Thinking Indicator */
 .is-thinking-bubble {
   display: flex;
   align-items: center;
@@ -3433,7 +3450,7 @@ h6 {
 }
 
 .thinking-text {
-  font-size: 0.8125rem;
+  font-size: 14px;
   color: #6B7280;
   margin-left: 4px;
 }
@@ -3447,7 +3464,7 @@ h6 {
   border: none;
   border-radius: 999px;
   padding: 6px 14px;
-  font-size: 0.75rem;
+  font-size: 13px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -3462,7 +3479,6 @@ h6 {
   transform: translateY(-2px);
 }
 
-/* Shortcuts Shelf in State B */
 .state-b-chips-shelf {
   flex: 0 0 auto;
   background: #F9FAFB;
@@ -3476,7 +3492,7 @@ h6 {
 
 .shelf-label {
   font-family: var(--font-mono), monospace;
-  font-size: 0.6875rem;
+  font-size: 11px;
   font-weight: 700;
   color: #9CA3AF;
   letter-spacing: 0.08em;
@@ -3494,7 +3510,7 @@ h6 {
   background: #FFFFFF;
   border-radius: 999px;
   padding: 4px 12px;
-  font-size: 0.78rem;
+  font-size: 14px;
   font-weight: 500;
   color: #374151;
   white-space: nowrap;
@@ -3508,7 +3524,6 @@ h6 {
   color: #111827;
 }
 
-/* Input Console in State B */
 .state-b-input-dock {
   flex: 0 0 auto;
   padding: 14px 20px;
@@ -3537,7 +3552,7 @@ h6 {
   outline: none;
   background: transparent;
   font-family: inherit;
-  font-size: 0.9375rem;
+  font-size: 15px;
   line-height: 1.5;
   color: #111827;
   resize: none;
@@ -3552,7 +3567,7 @@ h6 {
 
 .input-char-counter {
   font-family: var(--font-mono), monospace;
-  font-size: 0.6875rem;
+  font-size: 11px;
   color: #9CA3AF;
 }
 
@@ -3563,7 +3578,7 @@ h6 {
   color: #ffffff;
   border-radius: 999px;
   padding: 6px 14px;
-  font-size: 0.8125rem;
+  font-size: 14px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -3581,13 +3596,212 @@ h6 {
   cursor: not-allowed;
 }
 
-/* ── 06. Mobile Layout (<640px) ── */
+/* ── 07. Vertical Social Rail (.social-rail) ── */
+.social-rail {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: max(16px, env(safe-area-inset-right));
+  margin-block: auto;
+  height: max-content;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 10px;
+  border-radius: 22px;
+  background: rgba(255, 251, 243, 0.62);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 10px 30px rgba(60, 35, 10, 0.18);
+}
+
+.social-rail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+}
+
+.social-rail-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.social-rail-link,
+.social-rail-avatar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  position: relative;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.social-rail-icon-tile {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transform-origin: right center;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.social-rail-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.social-rail-link:hover .social-rail-icon-tile,
+.social-rail-link:focus-visible .social-rail-icon-tile,
+.social-rail-avatar-btn:hover .social-rail-avatar-frame,
+.social-rail-avatar-btn:focus-visible .social-rail-avatar-frame {
+  transform: translateX(-6px) scale(1.15);
+}
+
+.social-rail-avatar-frame {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  transform-origin: right center;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.social-rail-divider-item {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  list-style: none;
+}
+
+.social-rail-divider {
+  width: 60%;
+  height: 1px;
+  background: rgba(60, 35, 10, 0.16);
+  margin: 2px auto;
+}
+
+.social-rail-dot {
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.7);
+  pointer-events: none;
+}
+
+/* Tooltip positioned on the LEFT of the icon */
+.social-rail-tooltip {
+  position: absolute;
+  right: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(22, 24, 29, 0.94);
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 50;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  animation: rail-tooltip-in 0.15s ease-out;
+}
+
+@keyframes rail-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
+
+.social-rail-tooltip-name {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.social-rail-tooltip-cat {
+  font-size: 10.5px;
+  color: #A0A5B5;
+}
+
+.social-rail-tooltip-arrow {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 5px solid rgba(22, 24, 29, 0.94);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social-rail-icon-tile,
+  .social-rail-avatar-frame,
+  .social-rail-tooltip {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ── 08. Mobile Layout (<640px) ── */
 .workstation-mobile-view {
   display: none;
 }
 
 @media (max-width: 639px) {
-  .workstation-stage {
+  .scene-root {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 20px));
+  }
+
+  .scene-backdrop {
+    position: fixed;
+    inset: 0;
+    filter: blur(28px) brightness(0.85);
+    transform: scale(1.1);
+  }
+
+  .scene-box {
     display: none !important;
   }
 
@@ -3596,17 +3810,9 @@ h6 {
     flex-direction: column;
     gap: 16px;
     position: relative;
-    padding: 12px;
-    border-radius: 16px;
-    overflow: hidden;
-  }
-
-  .mobile-bg-blur {
-    position: absolute;
-    inset: -20px;
-    z-index: 0;
-    filter: blur(28px) brightness(0.85);
-    transform: scale(1.1);
+    padding: clamp(12px, 3.5vw, 16px);
+    z-index: 2;
+    padding-top: clamp(70px, 10vh, 88px);
   }
 
   .mobile-chat-card {
@@ -3619,7 +3825,7 @@ h6 {
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
     display: flex;
     flex-direction: column;
-    min-height: 420px;
+    min-height: 380px;
   }
 
   .mobile-chat-body {
@@ -3663,7 +3869,6 @@ h6 {
     outline: none;
   }
 
-  /* Flat 2D Virtual Keyboard for Mobile (keys >=30px) */
   .mobile-flat-keyboard {
     position: relative;
     z-index: 1;
@@ -3682,6 +3887,7 @@ h6 {
   }
 
   .mobile-keycap {
+    min-height: 30px;
     height: 34px;
     border-radius: 5px;
     border: 1px solid rgba(0, 0, 0, 0.12);
@@ -3707,7 +3913,74 @@ h6 {
     box-shadow: none;
     background: #E0E7FF;
   }
+
+  /* SocialRail becomes bottom horizontal bar on mobile (<640px) */
+  .social-rail {
+    top: auto;
+    bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    width: max-content;
+    flex-direction: row;
+    padding: 8px 12px;
+    border-radius: 20px;
+    gap: 10px;
+  }
+
+  .social-rail-list {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .social-rail-link,
+  .social-rail-avatar-btn,
+  .social-rail-icon-tile,
+  .social-rail-avatar-frame {
+    width: 40px;
+    height: 40px;
+  }
+
+  .social-rail-divider-item {
+    width: auto;
+    height: 100%;
+    align-items: center;
+  }
+
+  .social-rail-divider {
+    width: 1px;
+    height: 60%;
+    margin: auto 2px;
+  }
+
+  .social-rail-dot {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: -3px;
+    transform: translateX(-50%);
+  }
+
+  .social-rail-tooltip {
+    right: auto;
+    left: 50%;
+    top: auto;
+    bottom: calc(100% + 10px);
+    transform: translateX(-50%);
+    align-items: center;
+  }
+
+  .social-rail-tooltip-arrow {
+    left: 50%;
+    top: 100%;
+    transform: translateX(-50%);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid rgba(22, 24, 29, 0.94);
+    border-bottom: none;
+  }
 }
+
 
 /* ── 07. Back Navigation Pill Button ── */
 .site-back-pill-btn {
@@ -5946,122 +6219,4 @@ h6 {
   font-family: var(--font-mono), monospace;
   font-size: 0.6875rem;
   color: var(--ink-faint);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   STANDALONE AI WORKSTATION PAGE (/ask-ai)
-   ═══════════════════════════════════════════════════════════════════════ */
-.ai-standalone-page {
-  min-height: 100vh;
-  padding: clamp(96px, 12vh, 120px) 0 60px 0;
-  background-color: #faf8f3;
-  background-image:
-    radial-gradient(ellipse 70% 60% at 50% 30%, rgba(235, 110, 50, 0.05) 0%, transparent 70%),
-    radial-gradient(circle at 50% 40%, #ffffff 0%, rgba(253, 250, 244, 0.9) 45%, #f3eee3 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.ai-standalone-page::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    url("data:image/svg+xml,%3Csvg width='128' height='128' viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M60 64h8M64 60v8' stroke='rgba(55,45,35,0.12)' stroke-width='1' stroke-linecap='square'/%3E%3C/svg%3E"),
-    linear-gradient(to right, rgba(50, 40, 30, 0.032) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(50, 40, 30, 0.032) 1px, transparent 1px);
-  background-size: 128px 128px, 64px 64px, 64px 64px;
-  background-position: center top;
-  opacity: 0.85;
-}
-
-/* Header & Headline block (Restored Centered Block) */
-.ai-page-header-wrap {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  position: relative;
-  z-index: 10;
-}
-
-.ask-ai-top-nav {
-  display: flex;
-  align-items: center;
-  margin-bottom: 28px;
-}
-
-.ai-headline-block {
-  text-align: center;
-  margin-bottom: 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.ai-eyebrow {
-  display: inline-block;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 12px;
-  text-align: center;
-}
-
-.ai-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  color: var(--ink);
-  margin: 0;
-  text-align: center;
-}
-
-.ai-sub {
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  color: var(--ink-muted);
-  max-width: 620px;
-  margin: 14px auto 0 auto;
-  text-align: center;
-}
-
-/* Stage Container (Full-bleed breakout without horizontal scrollbar) */
-.ai-stage-container {
-  width: 100%;
-  position: relative;
-  z-index: 5;
-  margin-bottom: 48px;
-}
-
-/* Footer & Connect wrapper */
-.ai-page-footer-wrap {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-  position: relative;
-  z-index: 5;
-}
-
-@media (max-width: 640px) {
-  .ai-page-header-wrap,
-  .ai-page-footer-wrap {
-    padding: 0 14px;
-  }
-
-  .ai-headline-block {
-    margin-bottom: 20px;
-  }
-
-  .ai-sub {
-    font-size: 0.9375rem;
-  }
 }
