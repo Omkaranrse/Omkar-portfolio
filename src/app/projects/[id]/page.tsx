@@ -1,10 +1,20 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { projects, type Project } from '@/data/projects';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import LiquidGlassButton from '@/components/LiquidGlassButton';
+import ScrollProgressBar from '@/components/project-detail/ScrollProgressBar';
+import {
+  ProjectHero,
+  SectionToc,
+  Timeline,
+  ArchitectureDiagram,
+  DecisionAccordion,
+  ChallengeCards,
+  ResultPanel,
+  TechStackMarquee,
+  ProjectPager,
+} from '@/components/project-detail';
 
 interface ProjectPageProps {
   params: Promise<{
@@ -52,207 +62,229 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const nextProject = projects[(projectIndex + 1) % projects.length];
   const prevProject = projects[(projectIndex - 1 + projects.length) % projects.length];
 
+  // Split problem statement to highlight the first sentence as a pull quote
+  const problemSentences = project.problem.split(/(?<=[.?!])\s+/);
+  const problemLead = problemSentences[0] || project.problem;
+  const problemRemainder = problemSentences.slice(1).join(' ');
+
   return (
     <>
+      {/* Scroll progress bar attached under navigation */}
+      <ScrollProgressBar />
+
+      {/* Global site navigation */}
       <Nav />
 
-      <main id="main" className="project-detail-page">
-        {/* ── Top Header Navigation Bar ── */}
-        <div className="project-detail-hero">
-          <div className="wrap">
-            <div className="pd-breadcrumbs" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-              <LiquidGlassButton
-                href="/work"
-                size="sm"
-                icon="arrow"
-                iconPosition="left"
-                material="frosted"
-                surface="dark"
-                textColor="#ffffff"
-              >
-                Back to All Projects
-              </LiquidGlassButton>
+      <main
+        id="main"
+        className="relative min-h-screen bg-[#f8f8f5] text-[#111215] overflow-x-hidden selection:bg-[#eb4c2a]/15 selection:text-[#111215]"
+      >
+        {/* Subtle crumpled paper texture overlay */}
+        <div
+          className="fixed inset-0 pointer-events-none opacity-40 mix-blend-multiply z-0 bg-repeat"
+          style={{
+            backgroundImage: "url('/textures/crumpled-paper.jpg')",
+            backgroundSize: '800px 800px',
+          }}
+          aria-hidden="true"
+        />
 
-              <div className="pd-pagination-pills" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <LiquidGlassButton
-                  href={`/projects/${prevProject.id}`}
-                  size="sm"
-                  surface="dark"
-                  material="clear"
-                  textColor="rgba(255, 255, 255, 0.8)"
-                >
-                  ← Previous
-                </LiquidGlassButton>
-
-                <LiquidGlassButton
-                  href={`/projects/${nextProject.id}`}
-                  size="sm"
-                  surface="dark"
-                  material="clear"
-                  textColor="rgba(255, 255, 255, 0.8)"
-                >
-                  Next →
-                </LiquidGlassButton>
-              </div>
-            </div>
-
-            {/* ── Case Study Header ── */}
-            <div className="pd-header-content">
-              <div className="pd-header-meta">
-                <span className="pd-number">{project.number}</span>
-                <span className="pd-category">{project.category}</span>
-                <span className="pd-sep">·</span>
-                <span className="pd-year">{project.year}</span>
-              </div>
-
-              <h1 className="pd-title">{project.title}</h1>
-              <p className="pd-lead">{project.shortDesc}</p>
-
-              <div className="pd-role-tag">
-                <span>Role: {project.role}</span>
-              </div>
-            </div>
-          </div>
+        {/* 1. Hero Section */}
+        <div className="relative z-10">
+          <ProjectHero
+            project={project}
+            prevProject={prevProject}
+            nextProject={nextProject}
+          />
         </div>
 
-        {/* ── Two-Column Case Study Deep Dive Body ── */}
-        <section className="pd-body-section">
-          <div className="wrap">
-            <div className="pd-grid">
-
-              {/* Left Column */}
-              <div className="pd-col-left">
-
-                {/* Problem */}
-                <div className="pd-block">
-                  <h2 className="pd-block-label">01. The Problem</h2>
-                  <p className="pd-text">{project.problem}</p>
-                </div>
-
-                {/* Approach */}
-                <div className="pd-block">
-                  <h2 className="pd-block-label">02. Engineering Approach</h2>
-                  <ol className="pd-approach-list">
-                    {project.approach.map((step, i) => (
-                      <li key={i} className="pd-approach-item">
-                        <span className="pd-approach-num">{String(i + 1).padStart(2, '0')}</span>
-                        <span className="pd-approach-text">{step}</span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-
-                {/* Result */}
-                <div className="pd-block">
-                  <h2 className="pd-block-label">03. Result &amp; Impact</h2>
-                  <p className="pd-text">{project.result}</p>
-                </div>
-
-                {/* Stack */}
-                <div className="pd-block">
-                  <h2 className="pd-block-label">04. Technology Stack</h2>
-                  <div className="pd-stack">
-                    {project.stack.map((s) => (
-                      <span key={s} className="pd-tag">{s}</span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Links */}
-                {project.links.length > 0 && (
-                  <div className="pd-links" style={{ marginTop: 24 }}>
-                    {project.links.map((link) => (
-                      <LiquidGlassButton
-                        key={link.label}
-                        href={link.href}
-                        newTab
-                        size="md"
-                        icon="diagonal"
-                        tint="rgba(235, 76, 42, 0.3)"
-                        textColor="#ffffff"
-                      >
-                        View {link.label} Repository
-                      </LiquidGlassButton>
-                    ))}
-                  </div>
-                )}
-
-              </div>
-
-              {/* Right Column */}
-              <div className="pd-col-right">
-
-                {/* Architecture Flow */}
-                <div className="pd-block">
-                  <h2 className="pd-block-label">Architecture &amp; Data Flow</h2>
-                  <div className="pd-arch">
-                    {project.architecture.map((node, i) => (
-                      <div key={i} className="pd-arch-row">
-                        <div className="pd-arch-node">
-                          <span className="pd-arch-label">{node.label}</span>
-                          {node.note && <span className="pd-arch-note">{node.note}</span>}
-                        </div>
-                        {i < project.architecture.length - 1 && (
-                          <div className="pd-arch-arrow" aria-hidden="true">↓</div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Technical decisions */}
-                <div className="pd-block">
-                  <h2 className="pd-block-label">Key Technical Decisions</h2>
-                  <div className="pd-decisions">
-                    {project.techDecisions.map((td, i) => (
-                      <div key={i} className="pd-decision">
-                        <span className="pd-decision-why">{td.why}</span>
-                        <p className="pd-decision-answer">{td.answer}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Challenges */}
-                <div className="pd-block">
-                  <h2 className="pd-block-label">The Hard Part &amp; Challenges</h2>
-                  <div className="pd-challenges">
-                    {project.challenges.map((c, i) => (
-                      <div key={i} className="pd-challenge">
-                        <span className="pd-challenge-title">{c.title}</span>
-                        <p className="pd-challenge-detail">{c.detail}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-              </div>
-
+        {/* 12-Column Centered Container (Max-Width 1200px) */}
+        <div className="relative z-10 max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-14 items-start">
+            {/* 2. Sticky Left Mini Table of Contents (3 cols on md+, hidden <768px) */}
+            <div className="hidden md:block md:col-span-3 sticky top-28 self-start">
+              <SectionToc />
             </div>
 
-            {/* ── Bottom Project Switcher & Pagination ── */}
-            <div className="pd-bottom-nav">
-              <div className="pd-bottom-label">All Projects</div>
-              <div className="pd-bottom-grid">
-                {projects.map((p) => {
-                  const isCurrent = p.id === project.id;
-                  return (
-                    <Link
-                      key={p.id}
-                      href={`/projects/${p.id}`}
-                      className={`pd-bottom-card ${isCurrent ? 'is-current' : ''}`}
-                    >
-                      <span className="pd-bc-num">{p.number}</span>
-                      <span className="pd-bc-title">{p.title}</span>
-                      <span className="pd-bc-role">{p.category.split('·')[0].trim()}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
+            {/* Deep Dive Content Sections (9 cols on md+, single col on mobile) */}
+            <div className="col-span-1 md:col-span-9 space-y-16 lg:space-y-20 min-w-0">
+              {/* 3. Problem Section */}
+              <section
+                id="problem"
+                aria-labelledby="problem-heading"
+                className="scroll-mt-28 space-y-4"
+              >
+                <div className="space-y-1">
+                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                    01. THE PROBLEM
+                  </span>
+                  <h2
+                    id="problem-heading"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
+                  >
+                    Challenge &amp; Context
+                  </h2>
+                </div>
 
+                <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-[2px] p-6 sm:p-8 lg:p-10 shadow-[0_2px_8px_rgba(17,18,21,0.03)] hover:shadow-[0_8px_24px_rgba(17,18,21,0.06)] hover:-translate-y-0.5 transition-all duration-300">
+                  <blockquote className="border-l-3 border-[#eb4c2a] pl-5 sm:pl-6 my-2">
+                    <p className="font-sans text-lg sm:text-xl font-medium tracking-tight text-[#111215] leading-snug">
+                      &ldquo;{problemLead}&rdquo;
+                    </p>
+                  </blockquote>
+                  {problemRemainder && (
+                    <p className="mt-5 font-sans text-sm sm:text-base text-[#565862] leading-relaxed">
+                      {problemRemainder}
+                    </p>
+                  )}
+                </div>
+              </section>
+
+              {/* 4. Approach Section (Vertical Timeline) */}
+              <section
+                id="approach"
+                aria-labelledby="approach-heading"
+                className="scroll-mt-28 space-y-5"
+              >
+                <div className="space-y-1">
+                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                    02. ENGINEERING APPROACH
+                  </span>
+                  <h2
+                    id="approach-heading"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
+                  >
+                    Execution &amp; Phases
+                  </h2>
+                </div>
+
+                <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-[2px] p-6 sm:p-8 lg:p-10 shadow-[0_2px_8px_rgba(17,18,21,0.03)] hover:shadow-[0_8px_24px_rgba(17,18,21,0.06)] transition-all duration-300">
+                  <Timeline steps={project.approach} />
+                </div>
+              </section>
+
+              {/* 5. Architecture Section */}
+              <section
+                id="architecture"
+                aria-labelledby="architecture-heading"
+                className="scroll-mt-28 space-y-5"
+              >
+                <div className="space-y-1">
+                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                    03. ARCHITECTURE &amp; DATA FLOW
+                  </span>
+                  <h2
+                    id="architecture-heading"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
+                  >
+                    System Topology
+                  </h2>
+                </div>
+
+                <ArchitectureDiagram
+                  nodes={project.architecture}
+                  edges={project.edges}
+                />
+              </section>
+
+              {/* 6. Key Technical Decisions (Accordion) */}
+              <section
+                id="decisions"
+                aria-labelledby="decisions-heading"
+                className="scroll-mt-28 space-y-5"
+              >
+                <div className="space-y-1">
+                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                    04. KEY TECHNICAL DECISIONS
+                  </span>
+                  <h2
+                    id="decisions-heading"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
+                  >
+                    Architectural Trade-offs
+                  </h2>
+                </div>
+
+                <DecisionAccordion decisions={project.techDecisions} />
+              </section>
+
+              {/* 7. Challenges Section */}
+              <section
+                id="challenges"
+                aria-labelledby="challenges-heading"
+                className="scroll-mt-28 space-y-5"
+              >
+                <div className="space-y-1">
+                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                    05. THE HARD PART &amp; CHALLENGES
+                  </span>
+                  <h2
+                    id="challenges-heading"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
+                  >
+                    Obstacles &amp; Resolutions
+                  </h2>
+                </div>
+
+                <ChallengeCards challenges={project.challenges} />
+              </section>
+
+              {/* 8. Result & Impact Section */}
+              <section
+                id="result"
+                aria-labelledby="result-heading"
+                className="scroll-mt-28 space-y-5"
+              >
+                <div className="space-y-1">
+                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                    06. RESULT &amp; IMPACT
+                  </span>
+                  <h2
+                    id="result-heading"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
+                  >
+                    Outcomes &amp; Verification
+                  </h2>
+                </div>
+
+                <ResultPanel
+                  result={project.result}
+                  metrics={project.metrics}
+                  media={project.media}
+                />
+              </section>
+
+              {/* 9. Technology Stack (Marquee / Grid) */}
+              <section
+                id="stack"
+                aria-labelledby="stack-heading"
+                className="scroll-mt-28 space-y-5"
+              >
+                <div className="space-y-1">
+                  <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
+                    07. TECHNOLOGY STACK
+                  </span>
+                  <h2
+                    id="stack-heading"
+                    className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
+                  >
+                    Tech &amp; Tooling
+                  </h2>
+                </div>
+
+                <TechStackMarquee stack={project.stack} />
+              </section>
+            </div>
           </div>
-        </section>
+
+          {/* 10. Footer Prev/Next Cards + All Projects Index Strip */}
+          <ProjectPager
+            currentProject={project}
+            prevProject={prevProject}
+            nextProject={nextProject}
+            allProjects={projects}
+          />
+        </div>
       </main>
 
       <Footer />

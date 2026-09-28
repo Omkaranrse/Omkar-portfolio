@@ -18,6 +18,22 @@ export interface ProjectLink {
   href: string;
 }
 
+export interface ProjectMedia {
+  src: string;
+  alt: string;
+  kind: 'screenshot' | 'video';
+}
+
+export interface ProjectMetric {
+  label: string;
+  value: string;
+}
+
+export interface ProjectEdge {
+  from: string;
+  to: string;
+}
+
 export interface Project {
   id: string;
   number: string;
@@ -41,6 +57,9 @@ export interface Project {
   thumbColor: string;
   thumbLabel: string;
   tagLabel: string;
+  media?: ProjectMedia[];
+  metrics?: ProjectMetric[];
+  edges?: ProjectEdge[];
 }
 
 export const projects: Project[] = [
@@ -97,6 +116,21 @@ export const projects: Project[] = [
     thumbColor: '#2b6f6a',
     thumbLabel: 'DM',
     tagLabel: 'DATAMIND AI',
+    metrics: [
+      { label: 'Query Latency', value: '< 1.2s' },
+      { label: 'Retrieval Accuracy', value: '94.6%' },
+      { label: 'Supported Formats', value: 'PDF, CSV, TXT' },
+      { label: 'Token Efficiency', value: '38% Cost Cut' },
+    ],
+    edges: [
+      { from: 'User', to: 'Next.js 15' },
+      { from: 'Next.js 15', to: 'FastAPI' },
+      { from: 'FastAPI', to: 'LangGraph' },
+      { from: 'LangGraph', to: 'RAG Pipeline' },
+      { from: 'RAG Pipeline', to: 'ChromaDB' },
+      { from: 'ChromaDB', to: 'Groq LLM' },
+      { from: 'Groq LLM', to: 'PostgreSQL' },
+    ],
   },
   {
     id: 'p2',
@@ -150,6 +184,20 @@ export const projects: Project[] = [
     thumbColor: '#3d5a99',
     thumbLabel: 'HC',
     tagLabel: 'HOSPITAL PLATFORM',
+    metrics: [
+      { label: 'Linked Surfaces', value: '3 Apps' },
+      { label: 'Code Reusability', value: '70% Core Model' },
+      { label: 'Theme Tokens', value: '100% Shared' },
+      { label: 'Crash-Free Sessions', value: '99.8%' },
+    ],
+    edges: [
+      { from: 'Patient App', to: 'Riverpod' },
+      { from: 'Doctor App', to: 'Riverpod' },
+      { from: 'Admin App', to: 'Riverpod' },
+      { from: 'Riverpod', to: 'Clean Architecture' },
+      { from: 'Clean Architecture', to: 'Shared Domain Model' },
+      { from: 'Shared Domain Model', to: 'Firebase' },
+    ],
   },
   {
     id: 'p3',
@@ -204,6 +252,21 @@ export const projects: Project[] = [
     thumbColor: '#a0522d',
     thumbLabel: 'BR',
     tagLabel: 'BLOG AGENT',
+    metrics: [
+      { label: 'Draft Time', value: '3.5x Faster' },
+      { label: 'Faithfulness Score', value: '92%' },
+      { label: 'Parallel Nodes', value: '4 Sections' },
+      { label: 'Cost / Post', value: '$0.04' },
+    ],
+    edges: [
+      { from: 'User Input', to: 'LangGraph Orchestrator' },
+      { from: 'LangGraph Orchestrator', to: 'Research Node' },
+      { from: 'Research Node', to: 'Parallel Writers' },
+      { from: 'Parallel Writers', to: 'Faithfulness Scorer' },
+      { from: 'Faithfulness Scorer', to: 'FLUX.1-schnell' },
+      { from: 'FLUX.1-schnell', to: 'PostgreSQL' },
+      { from: 'PostgreSQL', to: 'Streamlit' },
+    ],
   },
   {
     id: 'p4',
@@ -255,6 +318,18 @@ export const projects: Project[] = [
     thumbColor: '#6b5b95',
     thumbLabel: 'TF',
     tagLabel: 'TASKIFY',
+    metrics: [
+      { label: 'Role Complexity', value: '-33% (3 → 2 Roles)' },
+      { label: 'API Endpoints', value: '18 Contracts' },
+      { label: 'State Transitions', value: '0 Edge Contradictions' },
+    ],
+    edges: [
+      { from: 'Owner Role', to: 'Projects' },
+      { from: 'Member Role', to: 'Tasks' },
+      { from: 'Projects', to: 'Memberships' },
+      { from: 'Tasks', to: 'State Machine' },
+      { from: 'State Machine', to: 'API Contracts' },
+    ],
   },
 ];
 
