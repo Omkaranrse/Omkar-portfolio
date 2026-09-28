@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   images: {
-    qualities: [75, 88, 90, 100],
+    qualities: [60, 75, 82, 88, 90, 100],
   },
   devIndicators: false,
   allowedDevOrigins: [
@@ -26,4 +26,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
