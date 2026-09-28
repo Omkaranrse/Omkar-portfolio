@@ -204,9 +204,6 @@ export default function SocialRail() {
                   <div className="social-rail-icon-svg">{item.icon}</div>
                 </div>
               </a>
-
-              {/* Running Indicator Dot on inner right edge */}
-              <div className="social-rail-dot" aria-hidden="true" />
             </li>
           );
         })}
@@ -250,9 +247,6 @@ export default function SocialRail() {
               />
             </div>
           </button>
-
-          {/* Running Indicator Dot for Profile */}
-          <div className="social-rail-dot" aria-hidden="true" />
         </li>
       </ul>
     </nav>

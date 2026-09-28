@@ -276,9 +276,6 @@ export default function SocialDock() {
                   <div className="social-dock-icon-svg">{item.icon}</div>
                 </div>
               </a>
-
-              {/* Running App Indicator Dot (like macOS dock) */}
-              <div className="social-dock-dot" aria-hidden="true" />
             </div>
           );
         })}
@@ -330,9 +327,6 @@ export default function SocialDock() {
               />
             </div>
           </button>
-
-          {/* Running Dot for Profile */}
-          <div className="social-dock-dot" aria-hidden="true" />
         </div>
       </div>
     </div>

@@ -3,13 +3,11 @@
 import { useState, useCallback } from 'react';
 import Nav from '@/components/Nav';
 import AskOmkarAiWorkstation, { ChatMessage } from '@/components/AskOmkarAiWorkstation';
-import { useSmartBack } from '@/components/BackButton';
 import SocialRail from '@/components/SocialRail';
 
 export default function AskAiPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isThinking, setIsThinking] = useState(false);
-  const handleSmartBack = useSmartBack('/#contact');
 
   const handleSendQuestion = useCallback(
     async (queryText: string) => {
@@ -123,7 +121,6 @@ export default function AskAiPage() {
         messages={messages}
         isThinking={isThinking}
         onSendQuestion={handleSendQuestion}
-        onBack={handleSmartBack}
       />
       <SocialRail />
     </>

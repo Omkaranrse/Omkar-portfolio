@@ -2671,12 +2671,11 @@ h6 {
 .mac-screen {
   position: absolute;
   z-index: 2;
-  container-type: inline-size;
+  container-type: size;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 6px;
 }
 
 .mac-screen-glass-reflection {
@@ -2686,45 +2685,6 @@ h6 {
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.35);
   pointer-events: none;
   z-index: 10;
-}
-
-.mac-screen-menubar {
-  flex: 0 0 22px;
-  height: 22px;
-  background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
-  font-size: clamp(12px, 1.8cqw, 13px);
-  color: #1c2233;
-  user-select: none;
-  z-index: 2;
-}
-
-.mac-menubar-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.mac-menubar-brand {
-  font-weight: 700;
-}
-
-.mac-menubar-item {
-  color: #4b5563;
-  font-weight: 500;
-}
-
-.mac-menubar-clock {
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  color: #374151;
 }
 
 .mac-screen-window-frame {
@@ -2737,6 +2697,7 @@ h6 {
   overflow: hidden;
   position: relative;
   z-index: 1;
+  min-height: 0;
 }
 
 .mac-window-titlebar {
@@ -2757,6 +2718,7 @@ h6 {
   display: flex;
   align-items: center;
   gap: 6px;
+  pointer-events: none;
 }
 
 .traffic-dot {
@@ -2765,38 +2727,13 @@ h6 {
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.12);
   padding: 0;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
+  cursor: default;
+  pointer-events: none;
 }
 
 .traffic-dot.red { background: #FF5F56; }
 .traffic-dot.yellow { background: #FFBD2E; }
 .traffic-dot.green { background: #27C93F; }
-
-.traffic-dot:hover {
-  opacity: 0.85;
-}
-
-.mac-nav-back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 5px;
-  padding: 2px 7px;
-  font-size: clamp(12px, 1.6cqw, 13px);
-  font-weight: 600;
-  color: #374151;
-  cursor: pointer;
-  margin-left: 6px;
-  transition: all 0.15s ease;
-}
-
-.mac-nav-back-btn:hover {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.2);
-}
 
 .mac-window-title {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
@@ -2839,6 +2776,100 @@ h6 {
   background: rgba(240, 240, 240, 0.7);
 }
 
+/* Title Bar Full Screen Toggle Button (Only entry point) */
+.fullscreen-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  color: #374151;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
+  font-size: clamp(12px, 1.6cqw, 13px);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fullscreen-btn:hover {
+  background: #ffffff;
+  color: #111827;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.fullscreen-btn-label {
+  display: inline;
+}
+
+@container (max-width: 420px) {
+  .fullscreen-btn-label {
+    display: none;
+  }
+}
+
+/* One-time soft pulse ring for Full Screen button */
+.fullscreen-btn.should-pulse {
+  animation: none;
+}
+
+.fullscreen-btn.should-pulse .fullscreen-btn-label {
+  display: inline !important;
+}
+
+.fullscreen-btn.should-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 8px;
+  border: 2px solid rgba(0, 122, 255, 0.7);
+  opacity: 0;
+  transform: scale(0.95);
+  animation: fullscreen-soft-pulse 2s ease-out 1;
+  pointer-events: none;
+}
+
+@keyframes fullscreen-soft-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.3);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fullscreen-btn.should-pulse::after {
+    animation: none !important;
+  }
+}
+
+/* ChatPanel Container */
+.chat-panel-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-panel-container.is-inline-panel {
+  font-size: 13px;
+}
+
+.chat-panel-container.is-modal-panel {
+  font-size: 14px;
+}
+
 /* State A: Compact Launcher Body (Vertically Centered Group) */
 .state-a-compact-body {
   flex: 1;
@@ -2849,6 +2880,7 @@ h6 {
   padding: clamp(10px, 2.4cqw, 18px);
   box-sizing: border-box;
   width: 100%;
+  min-height: 0;
 }
 
 .launcher-headline-wrap {
@@ -2881,15 +2913,6 @@ h6 {
   margin: 0;
 }
 
-.compact-expand-hint {
-  font-size: clamp(12px, 1.6cqw, 12.5px);
-  font-weight: 600;
-  color: var(--accent);
-  opacity: 0.9;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
 .compact-query-box {
   background: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.12);
@@ -2901,6 +2924,8 @@ h6 {
   gap: 8px;
   cursor: text;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .compact-query-box.is-focused,
@@ -2914,6 +2939,7 @@ h6 {
   position: relative;
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .compact-textarea {
@@ -2984,11 +3010,75 @@ h6 {
   cursor: not-allowed;
 }
 
-.compact-chips-row {
+/* State B / Active Chat: Compact Inline & Modal Chat Body */
+.active-chat-body {
+  flex: 1;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+
+/* Message List: The ONLY scroll region */
+.chat-messages-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(8px, 1.8cqw, 14px);
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.chat-messages-viewport::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-messages-viewport::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages-viewport::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+/* Pinned Input Row (min 44px) */
+.chat-input-pinned-row {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 6px clamp(8px, 1.8cqw, 14px);
+  background: rgba(255, 255, 255, 0.95);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+/* Chips Row: single line, horizontal scroll, hidden via @container (max-height: 240px) */
+.compact-chips-row {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 6px;
+  overflow-x: auto;
+  padding: 4px clamp(8px, 1.8cqw, 14px) 8px clamp(8px, 1.8cqw, 14px);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.compact-chips-row::-webkit-scrollbar {
+  display: none;
+}
+
+@container (max-height: 240px) {
+  .chat-panel-container.is-inline-panel .compact-chips-row {
+    display: none !important;
+  }
 }
 
 .compact-chip-pill {
@@ -3004,12 +3094,76 @@ h6 {
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .compact-chip-pill:hover {
   background: #E5E7EB;
   color: #111827;
   border-color: rgba(0, 0, 0, 0.18);
+}
+
+/* Compact Bubbles in Inline Chat */
+.chat-panel-container.is-inline-panel .chat-bubble {
+  max-width: 88%;
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.chat-panel-container.is-inline-panel .chat-bubble-row.is-user .chat-bubble {
+  background: #007aff;
+  color: #ffffff;
+  border-bottom-right-radius: 2px;
+}
+
+.chat-panel-container.is-inline-panel .chat-bubble-row.is-ai .chat-bubble {
+  background: #F3F4F6;
+  color: #111827;
+  border-bottom-left-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.chat-panel-container.is-inline-panel .bubble-source-pill {
+  margin-top: 4px;
+  padding: 1px 6px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  font-size: 11px;
+  display: inline-block;
+  color: #4b5563;
+}
+
+.chat-panel-container.is-inline-panel .is-thinking-bubble {
+  padding: 6px 12px;
+}
+
+.chat-panel-container.is-inline-panel .thinking-text {
+  font-size: 12px;
+}
+
+/* Placeholder inside monitor when conversation is in modal full screen */
+.monitor-expanded-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 246, 248, 0.95);
+  color: #6b7280;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.monitor-expanded-placeholder .placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.7;
 }
 
 /* ── 05. Keyboard Rect & Case Shell ── */
@@ -3701,19 +3855,6 @@ h6 {
   margin: 2px auto;
 }
 
-.social-rail-dot {
-  position: absolute;
-  right: -2px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #10B981;
-  box-shadow: 0 0 5px rgba(16, 185, 129, 0.7);
-  pointer-events: none;
-}
-
 /* Tooltip positioned on the LEFT of the icon */
 .social-rail-tooltip {
   position: absolute;
@@ -3953,14 +4094,6 @@ h6 {
     margin: auto 2px;
   }
 
-  .social-rail-dot {
-    right: auto;
-    left: 50%;
-    top: auto;
-    bottom: -3px;
-    transform: translateX(-50%);
-  }
-
   .social-rail-tooltip {
     right: auto;
     left: 50%;
@@ -3978,51 +4111,6 @@ h6 {
     border-right: 5px solid transparent;
     border-top: 5px solid rgba(22, 24, 29, 0.94);
     border-bottom: none;
-  }
-}
-
-
-/* ── 07. Back Navigation Pill Button ── */
-.site-back-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 36px;
-  padding: 0 14px;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  font-family: var(--font-mono), monospace;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: var(--ink-muted);
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
-}
-
-.site-back-pill-btn:hover {
-  background: #ffffff;
-  color: var(--ink);
-  border-color: rgba(0, 0, 0, 0.14);
-}
-
-.site-back-pill-btn:hover .back-pill-arrow {
-  transform: translateX(-2px);
-}
-
-.site-back-pill-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--accent);
-}
-
-@media (max-width: 639px) {
-  .site-back-pill-btn {
-    min-height: 44px;
-    padding: 0 16px;
   }
 }
 
@@ -5531,22 +5619,6 @@ h6 {
   justify-content: center;
   pointer-events: none;
   z-index: 1;
-}
-
-/* macOS Running App Indicator Dot (•) */
-.social-dock-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: rgba(30, 32, 38, 0.45);
-  margin-top: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
-}
-
-.social-dock-item-col:hover .social-dock-dot {
-  background: var(--ink, #111111);
-  transform: scale(1.3);
 }
 
 .social-dock-divider {

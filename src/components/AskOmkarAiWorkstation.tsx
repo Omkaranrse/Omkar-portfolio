@@ -32,10 +32,10 @@ export interface KeyDef {
   variant?: 'alpha' | 'modifier' | 'space' | 'enter' | 'arrow';
 }
 
-// ── 01. Placement Config (Percentages of .scene-box) ──
+// ── 01. Placement Config (Retuned with >= 3% clearance above box bottom) ──
 const SCENE = {
   screen:   { x: 28.9, y: 19.4, w: 42.8, h: 37.4 },
-  keyboard: { x: 27.0, y: 75.5, w: 44.0, h: 17.5 },
+  keyboard: { x: 27.5, y: 71.5, w: 42.5, h: 16.5 },
 };
 
 // ── 02. 5-Row 75% Mechanical Keyboard Layout ──
@@ -116,25 +116,365 @@ const PRESET_PROMPTS = [
   { label: 'Contact & Socials', prompt: 'How can I connect with you or collaborate?' },
 ];
 
+// ─────────────────────────────────────────────────────────
+// ChatPanel: Rendered EITHER inline in the monitor OR in
+// the portal modal (never both simultaneously), guaranteeing
+// exactly 1 <textarea> in the DOM.
+// ─────────────────────────────────────────────────────────
+interface ChatPanelProps {
+  isModal: boolean;
+  messages: ChatMessage[];
+  isThinking: boolean;
+  question: string;
+  onQuestionChange: (val: string) => void;
+  onSubmit: (q?: string) => void;
+  soundEnabled: boolean;
+  onToggleSound: () => void;
+  isExpanded: boolean;
+  onToggleExpanded: () => void;
+  shouldPulseFullscreen: boolean;
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
+  isFocused: boolean;
+  onFocusChange: (f: boolean) => void;
+  onTriggerPulse: () => void;
+}
+
+function ChatPanel({
+  isModal,
+  messages,
+  isThinking,
+  question,
+  onQuestionChange,
+  onSubmit,
+  soundEnabled,
+  onToggleSound,
+  isExpanded,
+  onToggleExpanded,
+  shouldPulseFullscreen,
+  textareaRef,
+  isFocused,
+  onFocusChange,
+  onTriggerPulse,
+}: ChatPanelProps) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const prevMessagesLength = useRef(messages.length);
+  const prevLastAiMsgId = useRef<string | null>(null);
+
+  // Scroll logic adhering to Section 3:
+  // 1. On send: scroll to bottom so question + thinking pill are visible.
+  // 2. When AI message appears: scroll so the TOP of that answer sits at top of viewport.
+  // 3. Do NOT chase bottom while it streams.
+  // 4. Show "Latest ↓" button when content extends below.
+  useEffect(() => {
+    const scrollEl = scrollRef.current;
+    if (!scrollEl) return;
+
+    const currentLen = messages.length;
+    const lastMsg = currentLen > 0 ? messages[currentLen - 1] : null;
+
+    if (currentLen > prevMessagesLength.current) {
+      if (lastMsg && lastMsg.role === 'user') {
+        scrollEl.scrollTo({ top: scrollEl.scrollHeight, behavior: 'smooth' });
+      }
+    }
+
+    if (lastMsg && lastMsg.role === 'ai' && lastMsg.id !== prevLastAiMsgId.current) {
+      prevLastAiMsgId.current = lastMsg.id;
+      requestAnimationFrame(() => {
+        const bubbleEl = scrollEl.querySelector(`[data-msg-id="${lastMsg.id}"]`) as HTMLElement;
+        if (bubbleEl) {
+          scrollEl.scrollTo({ top: bubbleEl.offsetTop - 8, behavior: 'smooth' });
+          if (!isModal && bubbleEl.offsetHeight > scrollEl.clientHeight) {
+            onTriggerPulse();
+          }
+        }
+      });
+    }
+
+    prevMessagesLength.current = currentLen;
+  }, [messages, isModal, onTriggerPulse]);
+
+  useEffect(() => {
+    if (isThinking && scrollRef.current) {
+      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  }, [isThinking]);
+
+  const handleScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    setShowScrollBottom(scrollHeight - scrollTop - clientHeight > 30);
+  }, []);
+
+  const scrollToBottom = useCallback((smooth = true) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    }
+  }, []);
+
+  const isIdle = messages.length === 0;
+
+  return (
+    <div className={`chat-panel-container ${isModal ? 'is-modal-panel' : 'is-inline-panel'}`}>
+      {/* ── Title Bar (32px) ── */}
+      <div className="mac-window-titlebar">
+        {/* Decorative traffic lights */}
+        <div className="traffic-lights" aria-hidden="true" style={{ pointerEvents: 'none' }}>
+          <span className="traffic-dot red" />
+          <span className="traffic-dot yellow" />
+          <span className="traffic-dot green" />
+        </div>
+
+        {/* Centered window title */}
+        <div className="mac-window-title">Omkar AI</div>
+
+        {/* Right Tools: Audio toggle & Exactly ONE Full Screen button */}
+        <div className="mac-window-tools">
+          <button
+            type="button"
+            className={`mac-tool-btn ${!soundEnabled ? 'is-muted' : ''}`}
+            onClick={onToggleSound}
+            title={soundEnabled ? 'Mute Mechanical Switch Audio' : 'Unmute Sound'}
+            aria-label="Toggle mechanical switch audio"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              {soundEnabled ? (
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+              ) : (
+                <line x1="23" y1="9" x2="17" y2="15" />
+              )}
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            className={`fullscreen-btn ${shouldPulseFullscreen ? 'should-pulse' : ''}`}
+            onClick={onToggleExpanded}
+            aria-label={isExpanded ? 'Exit full screen' : 'Open full screen conversation'}
+            title={isExpanded ? 'Exit full screen' : 'Open full screen conversation'}
+            aria-haspopup="dialog"
+            aria-expanded={isExpanded}
+          >
+            {isExpanded ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+                </svg>
+                <span className="fullscreen-btn-label">Exit full screen</span>
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                </svg>
+                <span className="fullscreen-btn-label">Full screen</span>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Body: Idle Launcher OR Active Chat ── */}
+      {isIdle ? (
+        <div className="state-a-compact-body">
+          <div className="launcher-headline-wrap">
+            <div className="launcher-text-col">
+              <h2 className="launcher-title">Ask anything about Omkar.</h2>
+              <p className="launcher-subtitle">Projects, stack, experience, roles.</p>
+            </div>
+          </div>
+
+          <div
+            className={`compact-query-box ${isFocused ? 'is-focused' : ''}`}
+            onClick={() => textareaRef.current?.focus()}
+          >
+            <div className="compact-textarea-wrap">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                className="compact-textarea"
+                placeholder=""
+                value={question}
+                onChange={(e) => onQuestionChange(e.target.value)}
+                onFocus={() => onFocusChange(true)}
+                onBlur={() => onFocusChange(false)}
+                aria-label="Ask Omkar AI a question"
+              />
+              {!question && (
+                <span className="compact-kinetic-placeholder" aria-hidden="true">
+                  Type via keyboard or click preset below
+                  <span className="compact-blinking-cursor" />
+                </span>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="compact-send-btn"
+              onClick={() => onSubmit()}
+              disabled={!question.trim() || isThinking}
+              aria-label="Send message"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </button>
+          </div>
+
+          <div className="compact-chips-row">
+            {PRESET_PROMPTS.map((p, idx) => (
+              <button
+                key={`preset-${idx}`}
+                type="button"
+                className="compact-chip-pill"
+                onClick={() => onSubmit(p.prompt)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="active-chat-body">
+          {/* Scrollable message thread (the ONLY scroll region) */}
+          <div
+            ref={scrollRef}
+            onScroll={handleScroll}
+            className="chat-messages-viewport"
+          >
+            <div className="messages-thread">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  data-msg-id={msg.id}
+                  className={`chat-bubble-row ${msg.role === 'user' ? 'is-user' : 'is-ai'}`}
+                >
+                  <div className="chat-bubble">
+                    <div className="bubble-text">{msg.text}</div>
+                    {msg.source && (
+                      <div className="bubble-source-pill">
+                        <span>Source: {msg.source}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Thinking Pill */}
+              {isThinking && (
+                <div className="chat-bubble-row is-ai">
+                  <div className="chat-bubble is-thinking-bubble">
+                    <span className="thinking-dot" />
+                    <span className="thinking-dot" />
+                    <span className="thinking-dot" />
+                    <span className="thinking-text">{isModal ? 'Retrieving knowledge base...' : 'Thinking…'}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Floating Latest Button */}
+            {showScrollBottom && (
+              <button
+                type="button"
+                className="scroll-latest-btn"
+                onClick={() => scrollToBottom(true)}
+                aria-label="Scroll to latest messages"
+              >
+                <span>Latest</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 5v14M19 12l-7 7-7-7" />
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* Pinned Query Input Row (min 44px) */}
+          <div className="chat-input-pinned-row">
+            <div
+              className={`compact-query-box ${isFocused ? 'is-focused' : ''}`}
+              onClick={() => textareaRef.current?.focus()}
+            >
+              <div className="compact-textarea-wrap">
+                <textarea
+                  ref={textareaRef}
+                  rows={1}
+                  className="compact-textarea"
+                  placeholder=""
+                  value={question}
+                  onChange={(e) => onQuestionChange(e.target.value)}
+                  onFocus={() => onFocusChange(true)}
+                  onBlur={() => onFocusChange(false)}
+                  aria-label="Ask Omkar AI a question"
+                />
+                {!question && (
+                  <span className="compact-kinetic-placeholder" aria-hidden="true">
+                    Ask a follow-up or type...
+                    <span className="compact-blinking-cursor" />
+                  </span>
+                )}
+              </div>
+
+              <button
+                type="button"
+                className="compact-send-btn"
+                onClick={() => onSubmit()}
+                disabled={!question.trim() || isThinking}
+                aria-label="Send message"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Chips Row (single line, horizontal scroll, hidden via @container (max-height: 240px)) */}
+          <div className="compact-chips-row">
+            {PRESET_PROMPTS.map((p, idx) => (
+              <button
+                key={`preset-${idx}`}
+                type="button"
+                className="compact-chip-pill"
+                onClick={() => onSubmit(p.prompt)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+// Main Component: AskOmkarAiWorkstation
+// ─────────────────────────────────────────────────────────
 export default function AskOmkarAiWorkstation({
   messages,
   isThinking,
   onSendQuestion,
-  onBack,
 }: AskOmkarAiWorkstationProps) {
   const [question, setQuestion] = useState('');
   const [pressedKeys, setPressedKeys] = useState<Record<string, boolean>>({});
   const [isFocused, setIsFocused] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isShiftActive, setIsShiftActive] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState(false);
-  const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [knobRotation, setKnobRotation] = useState(0);
-  const [clockTime, setClockTime] = useState('9:41 AM');
   const [mounted, setMounted] = useState(false);
 
   // State B (Expanded Modal Window)
   const [isExpanded, setIsExpanded] = useState(false);
+  const [shouldPulseFullscreen, setShouldPulseFullscreen] = useState(false);
+  const [hasPulsed, setHasPulsed] = useState(false);
 
   // Debug mode (?debug=1, only when process.env.NODE_ENV !== 'production')
   const [isDebug, setIsDebug] = useState(false);
@@ -144,17 +484,25 @@ export default function AskOmkarAiWorkstation({
   });
   const [railIntersects, setRailIntersects] = useState(false);
 
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const expandedTextareaRef = useRef<HTMLTextAreaElement>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
   const screenRectRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const savedCaretPos = useRef<{ start: number; end: number }>({ start: 0, end: 0 });
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Dev-only assertion: exactly 1 textarea in DOM at all times
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      const textareas = document.querySelectorAll('textarea');
+      if (textareas.length !== 1) {
+        console.warn(`[Dev Assertion] Expected exactly 1 textarea in DOM, found ${textareas.length}`);
+      }
+    }
+  });
 
   // Check ?debug=1 from URL safely in non-production
   useEffect(() => {
@@ -191,73 +539,65 @@ export default function AskOmkarAiWorkstation({
     return () => window.removeEventListener('resize', checkIntersection);
   }, [isDebug]);
 
-  // Update live clock
-  useEffect(() => {
-    const updateClock = () => {
-      const d = new Date();
-      setClockTime(
-        d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
-      );
-    };
-    updateClock();
-    const interval = setInterval(updateClock, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Scroll message list to bottom
-  const scrollToBottom = useCallback((smooth = true) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: smooth ? 'smooth' : 'auto',
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom(true);
-  }, [messages, isThinking, scrollToBottom]);
-
   // Open & Close handlers for State B with focus & caret preservation
-  const handleOpenExpanded = useCallback(() => {
+  const handleToggleExpanded = useCallback(() => {
     if (textareaRef.current) {
       savedCaretPos.current = {
         start: textareaRef.current.selectionStart || 0,
         end: textareaRef.current.selectionEnd || 0,
       };
     }
-    setIsExpanded(true);
+    setIsExpanded((prev) => !prev);
   }, []);
 
   const handleCloseExpanded = useCallback(() => {
-    if (expandedTextareaRef.current) {
+    if (textareaRef.current) {
       savedCaretPos.current = {
-        start: expandedTextareaRef.current.selectionStart || 0,
-        end: expandedTextareaRef.current.selectionEnd || 0,
+        start: textareaRef.current.selectionStart || 0,
+        end: textareaRef.current.selectionEnd || 0,
       };
     }
     setIsExpanded(false);
   }, []);
 
-  // Body scroll lock, focus trap, and caret restoration for State B
+  const triggerPulse = useCallback(() => {
+    if (!hasPulsed) {
+      setShouldPulseFullscreen(true);
+      setHasPulsed(true);
+    }
+  }, [hasPulsed]);
+
+  // Caret, scroll lock, focus trap, and inert handling across toggle
   useEffect(() => {
+    const t = setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        try {
+          textareaRef.current.setSelectionRange(
+            savedCaretPos.current.start,
+            savedCaretPos.current.end
+          );
+        } catch {
+          // Ignore range errors
+        }
+      }
+    }, 40);
+
+    // Set inert on <main> and the social rail while modal is open
+    const mainEl = document.querySelector('main');
+    const rail = document.querySelector('.social-rail');
+    if (mainEl) {
+      if (isExpanded) mainEl.setAttribute('inert', '');
+      else mainEl.removeAttribute('inert');
+    }
+    if (rail) {
+      if (isExpanded) rail.setAttribute('inert', '');
+      else rail.removeAttribute('inert');
+    }
+
     if (isExpanded) {
       const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-
-      const t = setTimeout(() => {
-        if (expandedTextareaRef.current) {
-          expandedTextareaRef.current.focus();
-          try {
-            expandedTextareaRef.current.setSelectionRange(
-              savedCaretPos.current.start,
-              savedCaretPos.current.end
-            );
-          } catch {
-            // Ignore selection error on non-focused elements
-          }
-        }
-      }, 50);
 
       // Focus trap handler
       const handleKeyDownTrap = (e: KeyboardEvent) => {
@@ -284,32 +624,14 @@ export default function AskOmkarAiWorkstation({
       return () => {
         document.body.style.overflow = originalOverflow;
         window.removeEventListener('keydown', handleKeyDownTrap);
+        if (mainEl) mainEl.removeAttribute('inert');
+        if (rail) rail.removeAttribute('inert');
         clearTimeout(t);
       };
-    } else {
-      const t = setTimeout(() => {
-        if (textareaRef.current) {
-          textareaRef.current.focus();
-          try {
-            textareaRef.current.setSelectionRange(
-              savedCaretPos.current.start,
-              savedCaretPos.current.end
-            );
-          } catch {
-            // Ignore selection error
-          }
-        }
-      }, 50);
-      return () => clearTimeout(t);
     }
-  }, [isExpanded]);
 
-  const handleScroll = useCallback(() => {
-    if (!scrollRef.current) return;
-    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-    const isUp = scrollHeight - scrollTop - clientHeight > 70;
-    setShowScrollBottom(isUp);
-  }, []);
+    return () => clearTimeout(t);
+  }, [isExpanded]);
 
   // Audio Switch Synthesis (Web Audio API)
   const playSwitchAudio = useCallback(
@@ -394,21 +716,17 @@ export default function AskOmkarAiWorkstation({
     [soundEnabled]
   );
 
-  // Submit Handler: Opens State B automatically on first send
+  // Submit Handler: Inline default (NO auto-open on first send)
   const handleSubmit = useCallback(
     (customQuery?: string) => {
       const q = (customQuery ?? question).trim();
       if (!q || isThinking) return;
 
-      setIsExpanded(true);
       onSendQuestion(q);
       setQuestion('');
 
       if (textareaRef.current) {
         textareaRef.current.value = '';
-      }
-      if (expandedTextareaRef.current) {
-        expandedTextareaRef.current.value = '';
       }
     },
     [question, isThinking, onSendQuestion]
@@ -434,14 +752,17 @@ export default function AskOmkarAiWorkstation({
       playSwitchAudio('press', variant);
 
       if (e.code === 'Escape') {
-        // Escape is the virtual keyboard's Clear key: Clear query input only, DO NOT close State B
-        setQuestion('');
-        if (textareaRef.current) textareaRef.current.value = '';
-        if (expandedTextareaRef.current) expandedTextareaRef.current.value = '';
+        // Physical Escape lights the Clear keycap; if in modal it closes modal, otherwise clears input
+        if (isExpanded) {
+          handleCloseExpanded();
+        } else {
+          setQuestion('');
+          if (textareaRef.current) textareaRef.current.value = '';
+        }
       }
 
       if (e.key === 'Enter' && !e.shiftKey) {
-        if (document.activeElement === textareaRef.current || document.activeElement === expandedTextareaRef.current) {
+        if (document.activeElement === textareaRef.current) {
           e.preventDefault();
           handleSubmit();
         }
@@ -472,12 +793,12 @@ export default function AskOmkarAiWorkstation({
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [playSwitchAudio, handleSubmit]);
+  }, [playSwitchAudio, handleSubmit, isExpanded, handleCloseExpanded]);
 
   // Cursor-aware text insertion for virtual keyboard
   const insertTextAtCursor = useCallback(
     (textToInsert: string) => {
-      const target = isExpanded ? expandedTextareaRef.current : textareaRef.current;
+      const target = textareaRef.current;
       if (!target) {
         setQuestion((prev) => prev + textToInsert);
         return;
@@ -496,11 +817,11 @@ export default function AskOmkarAiWorkstation({
       target.selectionEnd = newCursorPos;
       target.focus();
     },
-    [isExpanded]
+    []
   );
 
   const backspaceAtCursor = useCallback(() => {
-    const target = isExpanded ? expandedTextareaRef.current : textareaRef.current;
+    const target = textareaRef.current;
     if (!target) {
       setQuestion((prev) => prev.slice(0, -1));
       return;
@@ -524,7 +845,7 @@ export default function AskOmkarAiWorkstation({
       target.selectionEnd = start - 1;
     }
     target.focus();
-  }, [isExpanded]);
+  }, []);
 
   // Virtual Key Press Handler
   const handleVirtualKey = (key: KeyDef) => {
@@ -556,9 +877,12 @@ export default function AskOmkarAiWorkstation({
     }
 
     if (key.code === 'Escape') {
-      setQuestion('');
-      if (textareaRef.current) textareaRef.current.value = '';
-      if (expandedTextareaRef.current) expandedTextareaRef.current.value = '';
+      if (isExpanded) {
+        handleCloseExpanded();
+      } else {
+        setQuestion('');
+        if (textareaRef.current) textareaRef.current.value = '';
+      }
       return;
     }
 
@@ -585,16 +909,9 @@ export default function AskOmkarAiWorkstation({
     playSwitchAudio('press', 'enter');
   };
 
-  const handleCopyEmail = () => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText('omkaranarse13@gmail.com');
-      setCopiedEmail(true);
-      setTimeout(() => setCopiedEmail(false), 2000);
-    }
-  };
-
   const imageRatio = imgNatural.w / imgNatural.h;
   const isRatioOff = Math.abs(imageRatio - 16 / 9) > 0.02;
+  const bottomClearance = (100 - (SCENE.keyboard.y + SCENE.keyboard.h)).toFixed(1);
 
   return (
     <>
@@ -606,6 +923,7 @@ export default function AskOmkarAiWorkstation({
             <div className="debug-badge-title">🛠 SCENE DEBUG MODE (?debug=1)</div>
             <div>Screen: x={SCENE.screen.x}%, y={SCENE.screen.y}%, w={SCENE.screen.w}%, h={SCENE.screen.h}%</div>
             <div>Keyboard: x={SCENE.keyboard.x}%, y={SCENE.keyboard.y}%, w={SCENE.keyboard.w}%, h={SCENE.keyboard.h}%</div>
+            <div>Keyboard bottom clearance: {bottomClearance}% (safe &gt;= 3%)</div>
             <div>Image Natural: {imgNatural.w} × {imgNatural.h} (Ratio: {imageRatio.toFixed(4)})</div>
             {isRatioOff && (
               <div className="scene-debug-warn">
@@ -648,7 +966,7 @@ export default function AskOmkarAiWorkstation({
             }}
           />
 
-          {/* ── .mac-screen (State A: Launcher) ── */}
+          {/* ── .mac-screen (Starts at top edge, 6px corners, NO onClick handler on container) ── */}
           <div
             ref={screenRectRef}
             className={`mac-screen ${isDebug ? 'debug-outline' : ''}`}
@@ -658,195 +976,45 @@ export default function AskOmkarAiWorkstation({
               width: `${SCENE.screen.w}%`,
               height: `${SCENE.screen.h}%`,
             }}
-            onClick={handleOpenExpanded}
           >
             {/* Subtle Glass Reflection */}
             <div className="mac-screen-glass-reflection" aria-hidden="true" />
 
-            {/* Slim macOS Menu Bar */}
-            <div className="mac-screen-menubar" aria-hidden="true">
-              <div className="mac-menubar-left">
-                <span className="mac-menubar-brand">Omkar AI</span>
-                <span className="mac-menubar-item">File</span>
-                <span className="mac-menubar-item">Edit</span>
-                <span className="mac-menubar-item">View</span>
-              </div>
-              <div className="mac-menubar-right">
-                <span className="mac-menubar-clock">{clockTime}</span>
-              </div>
-            </div>
-
-            {/* Maximized macOS Window */}
+            {/* Window Frame: Starts right at top edge with title bar */}
             <div className="mac-screen-window-frame">
-              {/* Window Title Bar */}
-              <div className="mac-window-titlebar">
-                <div className="traffic-lights" aria-label="Window controls">
-                  <button
-                    type="button"
-                    className="traffic-dot red"
-                    aria-label="Clear query"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setQuestion('');
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="traffic-dot yellow"
-                    aria-label="Minimize"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  />
-                  <button
-                    type="button"
-                    className="traffic-dot green"
-                    aria-label="Expand to full screen"
-                    title="Expand to Full Screen"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleOpenExpanded();
-                    }}
-                  />
-                </div>
-
-                {onBack && (
-                  <button
-                    type="button"
-                    className="mac-nav-back-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onBack();
-                    }}
-                    aria-label="Go Back"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <path d="M19 12H5M12 19l-7-7 7-7" />
+              {/* Only render ChatPanel inline when NOT expanded */}
+              {!isExpanded ? (
+                <ChatPanel
+                  isModal={false}
+                  messages={messages}
+                  isThinking={isThinking}
+                  question={question}
+                  onQuestionChange={setQuestion}
+                  onSubmit={handleSubmit}
+                  soundEnabled={soundEnabled}
+                  onToggleSound={() => setSoundEnabled((p) => !p)}
+                  isExpanded={false}
+                  onToggleExpanded={handleToggleExpanded}
+                  shouldPulseFullscreen={shouldPulseFullscreen}
+                  textareaRef={textareaRef}
+                  isFocused={isFocused}
+                  onFocusChange={setIsFocused}
+                  onTriggerPulse={triggerPulse}
+                />
+              ) : (
+                <div className="monitor-expanded-placeholder" aria-hidden="true">
+                  <div className="placeholder-content">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
                     </svg>
-                    <span>Back</span>
-                  </button>
-                )}
-
-                <div className="mac-window-title">Omkar AI</div>
-
-                <div className="mac-window-tools">
-                  <button
-                    type="button"
-                    className={`mac-tool-btn ${!soundEnabled ? 'is-muted' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSoundEnabled((prev) => !prev);
-                    }}
-                    title={soundEnabled ? 'Mute Mechanical Switch Audio' : 'Unmute Sound'}
-                    aria-label="Toggle mechanical switch audio"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                      {soundEnabled ? (
-                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
-                      ) : (
-                        <line x1="23" y1="9" x2="17" y2="15" />
-                      )}
-                    </svg>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="mac-tool-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopyEmail();
-                    }}
-                    title="Copy email: omkaranarse13@gmail.com"
-                    aria-label="Copy email address"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="9" y="9" width="13" height="13" rx="2" />
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                    </svg>
-                    <span className="tool-btn-label">{copiedEmail ? 'Copied' : 'Email'}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* State A (launcher): Vertically centered group edge-to-edge */}
-              <div className="state-a-compact-body">
-                <div className="launcher-headline-wrap">
-                  <div className="launcher-text-col">
-                    <h2 className="launcher-title">Ask anything about Omkar.</h2>
-                    <p className="launcher-subtitle">Projects, stack, experience, roles.</p>
+                    <span>Viewing in full screen</span>
                   </div>
-                  <span className="compact-expand-hint" title="Click screen to expand">
-                    Click screen to expand ↗
-                  </span>
                 </div>
-
-                {/* Query Input Box with single placeholder fix */}
-                <div
-                  className={`compact-query-box ${isFocused ? 'is-focused' : ''}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    textareaRef.current?.focus();
-                  }}
-                >
-                  <div className="compact-textarea-wrap">
-                    <textarea
-                      ref={textareaRef}
-                      rows={1}
-                      className="compact-textarea"
-                      placeholder=""
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                      onFocus={() => setIsFocused(true)}
-                      onBlur={() => setIsFocused(false)}
-                      aria-label="Ask Omkar AI a question"
-                    />
-                    {!question && (
-                      <span className="compact-kinetic-placeholder" aria-hidden="true">
-                        Type via keyboard or click preset below
-                        <span className="compact-blinking-cursor" />
-                      </span>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    className="compact-send-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSubmit();
-                    }}
-                    disabled={!question.trim() || isThinking}
-                    aria-label="Send message"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <line x1="22" y1="2" x2="11" y2="13" />
-                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* 4 Shortcut Chips (wrap, never clip) */}
-                <div className="compact-chips-row">
-                  {PRESET_PROMPTS.map((p, idx) => (
-                    <button
-                      key={`preset-${idx}`}
-                      type="button"
-                      className="compact-chip-pill"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSubmit(p.prompt);
-                      }}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* ── .keyboard-wrap (Section 5) ── */}
+          {/* ── .keyboard-wrap (Keyboard with >= 3% clearance above bottom) ── */}
           <div
             className={`keyboard-wrap ${isDebug ? 'debug-outline' : ''}`}
             style={{
@@ -862,7 +1030,7 @@ export default function AskOmkarAiWorkstation({
               role="application"
               aria-label="Mechanical keyboard 75 percent layout"
             >
-              {/* Integrated Top Strip: LED + model label on left, OLED + knob on right */}
+              {/* Integrated Top Strip */}
               <div className="keyboard-top-strip">
                 <div className="keyboard-brand-group">
                   <span className="keyboard-led-dot" aria-hidden="true" />
@@ -940,23 +1108,14 @@ export default function AskOmkarAiWorkstation({
 
         {/* ── MOBILE VIEW (<640px) ── */}
         <div className="workstation-mobile-view">
-          {/* Full-width Chat Card (State B content inline, no modal) */}
           <div className="mobile-chat-card">
             <div className="mac-window-titlebar">
-              <div className="traffic-lights">
+              <div className="traffic-lights" aria-hidden="true">
                 <span className="traffic-dot red" />
                 <span className="traffic-dot yellow" />
                 <span className="traffic-dot green" />
               </div>
               <div className="mac-window-title">Omkar AI</div>
-              <button
-                type="button"
-                className="mac-tool-btn"
-                onClick={handleCopyEmail}
-                aria-label="Copy email"
-              >
-                <span className="tool-btn-label">{copiedEmail ? 'Copied' : 'Email'}</span>
-              </button>
             </div>
 
             <div className="mobile-chat-body">
@@ -1020,7 +1179,6 @@ export default function AskOmkarAiWorkstation({
             </div>
           </div>
 
-          {/* Flat 2D Virtual Keyboard for Mobile (Keys >=30px) */}
           <div className="mobile-flat-keyboard" role="application" aria-label="Virtual keyboard">
             {KEYBOARD_LAYOUT.map((row, rIdx) => (
               <div key={`m-row-${rIdx}`} className="mobile-keyboard-row">
@@ -1052,235 +1210,30 @@ export default function AskOmkarAiWorkstation({
           onClick={handleCloseExpanded}
           role="dialog"
           aria-modal="true"
-          aria-label="Expanded AI Chat Console"
+          aria-label="Full screen AI conversation"
         >
           <div
             className="state-b-window"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* macOS Menu Bar at top */}
-            <div className="mac-screen-menubar" aria-hidden="true">
-              <div className="mac-menubar-left">
-                <span className="mac-menubar-brand">Omkar AI</span>
-                <span className="mac-menubar-item">Conversation</span>
-                <span className="mac-menubar-item">History</span>
-                <span className="mac-menubar-item">Tools</span>
-              </div>
-              <div className="mac-menubar-right">
-                <span className="mac-menubar-clock">{clockTime}</span>
-              </div>
-            </div>
-
-            {/* macOS Title Bar with Exit Fullscreen button */}
-            <div className="mac-window-titlebar">
-              <div className="traffic-lights" aria-label="Window controls">
-                <button
-                  type="button"
-                  className="traffic-dot red"
-                  aria-label="Close modal"
-                  onClick={handleCloseExpanded}
-                />
-                <button
-                  type="button"
-                  className="traffic-dot yellow"
-                  aria-label="Minimize modal"
-                  onClick={handleCloseExpanded}
-                />
-                <button
-                  type="button"
-                  className="traffic-dot green"
-                  aria-label="Toggle full screen"
-                  onClick={handleCloseExpanded}
-                />
-              </div>
-
-              {onBack && (
-                <button
-                  type="button"
-                  className="mac-nav-back-btn"
-                  onClick={onBack}
-                  aria-label="Go Back"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M19 12H5M12 19l-7-7 7-7" />
-                  </svg>
-                  <span>Back</span>
-                </button>
-              )}
-
-              <div className="mac-window-title">Omkar AI · Conversation Console</div>
-
-              <div className="mac-window-tools">
-                <button
-                  type="button"
-                  className="exit-fullscreen-btn"
-                  onClick={handleCloseExpanded}
-                  aria-label="Exit full screen"
-                >
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
-                  </svg>
-                  <span>Exit full screen</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`mac-tool-btn ${!soundEnabled ? 'is-muted' : ''}`}
-                  onClick={() => setSoundEnabled((prev) => !prev)}
-                  title={soundEnabled ? 'Mute Mechanical Switch Audio' : 'Unmute Sound'}
-                  aria-label="Toggle mechanical switch audio"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                    {soundEnabled ? (
-                      <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
-                    ) : (
-                      <line x1="23" y1="9" x2="17" y2="15" />
-                    )}
-                  </svg>
-                </button>
-
-                <button
-                  type="button"
-                  className="mac-tool-btn"
-                  onClick={handleCopyEmail}
-                  title="Copy email: omkaranarse13@gmail.com"
-                  aria-label="Copy email address"
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="9" y="9" width="13" height="13" rx="2" />
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                  </svg>
-                  <span className="tool-btn-label">{copiedEmail ? 'Copied' : 'Email'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Scrolling Chat Message List */}
-            <div
-              ref={scrollRef}
-              onScroll={handleScroll}
-              className="state-b-messages-scroll"
-            >
-              {messages.length === 0 ? (
-                <div className="state-b-empty-state">
-                  <div className="empty-state-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <rect x="2" y="3" width="20" height="14" rx="2" />
-                      <line x1="8" y1="21" x2="16" y2="21" />
-                      <line x1="12" y1="17" x2="12" y2="21" />
-                    </svg>
-                  </div>
-                  <h3 className="empty-state-title">Welcome to Omkar AI</h3>
-                  <p className="empty-state-desc">
-                    Ask me about engineering capabilities, backend architecture,
-                    distributed systems, UI design, or past project achievements.
-                  </p>
-                </div>
-              ) : (
-                <div className="messages-thread">
-                  {messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`chat-bubble-row ${msg.role === 'user' ? 'is-user' : 'is-ai'}`}
-                    >
-                      <div className="chat-bubble">
-                        <div className="bubble-header">
-                          <span className="bubble-sender">
-                            {msg.role === 'user' ? 'You' : 'Omkar AI'}
-                          </span>
-                          {msg.time && <span className="bubble-time">{msg.time}</span>}
-                        </div>
-                        <div className="bubble-text">{msg.text}</div>
-                        {msg.source && (
-                          <div className="bubble-source-pill">
-                            <span>Source: {msg.source}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* Thinking Pill */}
-                  {isThinking && (
-                    <div className="chat-bubble-row is-ai">
-                      <div className="chat-bubble is-thinking-bubble">
-                        <span className="thinking-dot" />
-                        <span className="thinking-dot" />
-                        <span className="thinking-dot" />
-                        <span className="thinking-text">Retrieving knowledge base...</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Scroll-to-bottom Floating Button */}
-            {showScrollBottom && (
-              <button
-                type="button"
-                className="scroll-latest-btn"
-                onClick={() => scrollToBottom(true)}
-                aria-label="Scroll to latest messages"
-              >
-                <span>Latest</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M12 5v14M19 12l-7 7-7-7" />
-                </svg>
-              </button>
-            )}
-
-            {/* Shortcut Chips Bar */}
-            <div className="state-b-chips-shelf">
-              <span className="shelf-label">SHORTCUTS:</span>
-              <div className="shelf-chips-list">
-                {PRESET_PROMPTS.map((p, idx) => (
-                  <button
-                    key={`shelf-${idx}`}
-                    type="button"
-                    className="shelf-chip-pill"
-                    onClick={() => handleSubmit(p.prompt)}
-                  >
-                    {p.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Follow-up Query Input Console */}
-            <div className="state-b-input-dock">
-              <div className="input-dock-inner">
-                <textarea
-                  ref={expandedTextareaRef}
-                  rows={2}
-                  className="state-b-textarea"
-                  placeholder="Ask a follow-up question or continue typing..."
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  aria-label="Type your message"
-                />
-
-                <div className="input-dock-actions">
-                  <span className="input-char-counter">
-                    {question.length} chars
-                  </span>
-                  <button
-                    type="button"
-                    className="state-b-send-btn"
-                    onClick={() => handleSubmit()}
-                    disabled={!question.trim() || isThinking}
-                    aria-label="Send message"
-                  >
-                    <span>Send</span>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                      <line x1="22" y1="2" x2="11" y2="13" />
-                      <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
+            {/* Exactly ONE ChatPanel rendered in the portal when isExpanded is true */}
+            <ChatPanel
+              isModal={true}
+              messages={messages}
+              isThinking={isThinking}
+              question={question}
+              onQuestionChange={setQuestion}
+              onSubmit={handleSubmit}
+              soundEnabled={soundEnabled}
+              onToggleSound={() => setSoundEnabled((p) => !p)}
+              isExpanded={true}
+              onToggleExpanded={handleCloseExpanded}
+              shouldPulseFullscreen={false}
+              textareaRef={textareaRef}
+              isFocused={isFocused}
+              onFocusChange={setIsFocused}
+              onTriggerPulse={triggerPulse}
+            />
           </div>
         </div>,
         document.body
