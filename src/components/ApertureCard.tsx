@@ -100,10 +100,11 @@ export default function ApertureCard({ project }: ApertureCardProps) {
   }
 
   React.useEffect(() => {
+    router.prefetch(`/projects/${project.id}`);
     return () => {
       if (delayTimeoutRef.current) clearTimeout(delayTimeoutRef.current);
     };
-  }, []);
+  }, [project.id, router]);
 
   const ctaZ = ctaBaseZ + (cardHovered ? ctaCardLift : 0) + (ctaHovered ? ctaButtonLift : 0);
 

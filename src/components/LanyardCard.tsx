@@ -104,8 +104,8 @@ export default function LanyardCard({
             ? isShaking
               ? [-5, 4, -3, 2, -1, 0]
               : isHovered
-              ? [0, 1.5, -1, 0.5, 0]
-              : 0
+                ? [0, 1.5, -1, 0.5, 0]
+                : 0
             : [-16, 12, -8, 6, -4, 2, -1, 0],
         }}
         transition={{

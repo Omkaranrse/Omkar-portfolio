@@ -36,7 +36,7 @@ export interface KeyDef {
 // ── 01. Placement Config (Retuned with >= 3% clearance above box bottom) ──
 const SCENE = {
   screen:   { x: 28.9, y: 19.4, w: 42.8, h: 37.4 },
-  keyboard: { x: 27.5, y: 71.5, w: 42.5, h: 16.5 },
+  keyboard: { x: 27.5, y: 72.0, w: 42.5, h: 16.5 },
 };
 
 // ── 02. 5-Row 75% Mechanical Keyboard Layout ──
@@ -299,19 +299,13 @@ function ChatPanel({
                 ref={textareaRef}
                 rows={1}
                 className="compact-textarea"
-                placeholder=""
+                placeholder="Type via keyboard or click preset below"
                 value={question}
                 onChange={(e) => onQuestionChange(e.target.value)}
                 onFocus={() => onFocusChange(true)}
                 onBlur={() => onFocusChange(false)}
                 aria-label="Ask Omkar AI a question"
               />
-              {!question && (
-                <span className="compact-kinetic-placeholder" aria-hidden="true">
-                  Type via keyboard or click preset below
-                  <span className="compact-blinking-cursor" />
-                </span>
-              )}
             </div>
 
             <button
@@ -407,19 +401,13 @@ function ChatPanel({
                   ref={textareaRef}
                   rows={1}
                   className="compact-textarea"
-                  placeholder=""
+                  placeholder="Ask a follow-up or type..."
                   value={question}
                   onChange={(e) => onQuestionChange(e.target.value)}
                   onFocus={() => onFocusChange(true)}
                   onBlur={() => onFocusChange(false)}
                   aria-label="Ask Omkar AI a question"
                 />
-                {!question && (
-                  <span className="compact-kinetic-placeholder" aria-hidden="true">
-                    Ask a follow-up or type...
-                    <span className="compact-blinking-cursor" />
-                  </span>
-                )}
               </div>
 
               <button
@@ -1025,7 +1013,6 @@ export default function AskOmkarAiWorkstation({
               left: `${SCENE.keyboard.x}%`,
               top: `${SCENE.keyboard.y}%`,
               width: `${SCENE.keyboard.w}%`,
-              height: `${SCENE.keyboard.h}%`,
             }}
           >
             {/* Brushed aluminium case shell with extruded lower edge & contact shadow */}
