@@ -691,7 +691,7 @@ export default function GravityPills({
         borderRadius: '16px',
         userSelect: 'none',
         WebkitUserSelect: 'none',
-        touchAction: 'none',
+        touchAction: 'pan-y',
         ...style,
       }}
     >
@@ -702,7 +702,7 @@ export default function GravityPills({
           width: '100%',
           height: '100%',
           cursor: 'grab',
-          touchAction: 'none',
+          touchAction: 'pan-y',
         }}
       />
       {/* Subtle indicator hint at bottom right */}

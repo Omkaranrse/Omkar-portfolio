@@ -79,7 +79,7 @@ export default function LanyardCard({
         flexDirection: 'column',
         alignItems: 'center',
         width: '100%',
-        maxWidth: '380px',
+        maxWidth: 'min(380px, 100%)',
         margin: '0 auto',
       }}
     >

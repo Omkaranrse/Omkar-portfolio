@@ -35,7 +35,7 @@ export interface KeyDef {
 
 // ── 01. Placement Config (Retuned with >= 3% clearance above box bottom) ──
 const SCENE = {
-  screen:   { x: 28.9, y: 19.4, w: 42.8, h: 37.4 },
+  screen: { x: 28.9, y: 19.4, w: 42.8, h: 37.4 },
   keyboard: { x: 27.5, y: 72.0, w: 42.5, h: 16.5 },
 };
 
@@ -642,10 +642,10 @@ export default function AskOmkarAiWorkstation({
           keyVariant === 'space'
             ? 75
             : keyVariant === 'enter'
-            ? 100
-            : keyVariant === 'modifier'
-            ? 115
-            : 135;
+              ? 100
+              : keyVariant === 'modifier'
+                ? 115
+                : 135;
 
         // Sub-bass thock pulse
         const osc = ctx.createOscillator();
@@ -1072,11 +1072,9 @@ export default function AskOmkarAiWorkstation({
                         <button
                           key={k.id}
                           type="button"
-                          className={`cm-keycap ${isDown ? 'is-pressed' : ''} ${
-                            k.isAction ? 'is-modifier' : ''
-                          } ${k.variant ? `variant-${k.variant}` : ''} ${
-                            isShiftLit ? 'is-shift-lit' : ''
-                          }`}
+                          className={`cm-keycap ${isDown ? 'is-pressed' : ''} ${k.isAction ? 'is-modifier' : ''
+                            } ${k.variant ? `variant-${k.variant}` : ''} ${isShiftLit ? 'is-shift-lit' : ''
+                            }`}
                           style={{ flex: k.width ?? 1 }}
                           onClick={() => handleVirtualKey(k)}
                           onMouseDown={(e) => e.preventDefault()}
@@ -1177,9 +1175,8 @@ export default function AskOmkarAiWorkstation({
                   <button
                     key={`m-${k.id}`}
                     type="button"
-                    className={`mobile-keycap ${k.isAction ? 'is-action' : ''} ${
-                      pressedKeys[k.code] ? 'is-pressed' : ''
-                    }`}
+                    className={`mobile-keycap ${k.isAction ? 'is-action' : ''} ${pressedKeys[k.code] ? 'is-pressed' : ''
+                      }`}
                     style={{ flex: k.width ?? 1 }}
                     onClick={() => handleVirtualKey(k)}
                     tabIndex={-1}

@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
-import ucImg from '@/images/UC.png';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -76,16 +74,6 @@ export default function RootLayout({
           Skip to content
         </a>
         {children}
-        <div className="under-construction-badge" aria-hidden="true">
-          <Image
-            src={ucImg}
-            alt="Under Construction"
-            width={200}
-            height={300}
-            className="under-construction-img"
-            priority
-          />
-        </div>
       </body>
     </html>
   );

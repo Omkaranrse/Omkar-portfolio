@@ -43,7 +43,7 @@ export default function Work() {
           </div>
 
           {/* ── Liquid Glass Filter Pills ── */}
-          <div className="work-filters" role="tablist" aria-label="Filter projects by domain" style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <div className="work-filters" role="tablist" aria-label="Filter projects by domain">
             {filterOptions.map((filter) => {
               const isActive = activeFilter === filter;
               const count = filter === 'All' ? projects.length : projects.filter((p) => getDomain(p) === filter).length;
