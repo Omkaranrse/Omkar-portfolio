@@ -12,20 +12,8 @@ import {
   ChallengeCards,
   ResultPanel,
   TechStackMarquee,
+  ProjectPager,
 } from '@/components/project-detail';
-import {
-  AlertCircle,
-  Target,
-  Sparkles,
-  CheckCircle2,
-  XCircle,
-  ArrowRight,
-  Zap,
-  Clock,
-  Layers,
-  FileSpreadsheet,
-  Search,
-} from 'lucide-react';
 
 interface ProjectPageProps {
   params: Promise<{
@@ -72,6 +60,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   }
 
   const project: Project = projects[projectIndex];
+  const prevProject = projects[(projectIndex - 1 + projects.length) % projects.length];
+  const nextProject = projects[(projectIndex + 1) % projects.length];
 
   // Split problem statement to highlight the first sentence as a pull quote
   const problemSentences = project.problem.split(/(?<=[.?!])\s+/);
@@ -80,19 +70,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   return (
     <>
-      {/* Scroll progress bar attached under navigation */}
+      {/* Scroll progress bar */}
       <ScrollProgressBar />
 
-      {/* Global site navigation */}
+      {/* Navigation */}
       <Nav />
 
       <main
         id="main"
         className="relative min-h-screen bg-[#f8f8f5] text-[#111215] overflow-x-clip selection:bg-[#eb4c2a]/15 selection:text-[#111215]"
       >
-        {/* Subtle crumpled paper texture overlay */}
+        {/* Subtle paper texture overlay */}
         <div
-          className="fixed inset-0 pointer-events-none opacity-35 mix-blend-multiply z-0 bg-repeat"
+          className="fixed inset-0 pointer-events-none opacity-30 mix-blend-multiply z-0 bg-repeat"
           style={{
             backgroundImage: "url('/textures/crumpled-paper.jpg')",
             backgroundSize: '800px 800px',
@@ -100,234 +90,162 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           aria-hidden="true"
         />
 
-        {/* 1. Hero Section (Cleaned: no top pagination/back buttons, rich live UI showcase) */}
+        {/* ─── Section 1: Hero ─── */}
         <div className="relative z-10">
           <ProjectHero project={project} />
         </div>
 
-        {/* Centered Symmetrical Content Container (Max-Width 1140px) */}
-        <div className="relative z-10 max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20 space-y-16 lg:space-y-24">
-          {/* 2. Problem Section with Visual Architecture Contrast */}
+        {/* ─── Section 2: The Story (Problem + Approach) ─── */}
+        <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
           <section
-            id="problem"
-            aria-labelledby="problem-heading"
-            className="scroll-mt-28 space-y-6"
+            id="story"
+            aria-labelledby="story-heading"
+            className="space-y-12"
           >
-            <div className="space-y-1.5 pb-2">
+            {/* Section header */}
+            <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
                 <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                  01. THE PROBLEM
+                  The Story
                 </span>
               </div>
               <h2
-                id="problem-heading"
+                id="story-heading"
                 className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
               >
-                Challenge &amp; Context
+                Problem &amp; Approach
               </h2>
             </div>
 
-            <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-[4px] p-6 sm:p-8 lg:p-10 shadow-[0_4px_20px_rgba(17,18,21,0.03)] hover:shadow-[0_10px_30px_rgba(17,18,21,0.06)] transition-all duration-300 space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-[rgba(17,18,21,0.06)] font-mono text-[10px] text-[#8a8c98] uppercase tracking-wider">
-                <span>CORE BOTTLENECK</span>
-                <span className="text-[#eb4c2a] font-bold">CRITICAL FRICTION POINT</span>
+            {/* Two-column layout: Problem left, Approach right */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+              {/* Problem narrative */}
+              <div className="space-y-5">
+                <blockquote className="border-l-[3px] border-[#eb4c2a] pl-5">
+                  <p className="font-sans text-xl sm:text-2xl font-bold tracking-tight text-[#111215] leading-snug">
+                    &ldquo;{problemLead}&rdquo;
+                  </p>
+                </blockquote>
+
+                {problemRemainder && (
+                  <p className="font-sans text-base text-[#565862] leading-relaxed pl-5">
+                    {problemRemainder}
+                  </p>
+                )}
+
+                {/* Quick paragraph descriptions */}
+                {project.paragraphs.map((para, idx) => (
+                  <p
+                    key={idx}
+                    className="font-sans text-sm text-[#6b6d78] leading-relaxed"
+                  >
+                    {para}
+                  </p>
+                ))}
               </div>
 
-              <blockquote className="border-l-3 border-[#eb4c2a] pl-5 sm:pl-7 my-2">
-                <p className="font-sans text-xl sm:text-2xl font-bold tracking-tight text-[#111215] leading-snug">
-                  &ldquo;{problemLead}&rdquo;
-                </p>
-              </blockquote>
-
-              {problemRemainder && (
-                <p className="font-sans text-base text-[#565862] leading-relaxed pl-5 sm:pl-7">
-                  {problemRemainder}
-                </p>
-              )}
-
-              {/* Visual Workflow Contrast Diagram: Before vs After */}
-              <div className="pt-6 border-t border-[rgba(17,18,21,0.08)]">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#565862] block mb-4">
-                  OPERATIONAL PARADIGM COMPARISON
-                </span>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* Traditional Pain Point Workflow */}
-                  <div className="p-5 rounded-[4px] bg-[#faf8f6] border border-[#ef4444]/20 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold text-[#ef4444] flex items-center gap-1.5">
-                        <XCircle className="w-4 h-4" />
-                        Traditional Dashboard Workflow
-                      </span>
-                      <span className="font-mono text-[10px] text-[#8a8c98]">Avg: 3 - 5 Hours</span>
-                    </div>
-
-                    <div className="space-y-2 text-xs font-mono text-[#565862]">
-                      <div className="p-2 rounded bg-white border border-[rgba(17,18,21,0.06)] flex items-center gap-2">
-                        <span className="text-[#8a8c98]">1.</span> Manual ETL, data cleanup, and column mapping
-                      </div>
-                      <div className="p-2 rounded bg-white border border-[rgba(17,18,21,0.06)] flex items-center gap-2">
-                        <span className="text-[#8a8c98]">2.</span> Hand-craft SQL queries &amp; pivot aggregations
-                      </div>
-                      <div className="p-2 rounded bg-white border border-[rgba(17,18,21,0.06)] flex items-center gap-2">
-                        <span className="text-[#8a8c98]">3.</span> Build rigid visual dashboard widgets
-                      </div>
-                      <div className="p-2 rounded bg-[#fff0f0] border border-[#ef4444]/20 text-[#ef4444] font-medium flex items-center gap-2">
-                        <span className="font-bold">Result:</span> Fragile reports, high maintenance, stale data
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* DataMind AI Modern Conversational Workflow */}
-                  <div className="p-5 rounded-[4px] bg-[#f5faf8] border border-[#10b981]/30 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-bold text-[#10b981] flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4" />
-                        DataMind AI Conversational Pipeline
-                      </span>
-                      <span className="font-mono text-[10px] text-[#10b981] font-bold">Avg: &lt; 1.2 Seconds</span>
-                    </div>
-
-                    <div className="space-y-2 text-xs font-mono text-[#111215]">
-                      <div className="p-2 rounded bg-white border border-[rgba(17,18,21,0.06)] flex items-center gap-2">
-                        <span className="text-[#10b981] font-bold">1.</span> Drop any CSV / PDF / XLSX into upload zone
-                      </div>
-                      <div className="p-2 rounded bg-white border border-[rgba(17,18,21,0.06)] flex items-center gap-2">
-                        <span className="text-[#10b981] font-bold">2.</span> Instant vectorization into local ChromaDB
-                      </div>
-                      <div className="p-2 rounded bg-white border border-[rgba(17,18,21,0.06)] flex items-center gap-2">
-                        <span className="text-[#10b981] font-bold">3.</span> Ask plain-English questions via stream UI
-                      </div>
-                      <div className="p-2 rounded bg-[#e8f7f2] border border-[#10b981]/30 text-[#10b981] font-bold flex items-center gap-2">
-                        <span>Outcome:</span> Instant verified insights with ground-truth citations
-                      </div>
-                    </div>
-                  </div>
+              {/* Approach timeline */}
+              <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-2xl p-5 sm:p-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[rgba(17,18,21,0.06)]">
+                  <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
+                  <span className="font-mono text-[11px] font-bold tracking-wider uppercase text-[#111215]">
+                    How I built it
+                  </span>
                 </div>
+                <Timeline steps={project.approach} />
               </div>
             </div>
           </section>
+        </div>
 
-          {/* 3. Approach Section (Vertical Timeline) */}
-          <section
-            id="approach"
-            aria-labelledby="approach-heading"
-            className="scroll-mt-28 space-y-6"
-          >
-            <div className="space-y-1.5 pb-2">
+        {/* ─── Section 3: How It Works (Architecture + Decisions) ─── */}
+        <div className="relative z-10 bg-[#0e1015] py-16 lg:py-24">
+          {/* Subtle dot grid for dark section */}
+          <div
+            className="absolute inset-0 opacity-[0.04] pointer-events-none"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)',
+              backgroundSize: '32px 32px',
+            }}
+            aria-hidden="true"
+          />
+
+          <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            {/* Section header */}
+            <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
                 <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                  02. ENGINEERING APPROACH
+                  Under the hood
                 </span>
               </div>
-              <h2
-                id="approach-heading"
-                className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
-              >
-                Execution &amp; Phases
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display tracking-tight">
+                Architecture &amp; Key Decisions
               </h2>
             </div>
 
-            <div className="bg-white border border-[rgba(17,18,21,0.08)] rounded-[4px] p-6 sm:p-8 lg:p-10 shadow-[0_4px_20px_rgba(17,18,21,0.03)] hover:shadow-[0_10px_30px_rgba(17,18,21,0.06)] transition-all duration-300">
-              <Timeline steps={project.approach} />
-            </div>
-          </section>
-
-          {/* 4. Architecture Section (Interactive System Topology Diagram) */}
-          <section
-            id="architecture"
-            aria-labelledby="architecture-heading"
-            className="scroll-mt-28 space-y-6"
-          >
-            <div className="space-y-1.5 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
-                <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                  03. ARCHITECTURE &amp; DATA FLOW
-                </span>
-              </div>
-              <h2
-                id="architecture-heading"
-                className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
-              >
-                System Topology &amp; Pipelines
-              </h2>
-            </div>
-
+            {/* Architecture diagram */}
             <ArchitectureDiagram
               nodes={project.architecture}
               edges={project.edges}
             />
-          </section>
 
-          {/* 5. Key Technical Decisions (ADR Matrix) */}
-          <section
-            id="decisions"
-            aria-labelledby="decisions-heading"
-            className="scroll-mt-28 space-y-6"
-          >
-            <div className="space-y-1.5 pb-2">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
-                <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                  04. KEY TECHNICAL DECISIONS
-                </span>
-              </div>
-              <h2
-                id="decisions-heading"
-                className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
-              >
-                Architectural Trade-offs (ADRs)
-              </h2>
+            {/* Tech decisions */}
+            <div className="space-y-4">
+              <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-[#8a8c98]">
+                Why these choices?
+              </h3>
+              <DecisionAccordion decisions={project.techDecisions} variant="dark" />
             </div>
+          </div>
+        </div>
 
-            <DecisionAccordion decisions={project.techDecisions} />
-          </section>
-
-          {/* 6. Challenges Section */}
+        {/* ─── Section 4: Challenges & Results ─── */}
+        <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 space-y-16">
+          {/* Challenges */}
           <section
             id="challenges"
             aria-labelledby="challenges-heading"
-            className="scroll-mt-28 space-y-6"
+            className="space-y-6"
           >
-            <div className="space-y-1.5 pb-2">
+            <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
                 <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                  05. THE HARD PART &amp; CHALLENGES
+                  The hard parts
                 </span>
               </div>
               <h2
                 id="challenges-heading"
                 className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
               >
-                Obstacles &amp; Solutions
+                Challenges &amp; Solutions
               </h2>
             </div>
 
             <ChallengeCards challenges={project.challenges} />
           </section>
 
-          {/* 7. Result & Impact Section (With Live Verification Sandbox) */}
+          {/* Results */}
           <section
             id="result"
             aria-labelledby="result-heading"
-            className="scroll-mt-28 space-y-6"
+            className="space-y-6"
           >
-            <div className="space-y-1.5 pb-2">
+            <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
                 <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                  06. RESULT &amp; IMPACT
+                  Outcome
                 </span>
               </div>
               <h2
                 id="result-heading"
                 className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
               >
-                Outcomes &amp; Verification
+                Results &amp; Impact
               </h2>
             </div>
 
@@ -337,30 +255,40 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               media={project.media}
             />
           </section>
+        </div>
 
-          {/* 8. Technology Stack (Marquee / Grid) */}
+        {/* ─── Section 5: Tech Stack + Project Navigation ─── */}
+        <div className="relative z-10 max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 pb-16 lg:pb-24 space-y-8">
           <section
             id="stack"
             aria-labelledby="stack-heading"
-            className="scroll-mt-28 space-y-6"
+            className="space-y-6"
           >
-            <div className="space-y-1.5 pb-2">
+            <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#eb4c2a]" />
                 <span className="font-mono text-xs font-bold tracking-wider uppercase text-[#eb4c2a]">
-                  07. TECHNOLOGY STACK
+                  Tech Stack
                 </span>
               </div>
               <h2
                 id="stack-heading"
                 className="text-2xl sm:text-3xl font-extrabold text-[#111215] font-display tracking-tight"
               >
-                Core Technologies &amp; Tooling
+                Built With
               </h2>
             </div>
 
             <TechStackMarquee stack={project.stack} />
           </section>
+
+          {/* Project Navigation */}
+          <ProjectPager
+            currentProject={project}
+            prevProject={prevProject}
+            nextProject={nextProject}
+            allProjects={projects}
+          />
         </div>
       </main>
 

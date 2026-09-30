@@ -77,26 +77,24 @@ function getAuthoritativeKnowledge(): string {
 function retrieveAuthoritativeContext(query: string, knowledge: string): RetrievalResult {
   const q = query.trim().toLowerCase();
 
-  // Out-of-bounds checks: explicit non-portfolio domains or unlisted private info
+  // Out-of-bounds checks: only explicit non-portfolio spam or personal private domains
   const outOfScopeKeywords = [
-    'salary',
-    'compensation',
-    'pay rate',
-    'ctc',
     'ceo of google',
     'president',
     'weather',
     'bitcoin',
     'crypto',
-    'stock',
+    'stock market',
     'recipe',
     'football',
     'cricket score',
     'movie',
     'religion',
     'girlfriend',
+    'boyfriend',
+    'dating',
     'relationship',
-    'family',
+    'family members',
     'age',
     'birthday',
     'birthdate',
@@ -112,73 +110,474 @@ function retrieveAuthoritativeContext(query: string, knowledge: string): Retriev
     }
   }
 
-  // 1. Attendephi specific query
+  // 1. Resume / CV Download
+  if (
+    q.includes('resume') ||
+    q.includes('cv') ||
+    q.includes('curriculum vitae') ||
+    q.includes('download resume') ||
+    q.includes('profile pdf') ||
+    q.includes('biodata')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Resume & Credentials',
+      context: `Official Resume for Omkar Anarse: Available at /Omkar.pdf. Omkar has 3+ years engineering experience, B.Sc. CS and MCA from Mumbai University, production Flutter development at Metaphi and My Job Park, and applied AI systems (LangGraph, RAG, ChromaDB, FastAPI).`,
+      deterministicAnswer:
+        `You can view and download my official resume here:
+
+📄 **[Download Omkar Anarse - Resume (PDF)](/Omkar.pdf)**
+
+• **Direct Profiles**: [LinkedIn Profile](https://linkedin.com/in/omkar-anarse) · [GitHub Profile](https://github.com/Omkaranrse)
+• **Key Highlights**: 3+ years software engineering experience, B.Sc. CS & MCA from Mumbai University (MU), production Flutter & Clean Architecture at **Metaphi** and **My Job Park**, plus Applied Agentic AI engineering (**DataMind AI**, LangGraph, RAG, ChromaDB, FastAPI).
+
+Feel free to save a copy or reach out directly at [omkaranarse1906@gmail.com](mailto:omkaranarse1906@gmail.com)!`,
+    };
+  }
+
+  // 2. Years of Experience (YoE) / Total Experience / Seniority
+  if (
+    q.includes('years of experience') ||
+    q.includes('year of experience') ||
+    q.includes('how much experience') ||
+    q.includes('how many years') ||
+    q.includes('total experience') ||
+    q.includes('yoe') ||
+    q.includes('experience do you have') ||
+    q.includes('level of experience') ||
+    q.includes('seniority')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Experience & Seniority',
+      context: `Omkar Anarse has 3+ years of practical software engineering experience: 3 years part-time Flutter engineering at My Job Park building recruitment apps for thousands of users + current role as Flutter Developer at Metaphi (Clean Architecture & Riverpod) + extensive production AI systems engineering (LangGraph, RAG, FastAPI).`,
+      deterministicAnswer:
+        `I have **3+ years of practical software engineering experience**:
+
+• **My Job Park** (3 Years · Part-time Flutter Developer):
+  Engineered and scaled cross-platform recruitment applications serving thousands of active users, implementing real-time messaging, notifications, and job search with Firebase.
+• **Metaphi** (Current · Flutter Developer):
+  Architecting modular mobile interfaces with Clean Architecture and Riverpod, integrating asynchronous REST APIs, and crafting fluid design systems.
+• **Applied AI Systems**:
+  Extensive production experience building autonomous AI systems (like **DataMind AI** and multi-agent **LangGraph** research pipelines with ChromaDB and FastAPI).`,
+    };
+  }
+
+  // 3. Notice Period & Availability to Start / Immediate Joiner
+  if (
+    q.includes('notice period') ||
+    q.includes('how soon can you join') ||
+    q.includes('when can you join') ||
+    q.includes('when can you start') ||
+    q.includes('immediate joiner') ||
+    q.includes('start date') ||
+    q.includes('joining date') ||
+    q.includes('join immediately') ||
+    q.includes('earliest start')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Availability & Notice Period',
+      context: `Notice Period & Availability: Omkar Anarse has an immediate / short notice period and can onboard rapidly for full-time engineering roles, contracts, and collaborations.`,
+      deterministicAnswer:
+        `• **Notice Period**: **Immediate / Short notice** — I am available to onboard rapidly for the right full-time role or contract.
+• **Current Status**: Actively open to full-time engineering roles (AI Systems, Full-Stack, Mobile/Flutter) and high-impact product contracts.
+• **Next Steps**: Let's connect via email ([omkaranarse1906@gmail.com](mailto:omkaranarse1906@gmail.com)) or [WhatsApp (+91 8356011246)](https://wa.me/918356011246) to align on your team's timeline!`,
+    };
+  }
+
+  // 4. Location, Remote / Hybrid / On-site & Relocation
+  if (
+    q.includes('relocate') ||
+    q.includes('relocation') ||
+    q.includes('remote') ||
+    q.includes('hybrid') ||
+    q.includes('on-site') ||
+    q.includes('onsite') ||
+    q.includes('wfh') ||
+    q.includes('work from home') ||
+    q.includes('where are you located') ||
+    q.includes('where do you live') ||
+    q.includes('where are you based') ||
+    q.includes('city') ||
+    q.includes('bangalore') ||
+    q.includes('pune') ||
+    q.includes('hyderabad') ||
+    q.includes('gurgaon') ||
+    q.includes('delhi') ||
+    q.includes('work mode') ||
+    q.includes('open to relocate')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Location & Work Preferences',
+      context: `Location & Work Mode: Based in Mumbai, India. Open to Remote worldwide, Hybrid/On-site in Mumbai, and actively open to Relocation to major tech hubs (Bangalore, Pune, Hyderabad, international) for compelling full-time roles.`,
+      deterministicAnswer:
+        `• **Current Location**: Mumbai, Maharashtra, India.
+• **Work Mode Preference**:
+  - **Remote**: Fully open to remote roles worldwide (comfortable collaborating across US, European, and APAC time zones).
+  - **Hybrid / On-site**: Open to on-site and hybrid roles in Mumbai.
+• **Relocation**: **Yes**, I am actively open to relocation for compelling full-time engineering opportunities in major tech hubs (Bangalore, Pune, Hyderabad, Gurgaon, or internationally).`,
+    };
+  }
+
+  // 5. Compensation / Salary / CTC Expectations
+  if (
+    q.includes('salary') ||
+    q.includes('compensation') ||
+    q.includes('ctc') ||
+    q.includes('expected ctc') ||
+    q.includes('current ctc') ||
+    q.includes('pay rate') ||
+    q.includes('package') ||
+    q.includes('remuneration') ||
+    q.includes('expected salary')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Compensation & Expectations',
+      context: `Compensation Philosophy: Open to discussing competitive compensation and CTC aligned with industry standards, role scope, and whether the position is remote or on-site. Contact directly via email or WhatsApp.`,
+      deterministicAnswer:
+        `• **Compensation Philosophy**: I am open to discussing competitive compensation and CTC aligned with industry benchmarks, the scope of the role, team expectations, and whether the position is remote or on-site.
+• **Direct Discussion**: For specific current/expected numbers and benefits, feel free to reach out directly:
+  - **Email**: [omkaranarse1906@gmail.com](mailto:omkaranarse1906@gmail.com)
+  - **WhatsApp**: [+91 8356011246](https://wa.me/918356011246)
+  - **LinkedIn**: [linkedin.com/in/omkar-anarse](https://linkedin.com/in/omkar-anarse)`,
+    };
+  }
+
+  // 6. Why Hire Omkar / Key Strengths / Selling Points
+  if (
+    q.includes('why should we hire you') ||
+    q.includes('why hire') ||
+    q.includes('key strength') ||
+    q.includes('strengths') ||
+    q.includes('why you') ||
+    q.includes('what makes you unique') ||
+    q.includes('why choose you') ||
+    q.includes('differentiator') ||
+    q.includes('best fit') ||
+    q.includes('stand out') ||
+    q.includes('value you bring')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Key Strengths & Differentiators',
+      context: `Why Hire Omkar Anarse:
+1. Dual-Threat Systems Capability: Production mobile engineering (Clean Architecture, Flutter, Riverpod) combined with applied AI (LangGraph multi-agent systems, RAG, ChromaDB, FastAPI).
+2. Proven Track Record of Shipping: Production mobile apps with thousands of users at My Job Park + full-stack AI apps like DataMind AI.
+3. Clean Architecture & Rigor: Decoupled, type-safe, maintainable code with design tokens.
+4. Speed & Adaptability: B.Sc. CS & MCA degrees from Mumbai University, quick learner.`,
+      deterministicAnswer:
+        `Here are the top reasons I make a high-impact addition to your engineering team:
+
+1. **Dual-Threat Systems Capability**: I bridge the gap between production cross-platform mobile engineering (**Flutter**, **Clean Architecture**, **Riverpod**) and cutting-edge Applied AI (**LangGraph multi-agent pipelines**, **RAG**, **ChromaDB**, **FastAPI**).
+2. **Proven Track Record of Shipping**: I don't just prototype; I ship production-grade code that scales — from recruitment apps with thousands of active users at **My Job Park** to end-to-end AI applications like **DataMind AI**.
+3. **Rigorous Architecture & Clean Code**: I write modular, decoupled, type-safe software with clean boundaries, comprehensive design token systems, and robust error handling.
+4. **Speed & Adaptability**: Strong computer science foundation (B.Sc. CS & MCA from Mumbai University) allows me to master new stacks, tools, and paradigms rapidly.`,
+    };
+  }
+
+  // 7. Most Challenging Project / Technical Problem Solved
+  if (
+    q.includes('challenging project') ||
+    q.includes('hardest problem') ||
+    q.includes('most complex') ||
+    q.includes('complex problem') ||
+    q.includes('difficult bug') ||
+    q.includes('technical challenge') ||
+    q.includes('proudest project') ||
+    q.includes('best project')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Engineering Deep Dive: DataMind AI',
+      context: `Most challenging project: DataMind AI. Non-technical users upload arbitrary datasets (CSV, JSON, SQL) and run conversational queries without manual charts or hallucinated SQL. Solution: Multi-step LangGraph reasoning agent with conditional branching, ChromaDB vector store for schema understanding, FastAPI backend, Next.js 15 streaming interface with Groq LLM inference.`,
+      deterministicAnswer:
+        `My most technically demanding project is **DataMind AI**:
+
+• **The Challenge**: Enabling non-technical business users to upload arbitrary unstructured datasets (CSV, JSON, SQL) and run conversational queries without generating hallucinations or invalid database queries.
+• **The Solution**:
+  1. Engineered a multi-step reasoning agent using **LangGraph** with conditional branching to validate queries before execution.
+  2. Designed a hybrid **RAG pipeline** using **ChromaDB** vector embeddings to index dataset metadata and schema definitions.
+  3. Backed by a high-throughput asynchronous **FastAPI** server and Next.js 15 streaming UI with sub-second Groq LLM inference.
+• **The Impact**: Eliminated manual dashboard configuration and reduced ad-hoc data analysis cycles from hours to seconds.`,
+    };
+  }
+
+  // 8. Architecture, Clean Architecture, Design Patterns & Code Quality
+  if (
+    q.includes('clean architecture') ||
+    q.includes('design pattern') ||
+    q.includes('solid principle') ||
+    q.includes('how do you structure') ||
+    q.includes('code quality') ||
+    q.includes('riverpod') ||
+    q.includes('state management') ||
+    q.includes('folder structure') ||
+    q.includes('bloc')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Architecture & Design Principles',
+      context: `Engineering Architecture & Design Principles:
+Clean Architecture: Presentation (Widgets/UI) -> Domain (Use Cases/Entities) -> Data (Repositories/DataSources).
+State Management: Riverpod & BLoC in Flutter for unidirectional data flows.
+Backend: FastAPI modular routers, Pydantic validation, dependency injection, type safety with TypeScript/Zod.`,
+      deterministicAnswer:
+        `I design systems around **Clean Architecture** and SOLID principles to ensure testability, scalability, and maintainability:
+
+• **Layered Separation**:
+  - **Presentation Layer**: Flutter Widgets / React Components + Controllers & ViewModels.
+  - **Domain Layer**: Business Logic, Use Cases, and Pure Entities (strictly independent of UI and third-party libraries).
+  - **Data Layer**: Repositories, Data Sources (REST, Firestore, Local SQLite/Hive), and DTO mappers.
+• **Predictable State Management**: Riverpod and BLoC in Flutter for unidirectional data flows, immutable state, and zero side-effects.
+• **Backend Separation**: Modular FastAPI routes, dependency injection, and strict schema validation with Pydantic and Zod.`,
+    };
+  }
+
+  // 9. Teamwork, Git Workflow, Agile / Scrum
+  if (
+    q.includes('git workflow') ||
+    q.includes('how do you work in a team') ||
+    q.includes('team collaboration') ||
+    q.includes('agile') ||
+    q.includes('scrum') ||
+    q.includes('code review') ||
+    q.includes('collaborat') ||
+    q.includes('cross-functional') ||
+    q.includes('teamwork') ||
+    q.includes('git branching')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Teamwork & Engineering Practices',
+      context: `Teamwork & Agile Workflow: Feature branching, conventional commits, pull request code reviews, daily standups, sprint planning, cross-functional collaboration with designers (Figma tokens) and product managers.`,
+      deterministicAnswer:
+        `I thrive in collaborative, high-velocity engineering environments:
+
+• **Git & Version Control**: Structured feature branching, conventional commits, concise Pull Requests, and thorough peer code reviews.
+• **Agile & Sprint Cycles**: Daily standups, sprint grooming, backlog prioritization, and iterative retro enhancements.
+• **Design & Product Synergy**: Working closely with UI/UX designers using Figma design tokens and partnering with product managers to clarify edge cases before writing code.`,
+    };
+  }
+
+  // 10. Interview Scheduling / Screening Call / Phone
+  if (
+    q.includes('schedule an interview') ||
+    q.includes('schedule interview') ||
+    q.includes('set up a call') ||
+    q.includes('schedule a call') ||
+    q.includes('screening call') ||
+    q.includes('phone number') ||
+    q.includes('interview') ||
+    q.includes("let's talk") ||
+    q.includes("let's chat") ||
+    q.includes('calendar')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Interview Scheduling & Direct Contact',
+      context: `Schedule Interview with Omkar: Email: omkaranarse1906@gmail.com, WhatsApp/Phone: +91 8356011246, LinkedIn: https://linkedin.com/in/omkar-anarse, Resume: /Omkar.pdf. Open to introductory screening calls and technical discussions.`,
+      deterministicAnswer:
+        `I would love to set up an introductory screening or technical interview!
+
+• **Email**: [omkaranarse1906@gmail.com](mailto:omkaranarse1906@gmail.com)
+• **WhatsApp / Direct Line**: [+91 8356011246](https://wa.me/918356011246)
+• **LinkedIn**: [linkedin.com/in/omkar-anarse](https://linkedin.com/in/omkar-anarse)
+• **Official Resume**: [Download PDF](/Omkar.pdf)
+
+Feel free to email me a calendar invite or ping me directly on WhatsApp — I typically respond within a few hours!`,
+    };
+  }
+
+  // 11. AI / ML / LangGraph / RAG Stack
+  if (
+    q.includes('langgraph') ||
+    q.includes('rag') ||
+    q.includes('chromadb') ||
+    q.includes('vector db') ||
+    q.includes('agentic') ||
+    q.includes('multi-agent') ||
+    q.includes('fastapi') ||
+    q.includes('llm') ||
+    q.includes('ai stack') ||
+    q.includes('embeddings') ||
+    q.includes('generative ai') ||
+    q.includes('prompt') ||
+    q.includes('langchain')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Applied AI & Machine Learning Stack',
+      context: `AI & Machine Learning Engineering Stack: Python, FastAPI, LangGraph (multi-agent workflows, state machines, parallel research nodes), LangChain, RAG (Retrieval-Augmented Generation), ChromaDB vector store, Groq, OpenAI, Gemini LLM inference, PostgreSQL.`,
+      deterministicAnswer:
+        `My Applied AI engineering stack centers around production autonomy, state machines, and high-performance retrieval:
+
+• **Agent Orchestration**: **LangGraph** for cyclical multi-agent workflows, stateful conditional branching, parallel worker nodes, and automated quality evaluation.
+• **RAG & Vector Search**: Hybrid Retrieval-Augmented Generation, chunking algorithms, semantic similarity search, and **ChromaDB** vector storage.
+• **Inference & Serving**: High-throughput **FastAPI** backends with asynchronous workers, streaming responses (SSE), and integrations with **Groq**, **OpenAI**, and **Gemini**.`,
+    };
+  }
+
+  // 12. Mobile / Flutter / iOS Stack
+  if (
+    q.includes('flutter') ||
+    q.includes('dart') ||
+    q.includes('mobile stack') ||
+    q.includes('ios') ||
+    q.includes('swift') ||
+    q.includes('swiftui') ||
+    q.includes('cross-platform') ||
+    q.includes('android') ||
+    q.includes('mobile engineering')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Mobile Engineering Stack',
+      context: `Mobile Engineering Stack: Flutter, Dart, Riverpod, BLoC, Clean Architecture, Swift, SwiftUI, UIKit, Firebase (Auth, Firestore, Cloud Functions, Messaging), responsive design tokens, MethodChannels for native features.`,
+      deterministicAnswer:
+        `My mobile development expertise is centered on production cross-platform systems:
+
+• **Flutter & Dart**: 3+ years engineering production apps with **Riverpod**, **Clean Architecture**, custom animations, and responsive design token systems.
+• **Native Bridges & iOS**: Experience with **Swift / SwiftUI**, writing MethodChannels for native camera, geofencing, and biometric device capabilities.
+• **Cloud & Integrations**: Real-time Firebase Firestore, Auth, Cloud Messaging (FCM), push notifications, and resilient offline synchronization.`,
+    };
+  }
+
+  // 13. Web & Full-Stack Development
+  if (
+    q.includes('next.js') ||
+    q.includes('nextjs') ||
+    q.includes('react') ||
+    q.includes('typescript') ||
+    q.includes('full-stack') ||
+    q.includes('fullstack') ||
+    q.includes('frontend') ||
+    q.includes('tailwind') ||
+    q.includes('node') ||
+    q.includes('postgres') ||
+    q.includes('sql')
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Web & Full-Stack Systems',
+      context: `Web & Full-Stack Stack: Next.js 15 (App Router), React 19, TypeScript, Node.js, Tailwind CSS, Vanilla CSS, PostgreSQL, Redis, Docker, RESTful microservices.`,
+      deterministicAnswer:
+        `My full-stack web stack is modern, fast, and type-safe:
+
+• **Frontend**: Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion, and Vanilla CSS.
+• **Backend & APIs**: Node.js, Python (FastAPI), RESTful microservices, and streaming endpoints.
+• **Databases & DevOps**: PostgreSQL, Redis caching, ChromaDB vector store, Docker containers, and Git/GitHub CI/CD.`,
+    };
+  }
+
+  // 14. Elevator Pitch / Tell me about yourself / Greetings
+  if (
+    q === 'hi' ||
+    q === 'hello' ||
+    q === 'hey' ||
+    q.startsWith('hi ') ||
+    q.startsWith('hello ') ||
+    q.startsWith('hey ') ||
+    q.includes('greeting') ||
+    q.includes('introduce') ||
+    q.includes('myself') ||
+    q.includes('who are you') ||
+    q.includes('tell me about yourself') ||
+    q.includes('about yourself') ||
+    q.includes('walk me through your resume') ||
+    q.includes('elevator pitch')
+  ) {
+    const currentHour = new Date().getHours();
+    const timeGreeting = currentHour >= 5 && currentHour < 12 ? 'Good morning' : currentHour >= 12 && currentHour < 17 ? 'Good afternoon' : 'Good evening';
+
+    return {
+      hasMatch: true,
+      source: 'Elevator Pitch & Overview',
+      context: `Omkar Anarse: AI & Mobile Systems Engineer with a B.Sc. in Computer Science and an MCA from Mumbai University (MU). Works across Flutter (State Management, Clean Architecture), Next.js 15, Node.js, and Agentic AI projects (LangGraph multi-agent systems, RAG pipelines, ChromaDB, FastAPI). Experience: Flutter developer at Metaphi + 3 years of part-time experience building production mobile apps at My Job Park.`,
+      deterministicAnswer:
+        `${timeGreeting}! 👋 Myself Omkar Anarse.
+
+I am an **AI & Mobile Systems Engineer** based in Mumbai, India, with a B.Sc. in Computer Science and an MCA from Mumbai University (MU).
+
+Over the past **3+ years**, I have focused on building production software that solves real operational problems:
+• **Mobile Systems**: Flutter & Dart with Clean Architecture, Riverpod, and Firebase (production apps at **Metaphi** and **My Job Park**).
+• **Applied AI Engineering**: Autonomous multi-agent pipelines with **LangGraph**, RAG with **ChromaDB**, and **FastAPI** microservices (**DataMind AI**).
+• **Modern Full-Stack**: Next.js 15, TypeScript, React 19, Tailwind CSS, and PostgreSQL.
+
+Feel free to ask me anything about my projects, architecture decisions, tech stack, notice period, or career opportunities!`,
+    };
+  }
+
+  // 15. Attendephi specific query
   if (q.includes('attendephi') || (q.includes('attendance') && !q.includes('school'))) {
     return {
       hasMatch: true,
-      source: 'Projects',
+      source: 'Projects · Mobile Systems',
       context: `Attendephi is an attendance and check-in platform built with Flutter and Firebase, featuring QR-based check-in, location verification (geofencing), and face verification. Category: Mobile Systems · Authentication & Attendance.`,
       deterministicAnswer:
-        'Attendephi is an attendance and check-in platform built with Flutter and Firebase, featuring QR-based check-in, location verification (geofencing) and face verification.',
+        'I built **Attendephi**, a mobile attendance and check-in platform using Flutter and Firebase. It features QR-based check-in, location verification (geofencing), and face verification to ensure tamper-proof attendance workflows.',
     };
   }
 
-  // 2. DataMind AI
-  if (q.includes('datamind') || (q.includes('csv') && q.includes('query')) || (q.includes('rag') && q.includes('project'))) {
+  // 16. DataMind AI
+  if (q.includes('datamind') || (q.includes('csv') && q.includes('query'))) {
     return {
       hasMatch: true,
-      source: 'Projects',
+      source: 'Projects · AI Engineering',
       context: `DataMind AI: Upload any data (CSV, JSON, SQL) and interact with it through a conversational AI query layer — no dashboards, no manual charts. Features: Next.js 15, FastAPI, LangGraph multi-step reasoning agent, RAG pipeline with ChromaDB vector store, Groq LLM inference, PostgreSQL.`,
       deterministicAnswer:
-        "DataMind AI is Omkar's flagship AI platform that lets users upload arbitrary datasets (CSV, JSON, SQL) and query them conversationally without manual dashboards. It features a FastAPI backend, ChromaDB vector store, and a LangGraph multi-step reasoning agent for conditional branching.",
+        'I built **DataMind AI**, my flagship AI platform that lets users upload arbitrary datasets (CSV, JSON, SQL) and query them conversationally without manual dashboards. It features a FastAPI backend, ChromaDB vector store, and a LangGraph multi-step reasoning agent for conditional branching.',
     };
   }
 
-  // 3. Blog Research Agent
+  // 17. Blog Research Agent
   if (q.includes('blog') || (q.includes('agent') && !q.includes('mobile') && !q.includes('metaphi'))) {
     return {
       hasMatch: true,
-      source: 'Projects',
+      source: 'Projects · Multi-Agent AI',
       context: `Blog Research Agent: A LangGraph multi-agent pipeline that autonomously researches, drafts, evaluates quality, and tracks blog content. Key details: Multi-agent coordination with LangGraph, parallel research node execution, automated fact checking, and end-to-end observability.`,
       deterministicAnswer:
-        'The Blog Research Agent is an autonomous LangGraph multi-agent pipeline that coordinates parallel research nodes, drafts content, conducts automated fact verification, and tracks production quality with full observability.',
+        'I built the **Blog Research Agent**, an autonomous LangGraph multi-agent pipeline that coordinates parallel research nodes, drafts content, conducts automated fact verification, and tracks production quality with full observability.',
     };
   }
 
-  // 4. Hospital & Clinic Platform / Aarogya
+  // 18. Hospital & Clinic Platform / Aarogya
   if (q.includes('hospital') || q.includes('clinic') || q.includes('aarogya') || (q.includes('doctor') && q.includes('app'))) {
     return {
       hasMatch: true,
-      source: 'Projects',
+      source: 'Projects · Healthcare Mobile',
       context: `Hospital & Clinic Platform (Aarogya): Three linked Flutter applications — patient, doctor, and clinic admin — sharing a unified backend, Clean Architecture, cohesive design tokens, appointment scheduling, and digital prescription workflows.`,
       deterministicAnswer:
-        'Hospital & Clinic Platform (Aarogya) is a suite of three linked Flutter applications (patient, doctor, and clinic admin) sharing a unified backend, Clean Architecture, and cohesive design tokens to manage the end-to-end clinical workflow.',
+        'I engineered the **Hospital & Clinic Platform (Aarogya)**, a suite of three linked Flutter applications (patient, doctor, and clinic admin) sharing a unified backend, Clean Architecture, and cohesive design tokens to manage the end-to-end clinical workflow.',
     };
   }
 
-  // 5. Taskify
+  // 19. Taskify
   if (q.includes('taskify') || (q.includes('task') && q.includes('management'))) {
     return {
       hasMatch: true,
-      source: 'Projects',
+      source: 'Projects · Product Engineering',
       context: `Taskify: A collaborative project management platform designed from concept to developer-ready specification with a resolved two-role data model, role-based access control, sprint tracking, and real-time status management.`,
       deterministicAnswer:
-        'Taskify is a collaborative project management app designed from concept to developer-ready specification with a resolved two-role data model, real-time board updates, and sprint tracking.',
+        'I designed and engineered **Taskify**, a collaborative project management platform with a resolved two-role data model, role-based access control, real-time board updates, and sprint tracking.',
     };
   }
 
-  // 6. General Projects / What has Omkar built?
+  // 20. General Projects / What has Omkar built?
   if (
     q.includes('project') ||
     q.includes('built') ||
     q.includes('what has omkar built') ||
+    q.includes('what have you built') ||
     q.includes('portfolio') ||
     q.includes('work done') ||
     q.includes('apps')
   ) {
     return {
       hasMatch: true,
-      source: 'Projects',
+      source: 'Flagship Projects',
       context: `Projects built by Omkar Anarse:
 1. DataMind AI: Conversational data query layer with LangGraph, RAG, ChromaDB, and FastAPI.
 2. Attendephi: Attendance and check-in platform built with Flutter and Firebase with QR, geofencing, and face verification.
@@ -186,11 +585,17 @@ function retrieveAuthoritativeContext(query: string, knowledge: string): Retriev
 4. Hospital & Clinic Platform (Aarogya): 3 linked Flutter applications for clinical workflows.
 5. Taskify: Collaborative project management platform with resolved two-role data model.`,
       deterministicAnswer:
-        'Omkar has built several production-grade systems across AI, mobile, and system design:\n\n• DataMind AI: Conversational data query layer with LangGraph, RAG, and FastAPI.\n• Attendephi: Mobile attendance platform with Flutter, Firebase, QR, and face verification.\n• Blog Research Agent: LangGraph multi-agent autonomous research and drafting pipeline.\n• Hospital & Clinic Platform: Three linked Flutter applications for clinical workflows.\n• Taskify: Real-time collaborative project management platform.',
+        `Here are the flagship production-grade systems I have built across AI, mobile, and full-stack engineering:
+
+• **DataMind AI**: Conversational data query layer with LangGraph, RAG, ChromaDB, and FastAPI.
+• **Attendephi**: Mobile attendance platform with Flutter, Firebase, QR, and face verification.
+• **Blog Research Agent**: LangGraph multi-agent autonomous research and drafting pipeline.
+• **Hospital & Clinic Platform (Aarogya)**: Three linked Flutter applications for clinical healthcare workflows.
+• **Taskify**: Real-time collaborative project management platform.`,
     };
   }
 
-  // 7. Work Experience / Metaphi / My Job Park / Roles held
+  // 21. Work Experience / Metaphi / My Job Park / Roles held
   if (
     q.includes('experience') ||
     q.includes('work history') ||
@@ -198,55 +603,53 @@ function retrieveAuthoritativeContext(query: string, knowledge: string): Retriev
     q.includes('my job park') ||
     q.includes('employment') ||
     q.includes('previous company') ||
-    q.includes('companies worked')
+    q.includes('companies worked') ||
+    q.includes('part-time') ||
+    q.includes('part time')
   ) {
     return {
       hasMatch: true,
-      source: 'Experience',
+      source: 'Work Experience',
       context: `Work Experience of Omkar Anarse:
 1. Metaphi (Current · 1+ Month): Flutter Developer. Architecting modular mobile interfaces with Clean Architecture and Riverpod; integrating asynchronous REST APIs; crafting fluid micro-animations.
 2. My Job Park (3 Years · Part-time): Flutter Developer. Built cross-platform recruitment applications serving thousands of active users; implemented real-time messaging, notifications, and job search with Firebase.`,
       deterministicAnswer:
-        'Omkar has worked in two primary engineering roles:\n\n1. Metaphi (Current · 1+ Month): Flutter Developer architecting modular mobile experiences, state management with Riverpod, Clean Architecture, and REST API integrations.\n2. My Job Park (3 Years · Part-time): Flutter Developer engineering cross-platform recruitment applications with Firebase, responsive design tokens, and real-time messaging.',
+        `Here is a breakdown of my engineering experience:
+
+1. **Metaphi** (Current · Flutter Developer):
+   I architect modular mobile interfaces with Clean Architecture and Riverpod, integrate asynchronous REST APIs, and craft fluid micro-animations.
+
+2. **My Job Park** (3 Years · Part-time Flutter Developer):
+   I engineered cross-platform recruitment applications serving thousands of active users, implementing real-time messaging, notifications, and job search with Firebase.`,
     };
   }
 
-  // 8. Tech Stack / Technologies / Skills / Languages / Frameworks
+  // 22. Tech Stack / Technologies / Skills
   if (
     q.includes('technolog') ||
     q.includes('tech stack') ||
     q.includes('skill') ||
     q.includes('stack') ||
-    q.includes('flutter') ||
-    q.includes('python') ||
-    q.includes('fastapi') ||
-    q.includes('langgraph') ||
-    q.includes('dart') ||
-    q.includes('database') ||
-    q.includes('sql') ||
-    q.includes('postgres') ||
-    q.includes('redis') ||
-    q.includes('vector') ||
-    q.includes('chromadb') ||
-    q.includes('tools') ||
-    q.includes('react') ||
-    q.includes('next.js') ||
-    q.includes('typescript')
+    q.includes('tools')
   ) {
     return {
       hasMatch: true,
-      source: 'Skills',
+      source: 'Core Tech Stack',
       context: `Technical Skills of Omkar Anarse:
 • AI & Backend: Python, FastAPI, LangChain, LangGraph, RAG (Retrieval-Augmented Generation), LLM APIs (Groq, OpenAI, Gemini), ChromaDB, PostgreSQL, Redis, REST APIs.
-• Mobile: Flutter, Dart, Riverpod, Clean Architecture, Swift, SwiftUI, UIKit, Firebase, responsive design token systems.
-• Web: Next.js 15 (App Router), TypeScript, React 19, Tailwind CSS, Vanilla CSS, HTML5.
+• Mobile: Flutter, Dart, State Management, Clean Architecture, Swift, SwiftUI, UIKit, Firebase, responsive design token systems.
+• Web: Next.js 15 (App Router), Node.js, TypeScript, React 19, Tailwind CSS, Vanilla CSS, HTML5.
 • Tools & DevOps: Git, GitHub, Docker, Firebase, Supabase, Linux.`,
       deterministicAnswer:
-        'Omkar specializes in three primary engineering domains:\n\n• AI & Backend: Python, FastAPI, LangChain, LangGraph, RAG, ChromaDB, PostgreSQL, Redis, and Groq/LLM APIs.\n• Mobile Systems: Flutter, Dart, Riverpod, Clean Architecture, Swift, SwiftUI, and Firebase.\n• Web & Systems: Next.js 15, TypeScript, React 19, Tailwind CSS, and Docker.',
+        `My core technical stack centers around three main domains:
+
+• **AI & Backend**: Python, FastAPI, LangGraph multi-agent pipelines, RAG, ChromaDB, PostgreSQL, Redis, and Groq/LLM APIs.
+• **Mobile Systems**: Flutter, Dart, State Management (Riverpod/BLoC), Clean Architecture, Swift, SwiftUI, and Firebase.
+• **Web & Full-Stack**: Next.js 15, Node.js, TypeScript, React 19, Tailwind CSS, and Docker.`,
     };
   }
 
-  // 9. Career Interests / Target Roles / What roles is he looking for?
+  // 23. Career Interests / Target Roles / What roles is he looking for?
   if (
     q.includes('role') ||
     q.includes('looking for') ||
@@ -259,7 +662,7 @@ function retrieveAuthoritativeContext(query: string, knowledge: string): Retriev
   ) {
     return {
       hasMatch: true,
-      source: 'Career Interests',
+      source: 'Target Roles & Objectives',
       context: `Career Interests & Target Roles for Omkar Anarse:
 • AI Engineer / AI Systems Engineer
 • Machine Learning Systems Engineer
@@ -268,25 +671,43 @@ function retrieveAuthoritativeContext(query: string, knowledge: string): Retriev
 • Product Engineer
 Availability: Open to full-time roles, contracts, and engineering collaborations with teams building high-impact products.`,
       deterministicAnswer:
-        'Omkar is targeting roles in:\n\n• AI Engineering / ML Systems Engineering\n• Full-Stack AI Engineering\n• Mobile Systems Engineering (Flutter & iOS / Swift)\n• Product Engineering\n\nHe is open to full-time roles, contracts, and engineering collaborations with high-growth teams.',
+        `I am actively targeting engineering roles in:
+
+• **AI Engineering / ML Systems Engineering**
+• **Full-Stack AI Engineering**
+• **Mobile Systems Engineering** (Flutter & iOS / Swift)
+• **Product Engineering**
+
+I am open to full-time roles, contracts, and high-impact engineering collaborations.`,
     };
   }
 
-  // 10. Education / College / Degree / MCA
-  if (q.includes('education') || q.includes('college') || q.includes('degree') || q.includes('mca') || q.includes('study') || q.includes('university')) {
+  // 24. Education / College / Degree / MCA / BSC
+  if (
+    q.includes('education') ||
+    q.includes('college') ||
+    q.includes('degree') ||
+    q.includes('mca') ||
+    q.includes('bsc') ||
+    q.includes('bachelor') ||
+    q.includes('master') ||
+    q.includes('study') ||
+    q.includes('university') ||
+    q.includes('mu')
+  ) {
     return {
       hasMatch: true,
-      source: 'Education',
+      source: 'Education & Academics',
       context: `Education of Omkar Anarse:
-• Degree: Master of Computer Applications (MCA) in Mumbai, India.
-• Focus: Artificial Intelligence, Machine Learning Systems, Mobile & Distributed Architectures.
-• Coursework: Rigorous computer science coursework covering algorithms, system design, database management, and intelligent systems.`,
+• Degree: Master of Computer Applications (MCA) & Bachelor of Science in Computer Science (B.Sc. CS)
+• University: Mumbai University (MU), Mumbai, India.
+• Focus: Artificial Intelligence, Machine Learning Systems, Mobile & Distributed Architectures, and Full-Stack Engineering.`,
       deterministicAnswer:
-        'Omkar is pursuing his Master of Computer Applications (MCA) in Mumbai, India, with a core technical focus on Artificial Intelligence, Machine Learning systems, and distributed mobile architectures.',
+        `I completed my **Bachelor of Science in Computer Science (B.Sc. CS)** and **Master of Computer Applications (MCA)** from **Mumbai University (MU)**. My academic and practical coursework emphasized AI/ML systems, distributed mobile architectures, algorithms, and full-stack software development.`,
     };
   }
 
-  // 11. Contact / Reach out / WhatsApp / Email / Social Links
+  // 25. Contact / Reach out / WhatsApp / Email / Social Links
   if (
     q.includes('contact') ||
     q.includes('email') ||
@@ -299,7 +720,7 @@ Availability: Open to full-time roles, contracts, and engineering collaborations
   ) {
     return {
       hasMatch: true,
-      source: 'Contact',
+      source: 'Direct Contact Channels',
       context: `Contact & Social Links for Omkar Anarse:
 • Email: omkaranarse1906@gmail.com
 • WhatsApp: +91 8356011246 (Direct chat: https://wa.me/918356011246)
@@ -307,53 +728,61 @@ Availability: Open to full-time roles, contracts, and engineering collaborations
 • LinkedIn: https://linkedin.com/in/omkar-anarse
 • Location: Mumbai, India`,
       deterministicAnswer:
-        'You can reach Omkar directly via:\n\n• Email: omkaranarse1906@gmail.com\n• WhatsApp: +91 8356011246\n• LinkedIn: linkedin.com/in/omkar-anarse\n• GitHub: github.com/Omkaranrse',
+        `You can reach me directly via:
+
+• **Email**: [omkaranarse1906@gmail.com](mailto:omkaranarse1906@gmail.com)
+• **WhatsApp**: [+91 8356011246](https://wa.me/918356011246)
+• **LinkedIn**: [linkedin.com/in/omkar-anarse](https://linkedin.com/in/omkar-anarse)
+• **GitHub**: [github.com/Omkaranrse](https://github.com/Omkaranrse)
+• **Resume (PDF)**: [Download Resume](/Omkar.pdf)`,
     };
   }
 
-  // 12. About Omkar / Who is Omkar? / Location / Bio
+  // 26. About Omkar / Who is Omkar? / Location / Bio
   if (
     q.includes('who is omkar') ||
     q.includes('about omkar') ||
-    q.includes('tell me about yourself') ||
     q.includes('bio') ||
     q.includes('background') ||
-    q.includes('where is omkar') ||
-    q.includes('mumbai') ||
-    q.includes('location')
+    q.includes('mumbai')
   ) {
     return {
       hasMatch: true,
-      source: 'About Omkar',
-      context: `About Omkar: Omkar Anarse is an AI & Mobile Systems Engineer and MCA student based in Mumbai, India. He builds production-grade software spanning AI/ML engineering (RAG pipelines, LangGraph multi-agent architectures), cross-platform mobile systems with Flutter & Dart, and modern full-stack web applications.`,
+      source: 'About Omkar Anarse',
+      context: `About Omkar: Omkar Anarse is an AI & Mobile Systems Engineer with a B.Sc. in Computer Science and an MCA from Mumbai University (MU). Based in Mumbai, India. He builds production-grade software spanning AI/ML engineering (RAG pipelines, LangGraph multi-agent architectures), cross-platform mobile systems with Flutter & Dart, and modern full-stack web applications.`,
       deterministicAnswer:
-        'Omkar Anarse is an AI & Mobile Systems Engineer and MCA student based in Mumbai, India. He builds production-grade AI pipelines (RAG, LangGraph multi-agent workflows), cross-platform Flutter/iOS apps, and full-stack web platforms that solve real-world operational problems.',
+        `I am **Omkar Anarse**, an AI & Mobile Systems Engineer based in Mumbai, India. I hold a B.Sc. CS and MCA from Mumbai University (MU). I specialize in building production-grade software across agentic AI pipelines (RAG, LangGraph multi-agent workflows), cross-platform Flutter/iOS apps, and modern full-stack web applications.`,
     };
   }
 
-  // 13. Philosophy & Workflow
+  // 27. Philosophy & Workflow
   if (q.includes('philosophy') || q.includes('workflow') || q.includes('how do you work') || q.includes('methodology')) {
     return {
       hasMatch: true,
-      source: 'Philosophy',
+      source: 'Engineering Methodology',
       context: `Engineering Philosophy & Workflow:
 1. Understand: Define the problem, target users, and technical constraints before writing code.
 2. Design: Shape the user experience and distributed system architecture simultaneously.
 3. Build: Implement robust, maintainable code iteratively with clean boundaries.
 4. Iterate: Continuously test, measure performance, and refine with real-world feedback.`,
       deterministicAnswer:
-        'Omkar follows a 4-stage engineering workflow:\n\n1. Understand: Clarify problem, users, and constraints before coding.\n2. Design: Shape UI/UX and system architecture together.\n3. Build: Write modular, maintainable code with clean boundaries.\n4. Iterate: Continuously test, measure performance, and refine.',
+        `I follow a 4-stage engineering workflow:
+
+1. **Understand**: Clarify problem, users, and constraints before coding.
+2. **Design**: Shape UI/UX and system architecture together.
+3. **Build**: Write modular, maintainable code with clean boundaries.
+4. **Iterate**: Continuously test, measure performance, and refine with real-world feedback.`,
     };
   }
 
-  // 14. Availability
+  // 28. General Availability
   if (q.includes('available') || q.includes('freelance') || q.includes('full-time') || q.includes('part-time') || q.includes('when can')) {
     return {
       hasMatch: true,
       source: 'Availability',
-      context: `Availability: Omkar is currently open to full-time AI engineering roles, mobile & web systems projects, contracts, and product collaborations.`,
+      context: `Availability: Omkar is currently open to full-time AI engineering roles, mobile & web systems projects, contracts, and product collaborations. Immediate / short notice.`,
       deterministicAnswer:
-        'Omkar is currently available for full-time AI/mobile engineering roles, contract work, and product collaborations.',
+        `I am currently available on **immediate / short notice** and actively open to full-time AI/mobile engineering roles, contract projects, and high-impact product collaborations.`,
     };
   }
 
@@ -463,10 +892,15 @@ export async function POST(req: NextRequest) {
             messages: [
               {
                 role: 'system',
-                content: `You are "Ask Omkar AI", a helpful, concise portfolio AI assistant for Omkar Anarse.
+                content: `You are Omkar Anarse, responding directly to visitors on your personal portfolio website in the first person ("I", "my", "myself", "I built", "my experience").
+TONE & STYLE:
+- Speak directly as Omkar: authentic, articulate, technically proficient, and warm.
+- Never refer to Omkar in the third person ("Omkar is", "he has"). Always say "I am", "I built", "my experience".
+- Format responses beautifully using clean markdown: use bold text for key names/tech, bullet points for lists, and concise paragraphs.
+
 MANDATORY GROUNDING RULES:
 1. You may answer ONLY using the provided portfolio context below.
-2. If the answer cannot be supported by the provided context, do not guess. Reply strictly: "I don't have that information in my portfolio knowledge base."
+2. If the answer cannot be supported by the provided context, do not guess. Reply strictly: "I don't have that information in my portfolio knowledge base, but feel free to ask me about my projects, stack, or experience!"
 3. Do NOT hallucinate companies, years, salaries, technologies, or achievements.
 4. Keep answers concise, clear, and professional.
 

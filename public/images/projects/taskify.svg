@@ -1,0 +1,136 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgTask" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#140f07" />
+      <stop offset="50%" stop-color="#241407" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <radialGradient id="ambientAmber" cx="20%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="ambientOrange" cx="80%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#ea580c" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#ea580c" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="glassCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#bgTask)" />
+  <rect width="1280" height="720" fill="url(#ambientAmber)" />
+  <rect width="1280" height="720" fill="url(#ambientOrange)" />
+
+  <!-- Grid Lines -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="120" x2="1280" y2="120" />
+    <line x1="0" y1="240" x2="1280" y2="240" />
+    <line x1="0" y1="360" x2="1280" y2="360" />
+    <line x1="0" y1="480" x2="1280" y2="480" />
+    <line x1="0" y1="600" x2="1280" y2="600" />
+    <line x1="200" y1="0" x2="200" y2="720" />
+    <line x1="400" y1="0" x2="400" y2="720" />
+    <line x1="600" y1="0" x2="600" y2="720" />
+    <line x1="800" y1="0" x2="800" y2="720" />
+    <line x1="1000" y1="0" x2="1000" y2="720" />
+  </g>
+
+  <!-- Left Content Area -->
+  <g transform="translate(80, 90)">
+    <!-- Badge -->
+    <rect width="215" height="34" rx="17" fill="#d97706" fill-opacity="0.2" stroke="#f59e0b" stroke-width="1.5" />
+    <circle cx="20" cy="17" r="4.5" fill="#fbbf24" />
+    <text x="34" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#fde68a" letter-spacing="1.2">PROJECT 05 · SYSTEM DESIGN</text>
+
+    <!-- Title -->
+    <text x="0" y="95" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif" font-size="52" font-weight="800" fill="#ffffff" letter-spacing="-1">Taskify</text>
+    
+    <!-- Tagline -->
+    <text x="0" y="140" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif" font-size="19" font-weight="400" fill="#94a3b8">Developer-Ready Specification &amp; Two-Role Data Architecture</text>
+    <text x="0" y="168" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif" font-size="15" font-weight="400" fill="#64748b">Scoped project management architecture: REST API contracts, state machines &amp; data models</text>
+
+    <!-- Key Metrics Bento Row -->
+    <g transform="translate(0, 215)">
+      <!-- Metric 1 -->
+      <rect width="210" height="90" rx="16" fill="url(#glassCard)" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">ROLE STRUCTURE</text>
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#fbbf24">Owner · Member</text>
+
+      <!-- Metric 2 -->
+      <g transform="translate(225, 0)">
+        <rect width="210" height="90" rx="16" fill="url(#glassCard)" stroke="#ffffff" stroke-opacity="0.12" />
+        <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">SPEC READY</text>
+        <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#4ade80">100% Endpoints</text>
+      </g>
+    </g>
+
+    <!-- Tech Stack Pills -->
+    <g transform="translate(0, 340)">
+      <rect x="0" y="0" width="125" height="30" rx="15" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="62" y="19" text-anchor="middle" font-family="monospace" font-size="12" fill="#e2e8f0">System Design</text>
+
+      <rect x="135" y="0" width="115" height="30" rx="15" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="192" y="19" text-anchor="middle" font-family="monospace" font-size="12" fill="#e2e8f0">Data Modeling</text>
+
+      <rect x="260" y="0" width="95" height="30" rx="15" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="307" y="19" text-anchor="middle" font-family="monospace" font-size="12" fill="#e2e8f0">State Mach</text>
+
+      <rect x="365" y="0" width="85" height="30" rx="15" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="407" y="19" text-anchor="middle" font-family="monospace" font-size="12" fill="#e2e8f0">REST API</text>
+    </g>
+
+    <text x="0" y="440" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="600" fill="#fbbf24">
+      Click to open Complete Architecture Breakdown →
+    </text>
+  </g>
+
+  <!-- Right Kanban & Spec Board Mockup -->
+  <g transform="translate(680, 110)">
+    <rect width="520" height="500" rx="20" fill="#0d0904" fill-opacity="0.9" stroke="#ffffff" stroke-opacity="0.15" stroke-width="1.5" />
+    <rect width="520" height="42" rx="20" fill="#1f1406" />
+    <rect y="22" width="520" height="20" fill="#1f1406" />
+    <circle cx="24" cy="21" r="5.5" fill="#ef4444" />
+    <circle cx="44" cy="21" r="5.5" fill="#eab308" />
+    <circle cx="64" cy="21" r="5.5" fill="#22c55e" />
+    <text x="260" y="26" text-anchor="middle" font-family="monospace" font-size="12" fill="#fbbf24">taskify-data-contract.json</text>
+
+    <!-- 3-Column Kanban Board -->
+    <g transform="translate(24, 70)">
+      <!-- Col 1: Backlog -->
+      <rect x="0" y="0" width="146" height="390" rx="12" fill="#171007" stroke="#2d1c0c" />
+      <text x="14" y="28" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#d97706">TODO (3)</text>
+      
+      <rect x="10" y="44" width="126" height="68" rx="8" fill="#241709" stroke="#3b250d" />
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">Setup JWT Auth</text>
+      <rect x="20" y="82" width="48" height="18" rx="4" fill="#d97706" fill-opacity="0.3" />
+      <text x="44" y="95" text-anchor="middle" font-family="monospace" font-size="9" fill="#fde68a">Owner</text>
+
+      <rect x="10" y="122" width="126" height="68" rx="8" fill="#241709" stroke="#3b250d" />
+      <text x="20" y="146" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">Postgres Schema</text>
+      <rect x="20" y="160" width="54" height="18" rx="4" fill="#047857" fill-opacity="0.3" />
+      <text x="47" y="173" text-anchor="middle" font-family="monospace" font-size="9" fill="#6ee7b7">Schema</text>
+
+      <!-- Col 2: In Progress -->
+      <rect x="162" y="0" width="146" height="390" rx="12" fill="#171007" stroke="#2d1c0c" />
+      <text x="176" y="28" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#3b82f6">IN PROGRESS (2)</text>
+
+      <rect x="172" y="44" width="126" height="82" rx="8" fill="#1c2438" stroke="#1d4ed8" />
+      <text x="182" y="68" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#ffffff">Role Transition FSM</text>
+      <text x="182" y="86" font-family="monospace" font-size="9" fill="#93c5fd">Owner → Member</text>
+      <rect x="182" y="98" width="52" height="18" rx="4" fill="#3b82f6" fill-opacity="0.3" />
+      <text x="208" y="111" text-anchor="middle" font-family="monospace" font-size="9" fill="#bfdbfe">FSM</text>
+
+      <!-- Col 3: Done -->
+      <rect x="324" y="0" width="146" height="390" rx="12" fill="#171007" stroke="#2d1c0c" />
+      <text x="338" y="28" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" fill="#22c55e">DONE (4)</text>
+
+      <rect x="334" y="44" width="126" height="68" rx="8" fill="#11291b" stroke="#15803d" />
+      <text x="344" y="68" font-family="-apple-system, sans-serif" font-size="11" font-weight="600" fill="#e2e8f0">REST API Spec</text>
+      <rect x="344" y="82" width="62" height="18" rx="4" fill="#16a34a" fill-opacity="0.3" />
+      <text x="375" y="95" text-anchor="middle" font-family="monospace" font-size="9" fill="#86efac">Swagger</text>
+    </g>
+  </g>
+</svg>

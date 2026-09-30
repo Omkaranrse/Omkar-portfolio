@@ -1,14 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import type { Project } from '@/data/projects';
 import LiquidGlassButton from './LiquidGlassButton';
 
 const Z_TRANSITION = { duration: 0.35, ease: 'easeOut' } as const;
-const FILL_TRANSITION = { duration: 0.25, ease: 'easeOut' } as const;
 const Z_REST = 0.01;
 const ANTI_FLICKER_STYLE: React.CSSProperties = {
   backfaceVisibility: 'hidden',
@@ -26,7 +24,6 @@ export default function ApertureCard({ project }: ApertureCardProps) {
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
   const [cardHovered, setCardHovered] = React.useState(false);
-  const [ctaHovered, setCtaHovered] = React.useState(false);
 
   const delayTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const trackingActiveRef = React.useRef(false);
@@ -42,9 +39,6 @@ export default function ApertureCard({ project }: ApertureCardProps) {
   const titleHoverZ = translateAmount * 0.9;
   const descHoverZ = translateAmount * 1.1;
   const tagsHoverZ = translateAmount * 0.7;
-  const ctaBaseZ = translateAmount * 0.5;
-  const ctaCardLift = translateAmount * 0.35;
-  const ctaButtonLift = translateAmount * 0.35;
 
   // Tilt-shift focus blur
   function makeFocusBlur(anchorX: number, anchorY: number, amount: number) {
@@ -64,7 +58,6 @@ export default function ApertureCard({ project }: ApertureCardProps) {
   const metaBlur = makeFocusBlur(0, -0.35, 0.5);
   const titleBlur = makeFocusBlur(0, -0.1, 0.6);
   const descBlur = makeFocusBlur(0, 0.15, 0.6);
-  const ctaBlur = makeFocusBlur(0.35, 0.4, 0.8);
 
   function handleMouseEnter() {
     setCardHovered(true);
@@ -106,12 +99,9 @@ export default function ApertureCard({ project }: ApertureCardProps) {
     };
   }, [project.id, router]);
 
-  const ctaZ = ctaBaseZ + (cardHovered ? ctaCardLift : 0) + (ctaHovered ? ctaButtonLift : 0);
-
   const primaryGithubLink = project.links.find((l) => l.label.toLowerCase().includes('github'));
 
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // If clicking an interactive button/link (like the Code button), let it handle its own action
     const target = e.target as HTMLElement;
     if (target.closest('a, button')) {
       return;
@@ -143,8 +133,10 @@ export default function ApertureCard({ project }: ApertureCardProps) {
         perspective: perspectiveDistance,
         width: '100%',
         height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       }}
-      className="aperture-card-wrapper"
+      className="aperture-card-wrapper work-card-wrapper"
     >
       <motion.div
         onClick={handleCardClick}
@@ -159,7 +151,9 @@ export default function ApertureCard({ project }: ApertureCardProps) {
         }}
         style={{
           width: '100%',
-          height: '100%',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
           position: 'relative',
           borderRadius: 20,
           transformStyle: 'preserve-3d',

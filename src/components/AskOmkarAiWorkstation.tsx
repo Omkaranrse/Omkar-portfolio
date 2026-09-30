@@ -1,11 +1,41 @@
 'use client';
 
 import * as React from 'react';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import sceneImg from '@/images/home.png';
 import WorkstationAtmosphere from './WorkstationAtmosphere';
+import type { DragonChatState } from './FlyingDragon';
+
+const FlyingDragon = dynamic(() => import('./FlyingDragon'), { ssr: false });
+
+const CloseIcon = ({ color = '#ffffff', size = 18 }: { color?: string; size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <path d="M18 6L6 18M6 6l12 12" stroke={color} strokeWidth={2.5} strokeLinecap="round" />
+  </svg>
+);
+
+const SeenIcon = ({ color = '#ea580c' }: { color?: string }) => (
+  <svg width={16} height={11} viewBox="0 0 16 11" fill="none">
+    <path d="M1 5.5L4.5 9L10 3" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M6 5.5L9.5 9L15 3" stroke={color} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const VerifiedIcon = ({ color = '#38bdf8', size = 14 }: { color?: string; size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+    <path
+      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 export interface ChatMessage {
   id: string;
@@ -34,9 +64,10 @@ export interface KeyDef {
 }
 
 // ── 01. Placement Config (Retuned with >= 3% clearance above box bottom) ──
+// Keyboard x is centered directly to the desktop screen (screen center = 28.9 + 42.8/2 = 50.3%, keyboard center = 29.05 + 42.5/2 = 50.3%)
 const SCENE = {
   screen: { x: 28.9, y: 19.4, w: 42.8, h: 37.4 },
-  keyboard: { x: 27.5, y: 72.0, w: 42.5, h: 16.5 },
+  keyboard: { x: 29.05, y: 72.0, w: 42.5, h: 16.5 },
 };
 
 // ── 02. 5-Row 75% Mechanical Keyboard Layout ──
@@ -111,11 +142,134 @@ const KEYBOARD_LAYOUT: KeyDef[][] = [
 ];
 
 const PRESET_PROMPTS = [
-  { label: 'Projects & Stack', prompt: 'Tell me about your top technical projects and software stack.' },
-  { label: 'Experience & Roles', prompt: 'What is your background and what engineering roles are you seeking?' },
-  { label: 'Current Focus', prompt: 'What technologies or challenges are you currently focusing on?' },
-  { label: 'Contact & Socials', prompt: 'How can I connect with you or collaborate?' },
+  { label: 'Recruiter Quick Facts', prompt: 'What is your total years of experience, notice period, and preferred work mode?' },
+  { label: 'Projects & AI Stack', prompt: 'Tell me about DataMind AI and your LangGraph multi-agent pipelines.' },
+  { label: 'Flutter & Clean Arch', prompt: 'Tell me about your mobile engineering experience at Metaphi and Clean Architecture.' },
+  { label: 'Why Hire Omkar', prompt: 'Why should we hire you and what makes you unique?' },
+  { label: 'Download Resume', prompt: 'Can I download your official resume (PDF) and get your contact links?' },
 ];
+
+const MOBILE_SUGGESTION_CHIPS = [
+  { label: '⚡ Recruiter Quick Facts', prompt: 'What is your total years of experience, notice period, and preferred work mode?' },
+  { label: '📄 Download Resume', prompt: 'Where can I download your official resume PDF and see your contact links?' },
+  { label: '🤖 AI & LangGraph', prompt: 'Tell me about your AI experience with LangGraph, RAG, and multi-agent systems.' },
+  { label: '📱 Flutter & Clean Arch', prompt: 'Tell me about your Flutter & mobile development experience and Clean Architecture.' },
+  { label: '✉️ Schedule Interview', prompt: 'How can I get in touch with you or schedule an interview?' },
+];
+
+function renderInlineMarkdown(str: string): React.ReactNode[] {
+  const regex = /(\*\*.*?\*\*|`.*?`|\[.*?\]\(.*?\))/g;
+  const parts = str.split(regex);
+
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+      return (
+        <strong key={index} className="msg-strong">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
+      return (
+        <code key={index} className="msg-code">
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    const linkMatch = part.match(/^\[(.*?)\]\((.*?)\)$/);
+    if (linkMatch) {
+      const [, label, url] = linkMatch;
+      return (
+        <a
+          key={index}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="msg-link"
+        >
+          {label}
+        </a>
+      );
+    }
+    return part;
+  });
+}
+
+function FormattedMessageText({ text }: { text: string }) {
+  if (!text) return null;
+
+  const lines = text.split('\n');
+  const elements: React.ReactNode[] = [];
+  let currentList: React.ReactNode[] = [];
+
+  const flushList = () => {
+    if (currentList.length > 0) {
+      elements.push(
+        <ul key={`list-${elements.length}`} className="msg-list">
+          {currentList}
+        </ul>
+      );
+      currentList = [];
+    }
+  };
+
+  lines.forEach((line, idx) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushList();
+      return;
+    }
+
+    const bulletMatch = trimmed.match(/^([•\-\*]|\d+\.)\s+(.*)$/);
+    if (bulletMatch) {
+      const content = bulletMatch[2];
+      currentList.push(
+        <li key={`li-${idx}`} className="msg-list-item">
+          <span className="msg-bullet" aria-hidden="true">•</span>
+          <span className="msg-item-content">{renderInlineMarkdown(content)}</span>
+        </li>
+      );
+    } else {
+      flushList();
+      elements.push(
+        <p key={`p-${idx}`} className="msg-paragraph">
+          {renderInlineMarkdown(trimmed)}
+        </p>
+      );
+    }
+  });
+
+  flushList();
+
+  return <div className="formatted-msg-body">{elements}</div>;
+}
+
+function ChatMessageBubble({ msg }: { msg: ChatMessage }) {
+  const isAi = msg.role === 'ai';
+
+  return (
+    <div
+      data-msg-id={msg.id}
+      className={`chat-bubble-row ${isAi ? 'is-ai' : 'is-user'}`}
+    >
+      <div className="chat-bubble">
+        {isAi && (
+          <div className="bubble-header-row">
+            <div className="bubble-avatar" aria-hidden="true">OA</div>
+            <div className="bubble-author-col">
+              <span className="bubble-author">Omkar Anarse</span>
+              <span className="bubble-role-tag">Engineer</span>
+            </div>
+            <span className="bubble-status-dot" title="Active on portfolio" />
+          </div>
+        )}
+        <div className="bubble-text">
+          <FormattedMessageText text={msg.text} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─────────────────────────────────────────────────────────
 // ChatPanel: Rendered EITHER inline in the monitor OR in
@@ -328,7 +482,12 @@ function ChatPanel({
                 key={`preset-${idx}`}
                 type="button"
                 className="compact-chip-pill"
-                onClick={() => onSubmit(p.prompt)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onSubmit(p.prompt);
+                }}
+                disabled={isThinking}
               >
                 {p.label}
               </button>
@@ -345,20 +504,7 @@ function ChatPanel({
           >
             <div className="messages-thread">
               {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  data-msg-id={msg.id}
-                  className={`chat-bubble-row ${msg.role === 'user' ? 'is-user' : 'is-ai'}`}
-                >
-                  <div className="chat-bubble">
-                    <div className="bubble-text">{msg.text}</div>
-                    {msg.source && (
-                      <div className="bubble-source-pill">
-                        <span>Source: {msg.source}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <ChatMessageBubble key={msg.id} msg={msg} />
               ))}
 
               {/* Thinking Pill */}
@@ -432,7 +578,12 @@ function ChatPanel({
                 key={`preset-${idx}`}
                 type="button"
                 className="compact-chip-pill"
-                onClick={() => onSubmit(p.prompt)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onSubmit(p.prompt);
+                }}
+                disabled={isThinking}
               >
                 {p.label}
               </button>
@@ -451,7 +602,9 @@ export default function AskOmkarAiWorkstation({
   messages,
   isThinking,
   onSendQuestion,
+  onBack,
 }: AskOmkarAiWorkstationProps) {
+  const router = useRouter();
   const [question, setQuestion] = useState('');
   const [pressedKeys, setPressedKeys] = useState<Record<string, boolean>>({});
   const [isFocused, setIsFocused] = useState(false);
@@ -459,6 +612,13 @@ export default function AskOmkarAiWorkstation({
   const [isShiftActive, setIsShiftActive] = useState(false);
   const [knobRotation, setKnobRotation] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const mobileChatScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (mobileChatScrollRef.current) {
+      mobileChatScrollRef.current.scrollTop = mobileChatScrollRef.current.scrollHeight;
+    }
+  }, [messages, isThinking]);
 
   // State B (Expanded Modal Window)
   const [isExpanded, setIsExpanded] = useState(false);
@@ -478,6 +638,30 @@ export default function AskOmkarAiWorkstation({
   const audioCtxRef = useRef<AudioContext | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const savedCaretPos = useRef<{ start: number; end: number }>({ start: 0, end: 0 });
+
+  // 3D Flying Dragon Chat State
+  const [isFinishedSwoop, setIsFinishedSwoop] = useState(false);
+  const prevThinkingRef = useRef(isThinking);
+
+  // Transition from streaming to finished victory swoop (1.5s)
+  useEffect(() => {
+    if (prevThinkingRef.current && !isThinking) {
+      setIsFinishedSwoop(true);
+      const timer = setTimeout(() => {
+        setIsFinishedSwoop(false);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+    prevThinkingRef.current = isThinking;
+  }, [isThinking]);
+
+  // Unified dragon flight state
+  const dragonChatState: DragonChatState = useMemo(() => {
+    if (isThinking) return 'streaming';
+    if (isFinishedSwoop) return 'finished';
+    if (isFocused || question.length > 0 || Object.keys(pressedKeys).length > 0) return 'typing';
+    return 'idle';
+  }, [isThinking, isFinishedSwoop, isFocused, question.length, pressedKeys]);
 
   useEffect(() => {
     setMounted(true);
@@ -711,6 +895,7 @@ export default function AskOmkarAiWorkstation({
       const q = (customQuery ?? question).trim();
       if (!q || isThinking) return;
 
+      playSwitchAudio('press', 'enter');
       onSendQuestion(q);
       setQuestion('');
 
@@ -718,7 +903,7 @@ export default function AskOmkarAiWorkstation({
         textareaRef.current.value = '';
       }
     },
-    [question, isThinking, onSendQuestion]
+    [question, isThinking, onSendQuestion, playSwitchAudio]
   );
 
   // Physical keyboard synchronization
@@ -934,8 +1119,9 @@ export default function AskOmkarAiWorkstation({
           style={{ backgroundImage: `url(${sceneImg.blurDataURL})` }}
         />
 
-        {/* 16:9 Cover Box */}
-        <div className="scene-box">
+        {/* 16:9 Cover Box (Desktop View >= 769px) */}
+        <div className="workstation-desktop-view">
+          <div className="scene-box">
           <Image
             src={sceneImg}
             alt=""
@@ -957,6 +1143,9 @@ export default function AskOmkarAiWorkstation({
 
           {/* ── Lively Ambient Atmosphere (Sunbeams, Fairy Lights, Orb Lamp Glow, Dust Motes) ── */}
           <WorkstationAtmosphere />
+
+          {/* ── 3D Flying Dragon Layer (Full-viewport fixed Canvas, above background, behind UI) ── */}
+          {mounted && <FlyingDragon chatState={dragonChatState} />}
 
           {/* ── .mac-screen (Starts at top edge, 6px corners, NO onClick handler on container) ── */}
           <div
@@ -1094,98 +1283,174 @@ export default function AskOmkarAiWorkstation({
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ── MOBILE VIEW (<640px) ── */}
+        {/* ── 02. DEDICATED MOBILE CHAT INTERFACE (<768px, Matching Reference Screenshot) ── */}
         <div className="workstation-mobile-view">
-          <div className="mobile-chat-card">
-            <div className="mac-window-titlebar">
-              <div className="traffic-lights" aria-hidden="true">
-                <span className="traffic-dot red" />
-                <span className="traffic-dot yellow" />
-                <span className="traffic-dot green" />
-              </div>
-              <div className="mac-window-title">Omkar AI</div>
-            </div>
-
-            <div className="mobile-chat-body">
-              {messages.length === 0 ? (
-                <div className="mobile-empty-state">
-                  <p>What would you like to know about Omkar?</p>
+          <div className="mobile-messenger-screen">
+            {/* Header (Matching Reference Screenshot) */}
+            <header className="mobile-messenger-header">
+              <div className="mobile-messenger-avatar-wrap">
+                <div className="mobile-messenger-avatar-disc">
+                  <Image
+                    src="/images/avatar.png"
+                    alt="Omkar Anarse"
+                    width={46}
+                    height={46}
+                    unoptimized
+                    priority
+                    className="mobile-messenger-avatar-img"
+                  />
                 </div>
-              ) : (
-                <div className="messages-thread">
-                  {messages.map((m) => (
-                    <div key={m.id} className={`chat-bubble-row ${m.role === 'user' ? 'is-user' : 'is-ai'}`}>
-                      <div className="chat-bubble">
-                        <div className="bubble-text">{m.text}</div>
+                <span className="mobile-messenger-online-badge" />
+              </div>
+
+              <div className="mobile-messenger-info">
+                <div className="mobile-messenger-title-row">
+                  <span className="mobile-messenger-name">Omkar Anarse</span>
+                  <VerifiedIcon color="#38bdf8" size={15} />
+                </div>
+                <div className="mobile-messenger-subtitle">
+                  @omkaranarse · online · AI &amp; Mobile
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="mobile-messenger-close-btn"
+                onClick={() => (onBack ? onBack() : router.push('/'))}
+                aria-label="Exit Chat"
+              >
+                <CloseIcon color="#ffffff" size={16} />
+              </button>
+            </header>
+
+            {/* Chat Thread Canvas with Dot-Matrix Pattern */}
+            <div ref={mobileChatScrollRef} className="mobile-messenger-thread">
+              {messages.map((m) => {
+                const isAi = m.role === 'ai';
+                return (
+                  <div key={m.id} className={`mobile-msg-row ${isAi ? 'is-ai' : 'is-user'}`}>
+                    {/* Message Bubble Card */}
+                    <div className="mobile-msg-bubble">
+                      <div className="mobile-msg-text">
+                        <FormattedMessageText text={m.text} />
                       </div>
                     </div>
-                  ))}
-                  {isThinking && (
-                    <div className="chat-bubble-row is-ai">
-                      <div className="chat-bubble is-thinking-bubble">Thinking...</div>
+
+                    {/* Metadata: mini avatar (for AI), timestamp and checkmarks */}
+                    <div className="mobile-msg-meta">
+                      {isAi && (
+                        <div className="mobile-msg-mini-avatar">
+                          <Image
+                            src="/images/avatar.png"
+                            alt="Omkar"
+                            width={22}
+                            height={22}
+                            unoptimized
+                          />
+                        </div>
+                      )}
+                      <span className="mobile-msg-time">{m.time || '00:08'}</span>
+                      <SeenIcon color="#ea580c" />
                     </div>
-                  )}
+                  </div>
+                );
+              })}
+
+              {isThinking && (
+                <div className="mobile-msg-row is-ai">
+                  <div className="mobile-msg-bubble is-thinking">
+                    <div className="typing-dots">
+                      <span className="typing-dot" />
+                      <span className="typing-dot" />
+                      <span className="typing-dot" />
+                    </div>
+                  </div>
+                  <div className="mobile-msg-meta">
+                    <div className="mobile-msg-mini-avatar">
+                      <Image
+                        src="/images/avatar.png"
+                        alt="Omkar"
+                        width={22}
+                        height={22}
+                        unoptimized
+                      />
+                    </div>
+                    <span className="mobile-msg-time">typing...</span>
+                  </div>
                 </div>
               )}
             </div>
 
-            <div className="mobile-chips-shelf">
-              {PRESET_PROMPTS.map((p, idx) => (
+            {/* Quick Suggestion Pills / Chips Shelf */}
+            <div className="mobile-messenger-chips-shelf">
+              {MOBILE_SUGGESTION_CHIPS.map((p, idx) => (
                 <button
                   key={`m-chip-${idx}`}
                   type="button"
-                  className="compact-chip-pill"
-                  onClick={() => handleSubmit(p.prompt)}
+                  className="mobile-messenger-chip"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmit(p.prompt);
+                  }}
+                  disabled={isThinking}
                 >
                   {p.label}
                 </button>
               ))}
             </div>
 
-            <div className="mobile-input-bar">
-              <input
-                type="text"
-                className="mobile-input"
-                placeholder="Ask anything..."
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-              />
+            {/* Floating Input Bar */}
+            <div className="mobile-messenger-input-bar">
+              <span className="mobile-messenger-sparkle" aria-hidden="true">
+                ✨
+              </span>
+              <div className="mobile-messenger-input-pill">
+                <input
+                  type="text"
+                  className="mobile-messenger-input"
+                  placeholder="Ask Omkar AI a question..."
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleSubmit();
+                    }
+                  }}
+                  disabled={isThinking}
+                />
+              </div>
               <button
                 type="button"
-                className="compact-send-btn"
+                className="mobile-messenger-send-btn"
                 onClick={() => handleSubmit()}
                 disabled={!question.trim() || isThinking}
+                aria-label="Send question"
               >
-                Send
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2"
+                    stroke="#ffffff"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
             </div>
-          </div>
 
-          <div className="mobile-flat-keyboard" role="application" aria-label="Virtual keyboard">
-            {KEYBOARD_LAYOUT.map((row, rIdx) => (
-              <div key={`m-row-${rIdx}`} className="mobile-keyboard-row">
-                {row.map((k) => (
-                  <button
-                    key={`m-${k.id}`}
-                    type="button"
-                    className={`mobile-keycap ${k.isAction ? 'is-action' : ''} ${pressedKeys[k.code] ? 'is-pressed' : ''
-                      }`}
-                    style={{ flex: k.width ?? 1 }}
-                    onClick={() => handleVirtualKey(k)}
-                    tabIndex={-1}
-                  >
-                    {isShiftActive && k.shiftChar && !k.isAction ? k.shiftChar : k.label}
-                  </button>
-                ))}
-              </div>
-            ))}
+            {/* Subtle Footer Link */}
+            <div className="mobile-messenger-footer">
+              <button
+                type="button"
+                className="mobile-messenger-footer-link"
+                onClick={handleToggleExpanded}
+              >
+                Open in <span>Ask Omkar AI Workstation ↗</span>
+              </button>
+            </div>
           </div>
         </div>
       </main>

@@ -3,8 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import heroPhoto from '@/images/hero.png';
-import LiquidGlassButton from './LiquidGlassButton';
-
+import FluidGlassButton from './FluidGlassButton';
 import FlyingBirds from './FlyingBirds';
 
 export default function Hero() {
@@ -107,28 +106,29 @@ export default function Hero() {
             </p>
           </div>
 
-          {/* 04: Interactive Liquid Glass CTAs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 8, flexWrap: 'wrap' }}>
-            <LiquidGlassButton
-              href="/work"
-              size="md"
+          {/* 04: Interactive Fluid Glass Shader CTAs */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 10, flexWrap: 'wrap' }}>
+            <FluidGlassButton
+              href="/ask-ai"
+              text="Ask to AI"
               icon="arrow"
-              tint="rgba(235, 76, 42, 0.4)"
-              textColor="#ffffff"
-            >
-              View Selected Work
-            </LiquidGlassButton>
+              baseColor="#2c140d"
+              glassColor="#f1694a"
+              padding="13px 26px"
+              fontSize="15px"
+              fontWeight={600}
+            />
 
-            <LiquidGlassButton
+            <FluidGlassButton
               href="#contact"
-              size="md"
-              material="clear"
-              surface="dark"
+              text="Get in Touch"
               icon="diagonal"
-              textColor="#ffffff"
-            >
-              Get in Touch
-            </LiquidGlassButton>
+              baseColor="#111317"
+              glassColor="#c4c4c8"
+              padding="13px 26px"
+              fontSize="15px"
+              fontWeight={600}
+            />
           </div>
 
         </div>

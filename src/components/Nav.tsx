@@ -83,7 +83,7 @@ export default function Nav() {
                 href="/Omkar.pdf"
                 newTab
                 size="sm"
-                icon="diagonal"
+                icon="none"
                 tint="rgba(235, 76, 42, 0.2)"
                 textColor="var(--accent)"
                 style={{ marginLeft: 4 }}
@@ -148,7 +148,6 @@ export default function Nav() {
             <span className="mobile-menu-label" style={{ color: 'var(--accent)' }}>
               Resume
             </span>
-            <span className="mobile-menu-index">↗</span>
           </a>
         </nav>
 

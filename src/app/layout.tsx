@@ -46,6 +46,9 @@ const jsonLd = {
   ],
 };
 
+import FloatingAvatarChatWidget from '@/components/FloatingAvatarChatWidget';
+import RouteLoadingHandler from '@/components/RouteLoadingHandler';
+
 export default function RootLayout({
   children,
 }: {
@@ -74,6 +77,8 @@ export default function RootLayout({
           Skip to content
         </a>
         {children}
+        <FloatingAvatarChatWidget />
+        <RouteLoadingHandler />
       </body>
     </html>
   );

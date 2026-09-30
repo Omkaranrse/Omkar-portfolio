@@ -1,0 +1,134 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgHosp" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#022c22" />
+      <stop offset="50%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <radialGradient id="ambientEmerald" cx="20%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="ambientTeal" cx="80%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#14b8a6" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="glassCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="720" fill="url(#bgHosp)" />
+  <rect width="1280" height="720" fill="url(#ambientEmerald)" />
+  <rect width="1280" height="720" fill="url(#ambientTeal)" />
+
+  <!-- Grid Lines -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="120" x2="1280" y2="120" />
+    <line x1="0" y1="240" x2="1280" y2="240" />
+    <line x1="0" y1="360" x2="1280" y2="360" />
+    <line x1="0" y1="480" x2="1280" y2="480" />
+    <line x1="0" y1="600" x2="1280" y2="600" />
+    <line x1="200" y1="0" x2="200" y2="720" />
+    <line x1="400" y1="0" x2="400" y2="720" />
+    <line x1="600" y1="0" x2="600" y2="720" />
+    <line x1="800" y1="0" x2="800" y2="720" />
+    <line x1="1000" y1="0" x2="1000" y2="720" />
+  </g>
+
+  <!-- Left Content Area -->
+  <g transform="translate(80, 90)">
+    <!-- Badge -->
+    <rect width="215" height="34" rx="17" fill="#047857" fill-opacity="0.2" stroke="#10b981" stroke-width="1.5" />
+    <circle cx="20" cy="17" r="4.5" fill="#34d399" />
+    <text x="34" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#a7f3d0" letter-spacing="1.2">PROJECT 04 · HEALTHCARE</text>
+
+    <!-- Title -->
+    <text x="0" y="95" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif" font-size="48" font-weight="800" fill="#ffffff" letter-spacing="-1">Hospital &amp; Clinic Platform</text>
+    
+    <!-- Tagline -->
+    <text x="0" y="140" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif" font-size="19" font-weight="400" fill="#94a3b8">Triple-App Flutter Ecosystem with Shared Design System</text>
+    <text x="0" y="168" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif" font-size="15" font-weight="400" fill="#64748b">Unified Patient, Doctor, and Hospital Administrator applications with HIPAA compliance</text>
+
+    <!-- Key Metrics Bento Row -->
+    <g transform="translate(0, 215)">
+      <!-- Metric 1 -->
+      <rect width="210" height="90" rx="16" fill="url(#glassCard)" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">DEPLOYED CLIENT APPS</text>
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="26" font-weight="800" fill="#34d399">3 Flutter Apps</text>
+
+      <!-- Metric 2 -->
+      <g transform="translate(225, 0)">
+        <rect width="210" height="90" rx="16" fill="url(#glassCard)" stroke="#ffffff" stroke-opacity="0.12" />
+        <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">THEME ENGINE TOKENS</text>
+        <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#6ee7b7">100% Shared</text>
+      </g>
+    </g>
+
+    <!-- Tech Stack Pills -->
+    <g transform="translate(0, 340)">
+      <rect x="0" y="0" width="85" height="30" rx="15" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="42" y="19" text-anchor="middle" font-family="monospace" font-size="12" fill="#e2e8f0">Flutter</text>
+
+      <rect x="95" y="0" width="90" height="30" rx="15" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="140" y="19" text-anchor="middle" font-family="monospace" font-size="12" fill="#e2e8f0">Design Sys</text>
+
+      <rect x="195" y="0" width="85" height="30" rx="15" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="237" y="19" text-anchor="middle" font-family="monospace" font-size="12" fill="#e2e8f0">Node.js</text>
+
+      <rect x="290" y="0" width="100" height="30" rx="15" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="340" y="19" text-anchor="middle" font-family="monospace" font-size="12" fill="#e2e8f0">PostgreSQL</text>
+    </g>
+
+    <text x="0" y="440" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="16" font-weight="600" fill="#34d399">
+      Click to open Complete Architecture Breakdown →
+    </text>
+  </g>
+
+  <!-- Right App Mockup Preview -->
+  <g transform="translate(680, 110)">
+    <rect width="520" height="500" rx="20" fill="#041a14" fill-opacity="0.9" stroke="#ffffff" stroke-opacity="0.15" stroke-width="1.5" />
+    <rect width="520" height="42" rx="20" fill="#063628" />
+    <rect y="22" width="520" height="20" fill="#063628" />
+    <circle cx="24" cy="21" r="5.5" fill="#ef4444" />
+    <circle cx="44" cy="21" r="5.5" fill="#eab308" />
+    <circle cx="64" cy="21" r="5.5" fill="#22c55e" />
+    <text x="260" y="26" text-anchor="middle" font-family="monospace" font-size="12" fill="#34d399">clinic-admin-portal.dart</text>
+
+    <!-- Clinic Admin Dashboard preview -->
+    <g transform="translate(28, 70)">
+      <g transform="translate(0, 0)">
+        <rect width="144" height="74" rx="10" fill="#0b382a" stroke="#10b981" stroke-opacity="0.4" />
+        <text x="16" y="28" font-family="-apple-system, sans-serif" font-size="11" fill="#a7f3d0">PATIENTS TODAY</text>
+        <text x="16" y="58" font-family="-apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff">142</text>
+      </g>
+      <g transform="translate(160, 0)">
+        <rect width="144" height="74" rx="10" fill="#0b382a" stroke="#10b981" stroke-opacity="0.4" />
+        <text x="16" y="28" font-family="-apple-system, sans-serif" font-size="11" fill="#a7f3d0">DOCTORS ACTIVE</text>
+        <text x="16" y="58" font-family="-apple-system, sans-serif" font-size="24" font-weight="700" fill="#ffffff">18 / 20</text>
+      </g>
+      <g transform="translate(320, 0)">
+        <rect width="144" height="74" rx="10" fill="#0b382a" stroke="#10b981" stroke-opacity="0.4" />
+        <text x="16" y="28" font-family="-apple-system, sans-serif" font-size="11" fill="#a7f3d0">AVG WAIT TIME</text>
+        <text x="16" y="58" font-family="-apple-system, sans-serif" font-size="24" font-weight="700" fill="#34d399">8.5 min</text>
+      </g>
+
+      <!-- Appointment schedule preview -->
+      <g transform="translate(0, 95)">
+        <rect width="464" height="260" rx="14" fill="#022119" stroke="#064e3b" />
+        <text x="24" y="32" font-family="-apple-system, sans-serif" font-size="14" font-weight="600" fill="#e2e8f0">Upcoming Realtime Consultations</text>
+        
+        <rect x="20" y="48" width="424" height="52" rx="8" fill="#063628" />
+        <text x="36" y="78" font-family="monospace" font-size="12" fill="#6ee7b7">10:30 AM · Dr. Sarah Jenkins (Cardiology) · Patient #4029</text>
+
+        <rect x="20" y="110" width="424" height="52" rx="8" fill="#063628" />
+        <text x="36" y="140" font-family="monospace" font-size="12" fill="#6ee7b7">11:00 AM · Dr. Alex Vance (Neurology) · Patient #4030</text>
+
+        <rect x="20" y="172" width="424" height="52" rx="8" fill="#063628" />
+        <text x="36" y="202" font-family="monospace" font-size="12" fill="#6ee7b7">11:30 AM · Dr. David Kim (Pediatrics) · Patient #4031</text>
+      </g>
+    </g>
+  </g>
+</svg>

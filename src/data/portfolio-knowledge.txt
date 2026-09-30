@@ -1,12 +1,22 @@
 # PORTFOLIO KNOWLEDGE BASE: OMKAR ANARSE
 
 ## ABOUT OMKAR
-Omkar Anarse is an AI & Mobile Systems Engineer and MCA student based in Mumbai, India. He builds production-grade software spanning AI/ML engineering (RAG pipelines, LangGraph multi-agent architectures), cross-platform mobile systems with Flutter & Dart, and modern full-stack web applications. He focuses on building software that actually ships, solves real-world operational problems, and creates measurable impact.
+Omkar Anarse is an AI & Mobile Systems Engineer and MCA graduate/student based in Mumbai, India. He builds production-grade software spanning applied AI/ML engineering (RAG pipelines, LangGraph multi-agent architectures), cross-platform mobile systems with Flutter & Dart, and modern full-stack web applications. He focuses on building software that actually ships, solves real-world operational problems, and creates measurable impact.
+
+## RECRUITER QUICK FACTS & OVERVIEW
+- Total Experience: 3+ years of practical engineering experience (3 years part-time mobile development at My Job Park + current Flutter Developer role at Metaphi + independent AI systems engineering).
+- Target Roles: AI Systems Engineer, Full-Stack AI Engineer, Mobile Systems Engineer (Flutter, iOS), Product Engineer.
+- Notice Period: Immediate / Short notice period (rapid onboarding available).
+- Location & Work Mode: Based in Mumbai, India. Open to Remote (worldwide), Hybrid, On-site (Mumbai), and Relocation for compelling opportunities.
+- Compensation & CTC: Open to competitive compensation aligned with role scope, impact, and market standards. Discuss directly via email or WhatsApp.
+- Official Resume: Available for download at /Omkar.pdf.
+- Key Strengths: Bridging the gap between production mobile engineering (Clean Architecture, Flutter, Riverpod) and cutting-edge Applied AI (LangGraph multi-agent systems, RAG, ChromaDB, FastAPI). Fast learner, product-oriented, strong CS fundamentals.
 
 ## EDUCATION
-- Degree: Master of Computer Applications (MCA)
-- Focus: Artificial Intelligence, Machine Learning Systems, Mobile & Distributed Architectures
-- Background: Rigorous computer science coursework covering algorithms, system design, database management, and intelligent systems.
+- Degree: Master of Computer Applications (MCA) & Bachelor of Science in Computer Science (B.Sc. CS)
+- University: Mumbai University (MU), Mumbai, India
+- Focus: Artificial Intelligence, Machine Learning Systems, Mobile & Distributed Architectures, and Full-Stack Engineering
+- Background: Rigorous computer science foundations spanning data structures, algorithms, system design, distributed databases, and intelligent agent systems.
 
 ## CAREER INTERESTS & TARGET ROLES
 - AI Engineer / AI Systems Engineer
@@ -14,7 +24,7 @@ Omkar Anarse is an AI & Mobile Systems Engineer and MCA student based in Mumbai,
 - Full-Stack AI Engineer
 - Mobile Systems Engineer (Flutter, iOS / Swift)
 - Product Engineer
-Omkar is open to full-time roles, contracts, and engineering collaborations with teams building high-impact products.
+Omkar is actively open to full-time roles, contracts, and engineering collaborations with teams building high-impact products.
 
 ## CONTACT & SOCIAL LINKS
 - Email: omkaranarse1906@gmail.com
@@ -22,8 +32,9 @@ Omkar is open to full-time roles, contracts, and engineering collaborations with
 - GitHub: https://github.com/Omkaranrse
 - LinkedIn: https://linkedin.com/in/omkar-anarse
 - Portfolio Website: https://omkaranarse.dev
+- Resume: https://omkaranarse.dev/Omkar.pdf
 - Location: Mumbai, India
-- Availability: Open to AI engineering roles, mobile & web systems projects, and product collaborations.
+- Availability: Immediate / Short notice for full-time roles, contracts, and collaborations.
 
 ## WORK EXPERIENCE
 1. Metaphi

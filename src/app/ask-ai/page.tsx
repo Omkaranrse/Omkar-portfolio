@@ -5,8 +5,32 @@ import Nav from '@/components/Nav';
 import AskOmkarAiWorkstation, { ChatMessage } from '@/components/AskOmkarAiWorkstation';
 import SocialRail from '@/components/SocialRail';
 
+function getTimeBasedGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return 'Good morning';
+  if (hour >= 12 && hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function getInitialOmkarMessage(): ChatMessage {
+  const greeting = getTimeBasedGreeting();
+  return {
+    id: 'omkar-welcome-intro',
+    role: 'ai',
+    text: `${greeting}! 👋 Myself Omkar Anarse.
+
+I completed my Bachelor's in B.Sc. CS and MCA from Mumbai University (MU). Over the years, I've worked across:
+• **Mobile Development**: Flutter & Dart (Clean Architecture, State Management, Firebase)
+• **Modern Web & Backend**: Next.js 15, Node.js, TypeScript, React 19 & Tailwind CSS
+• **AI Projects**: Autonomous multi-agent pipelines with LangGraph, RAG with ChromaDB, and FastAPI
+• **Work Experience**: Production Flutter engineering at **Metaphi** + 3 years of part-time experience building cross-platform apps at **My Job Park**.
+
+Feel free to ask me anything about my projects, architecture decisions, tech stack, or career opportunities!`,
+  };
+}
+
 export default function AskAiPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [getInitialOmkarMessage()]);
   const [isThinking, setIsThinking] = useState(false);
 
   const handleSendQuestion = useCallback(
@@ -114,7 +138,7 @@ export default function AskAiPage() {
   );
 
   return (
-    <>
+    <div className="ask-ai-page-root">
       <Nav />
       <h1 className="sr-only">Ask anything about Omkar</h1>
       <AskOmkarAiWorkstation
@@ -123,6 +147,6 @@ export default function AskAiPage() {
         onSendQuestion={handleSendQuestion}
       />
       <SocialRail />
-    </>
+    </div>
   );
 }
