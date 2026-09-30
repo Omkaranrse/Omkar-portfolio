@@ -267,7 +267,7 @@ export default function CarouselPreloader({
   slides = DEFAULT_PROJECT_SLIDES,
   mainImage = 1,
   slideWidth = 620,
-  gap = 70,
+  gap = 28,
   shape = 'convex',
   amount = 36,
   direction = 'leftToRight',
@@ -464,12 +464,40 @@ export default function CarouselPreloader({
         perspective: size.width || 1200,
         perspectiveOrigin: '50% 50%',
         minHeight: 380,
-        height: 'clamp(380px, 48vh, 520px)',
+        height: 'clamp(380px, 52vh, 560px)',
         borderRadius: 20,
       }}
       role="region"
       aria-label="3D Project Carousel Showcase"
     >
+      {/* Left edge depth-of-field fade */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '12%',
+          height: '100%',
+          background: 'linear-gradient(to right, var(--bg-warm, #f5f0e8) 0%, rgba(245,240,232,0.7) 40%, transparent 100%)',
+          zIndex: 5,
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Right edge depth-of-field fade */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '12%',
+          height: '100%',
+          background: 'linear-gradient(to left, var(--bg-warm, #f5f0e8) 0%, rgba(245,240,232,0.7) 40%, transparent 100%)',
+          zIndex: 5,
+          pointerEvents: 'none',
+        }}
+      />
       <div
         style={{
           position: 'absolute',
