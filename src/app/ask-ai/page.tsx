@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Nav from '@/components/Nav';
 import AskOmkarAiWorkstation, { ChatMessage } from '@/components/AskOmkarAiWorkstation';
 import SocialRail from '@/components/SocialRail';
+import PageLoadingScreen from '@/components/PageLoadingScreen';
 
 function getTimeBasedGreeting(): string {
   const hour = new Date().getHours();
@@ -32,6 +33,31 @@ Feel free to ask me anything about my projects, architecture decisions, tech sta
 export default function AskAiPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(() => [getInitialOmkarMessage()]);
   const [isThinking, setIsThinking] = useState(false);
+  const [isPageReady, setIsPageReady] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('Initializing 3D Neural Workstation...');
+
+  useEffect(() => {
+    // Stage 1 (0ms - 900ms): Initializing scene & Three.js canvas
+    const t1 = setTimeout(() => {
+      setLoadingMessage('Loading Spatial 3D GLB Models...');
+    }, 900);
+
+    // Stage 2 (900ms - 1750ms): Compiling shaders & warming up workstation
+    const t2 = setTimeout(() => {
+      setLoadingMessage('Warming Up Workstation Atmosphere...');
+    }, 1750);
+
+    // Stage 3 (2400ms): Fully ready, smoothly reveal workstation
+    const t3 = setTimeout(() => {
+      setIsPageReady(true);
+    }, 2400);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
+  }, []);
 
   const handleSendQuestion = useCallback(
     async (queryText: string) => {
@@ -139,6 +165,11 @@ export default function AskAiPage() {
 
   return (
     <div className="ask-ai-page-root">
+      <PageLoadingScreen
+        isVisible={!isPageReady}
+        message={loadingMessage}
+        minDuration={2200}
+      />
       <Nav />
       <h1 className="sr-only">Ask anything about Omkar</h1>
       <AskOmkarAiWorkstation

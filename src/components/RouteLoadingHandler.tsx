@@ -50,12 +50,14 @@ export default function RouteLoadingHandler() {
       try {
         const url = new URL(href, window.location.origin);
         if (url.origin === window.location.origin && url.pathname !== window.location.pathname) {
+          const isAskAi = url.pathname === '/ask-ai' || url.pathname.startsWith('/ask-ai');
+          
           // Determine contextual message
           let loadingMsg = 'Loading portfolio...';
           if (url.pathname.startsWith('/projects/')) {
             loadingMsg = 'Loading case study...';
-          } else if (url.pathname === '/ask-ai') {
-            loadingMsg = 'Entering 3D AI workstation...';
+          } else if (isAskAi) {
+            loadingMsg = 'Initializing 3D AI workstation & spatial models...';
           } else if (url.pathname === '/work') {
             loadingMsg = 'Loading engineering systems...';
           } else if (url.pathname === '/experience') {
@@ -64,21 +66,33 @@ export default function RouteLoadingHandler() {
 
           setMessage(loadingMsg);
 
-          // Only show loader if the transition takes time (> 140ms)
+          // For /ask-ai show immediately (0ms delay) so the screen doesn't freeze; for others, brief debounce
           if (timeoutRef.current) clearTimeout(timeoutRef.current);
           timeoutRef.current = setTimeout(() => {
             setIsLoading(true);
-          }, 140);
+          }, isAskAi ? 0 : 120);
         }
       } catch {
         // invalid URL, ignore
       }
     };
 
+    // Listen for programmatic redirects (e.g. from FloatingAvatarChatWidget)
+    const handleCustomRouteLoading = (e: Event) => {
+      const customEvent = e as CustomEvent<{ path: string; message?: string }>;
+      const targetPath = customEvent.detail?.path;
+      if (targetPath === '/ask-ai' || targetPath?.startsWith('/ask-ai')) {
+        setMessage(customEvent.detail?.message || 'Initializing 3D AI workstation & spatial models...');
+        setIsLoading(true);
+      }
+    };
+
     document.addEventListener('click', handleDocumentClick, { capture: true });
+    window.addEventListener('trigger-route-loading', handleCustomRouteLoading);
 
     return () => {
       document.removeEventListener('click', handleDocumentClick, { capture: true });
+      window.removeEventListener('trigger-route-loading', handleCustomRouteLoading);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);

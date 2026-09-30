@@ -1776,11 +1776,46 @@ h6 {
 .work-section.grid-bg {
   padding: 0;
   background-color: var(--bg-warm);
-  background-attachment: fixed !important;
 }
 
-.work-section::after {
-  background-attachment: fixed !important;
+/* When in carousel mode with sticky scroll, disable the 300vh scrolling background to prevent jitter */
+.work-section.has-sticky-scroll {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.work-section.has-sticky-scroll::after {
+  display: none !important;
+}
+
+/* Dedicated rock-solid pinned backdrop during carousel scroll (completely eliminates up-down jitter) */
+.work-sticky-backdrop {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  margin-bottom: -100vh;
+  pointer-events: none;
+  z-index: 0;
+  background-color: var(--bg-warm);
+  overflow: hidden;
+  background-image:
+    linear-gradient(to right, rgba(17, 18, 21, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17, 18, 21, 0.04) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.work-sticky-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/textures/crumpled-paper.jpg');
+  background-repeat: repeat;
+  background-size: 800px 800px;
+  mix-blend-mode: multiply;
+  opacity: 0.45;
+  pointer-events: none;
 }
 
 .work-header {
@@ -5094,12 +5129,95 @@ h6 {
   display: none;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
   .workstation-desktop-view {
     display: block !important;
   }
   .workstation-mobile-view {
     display: none !important;
+  }
+}
+
+/* ── 08b. TABLET WORKSTATION RESPONSIVENESS (769px - 1024px) ── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .workstation-desktop-view {
+    display: block !important;
+  }
+  
+  .workstation-mobile-view {
+    display: none !important;
+  }
+
+  .scene-root {
+    --h: 100dvh;
+    height: 100dvh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  .scene-box {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    bottom: auto !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    aspect-ratio: 16 / 9 !important;
+    /* Scale workstation box proportionally so that the monitor and keyboard fit with safe margins from edges and social rail */
+    width: min(1280px, calc(var(--h) * 16 / 9 * 0.84), calc((100vw - 160px) / 0.435)) !important;
+    max-width: none !important;
+  }
+
+  /* Compact Social Rail on Tablet to guarantee zero overlap */
+  .social-rail {
+    right: max(10px, env(safe-area-inset-right)) !important;
+    padding: 8px 6px !important;
+    gap: 8px !important;
+    border-radius: 18px !important;
+  }
+
+  .social-rail-list {
+    gap: 8px !important;
+  }
+
+  .social-rail-link,
+  .social-rail-avatar-btn,
+  .social-rail-icon-tile,
+  .social-rail-avatar-frame {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Tablet Nav Pill optimization */
+  .floating-nav-header {
+    top: max(10px, env(safe-area-inset-top)) !important;
+  }
+
+  .floating-nav-pill {
+    height: 44px !important;
+    padding: 4px 12px 4px 8px !important;
+  }
+
+  .floating-nav-links {
+    gap: 12px !important;
+  }
+
+  .floating-nav-link {
+    font-size: 0.8125rem !important;
+  }
+
+  /* Keyboard touch target optimization on tablet */
+  .cm-keycap {
+    touch-action: manipulation;
+  }
+
+  .compact-send-btn,
+  .fullscreen-btn {
+    touch-action: manipulation;
   }
 }
 

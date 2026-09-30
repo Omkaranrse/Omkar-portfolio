@@ -161,8 +161,19 @@ export default function FloatingAvatarChatWidget() {
     setPopupDismissed(true);
   };
 
+  const triggerAskAiLoader = () => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('trigger-route-loading', {
+          detail: { path: '/ask-ai', message: 'Initializing 3D AI workstation & spatial models...' },
+        })
+      );
+    }
+  };
+
   const navigateToAskAi = () => {
     setIsOpen(false);
+    triggerAskAiLoader();
     router.push('/ask-ai');
   };
 
@@ -170,6 +181,7 @@ export default function FloatingAvatarChatWidget() {
     const q = inputValue.trim();
     setIsOpen(false);
     setInputValue('');
+    triggerAskAiLoader();
     if (q) {
       router.push(`/ask-ai?q=${encodeURIComponent(q)}`);
     } else {
@@ -179,6 +191,7 @@ export default function FloatingAvatarChatWidget() {
 
   const handleQuickReply = (qr: (typeof QUICK_REPLIES)[0]) => {
     setIsOpen(false);
+    triggerAskAiLoader();
     router.push(`/ask-ai?q=${encodeURIComponent(qr.message)}`);
   };
 

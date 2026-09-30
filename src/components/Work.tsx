@@ -95,12 +95,13 @@ export default function Work() {
       : 'auto';
 
   return (
-    <section id="work" className="work-section grid-bg">
+    <section id="work" className={`work-section grid-bg ${isCarousel ? 'has-sticky-scroll' : ''}`}>
       <div
         ref={scrollTrackRef}
         className="work-scroll-container"
         style={{ height: trackHeight }}
       >
+        {isCarousel && <div className="work-sticky-backdrop" aria-hidden="true" />}
         <div className={isCarousel ? 'work-sticky-viewport' : 'work-static-viewport'}>
           <div className="wrap">
             {/* ── Section Header ── */}
