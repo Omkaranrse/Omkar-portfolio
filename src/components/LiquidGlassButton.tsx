@@ -19,7 +19,7 @@ export interface LiquidGlassButtonProps {
   onClick?: (event: React.MouseEvent<HTMLElement>) => void;
   newTab?: boolean;
   material?: 'clear' | 'frosted' | 'tinted';
-  surface?: 'light' | 'dark';
+  surface?: 'light' | 'dark' | 'accent';
   tint?: string;
   textColor?: string;
   icon?: 'arrow' | 'diagonal' | 'chevron' | 'plus' | 'check' | 'copy' | 'none' | 'custom';
@@ -143,6 +143,9 @@ export default function LiquidGlassButton({
 
   const bodyShadow = useTransform([opticalEngagement, pressure], ([h, p]: number[]) => {
     const lift = Number(h) * (1 - Number(p));
+    if (surface === 'accent') {
+      return `0 2px 8px rgba(234, 88, 12, 0.35), 0 ${4 + lift * 2 - Number(p) * 2}px ${8 + lift * 2 - Number(p) * 2}px -2px rgba(234, 88, 12, 0.45), 0 ${12 + lift * 4 - Number(p) * 6}px ${24 + lift * 6 - Number(p) * 8}px -8px rgba(234, 88, 12, 0.55)`;
+    }
     return `0 1px 2px rgba(0,0,0,0.3), 0 ${4 + lift * 2 - Number(p) * 2}px ${6 + lift * 2 - Number(p) * 2}px -2px rgba(0,0,0,0.35), 0 ${12 + lift * 4 - Number(p) * 6}px ${24 + lift * 6 - Number(p) * 8}px -8px rgba(0,0,0,0.45)`;
   });
 
@@ -191,15 +194,30 @@ export default function LiquidGlassButton({
       copy: <path d="M8 4v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7.242a2 2 0 0 0-.602-1.43L16.083 2.57A2 2 0 0 0 14.685 2H10a2 2 0 0 0-2 2zM4 8v11a2 2 0 0 0 2 2h10" />,
     };
 
+    const strokeColor =
+      textColor || (surface === 'dark' || surface === 'accent' ? '#ffffff' : '#111827');
+
     return (
-      <span className="ml-optical-icon" aria-hidden="true" style={{ display: 'inline-flex' }}>
+      <span
+        className="ml-optical-icon"
+        aria-hidden="true"
+        style={{
+          position: 'relative',
+          zIndex: 5,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: strokeColor,
+          flexShrink: 0,
+        }}
+      >
         <svg
           width="15"
           height="15"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="2.25"
+          stroke={strokeColor}
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -251,13 +269,17 @@ export default function LiquidGlassButton({
             overflow: 'hidden',
             borderRadius: radius,
             background:
-              surface === 'dark'
+              surface === 'accent'
+                ? 'linear-gradient(150deg, #f97316 0%, #ea580c 45%, #c2410c 100%)'
+                : surface === 'dark'
                 ? 'linear-gradient(155deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 48%, rgba(255, 255, 255, 0.08) 100%)'
                 : 'linear-gradient(150deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 42%, rgba(255, 255, 255, 0.3) 100%)',
             backdropFilter: 'blur(16px) saturate(1.15)',
             WebkitBackdropFilter: 'blur(16px) saturate(1.15)',
             boxShadow:
-              'inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1px 1px rgba(255, 255, 255, 0.3), inset 1px 0 0.5px rgba(255, 255, 255, 0.4)',
+              surface === 'accent'
+                ? 'inset 0 1.5px 1px rgba(255, 255, 255, 0.75), inset 0 -1.5px 1px rgba(0, 0, 0, 0.3), inset 1px 0 0.5px rgba(255, 255, 255, 0.5)'
+                : 'inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1px 1px rgba(255, 255, 255, 0.3), inset 1px 0 0.5px rgba(255, 255, 255, 0.4)',
           }}
         >
           {/* Tint Layer */}
@@ -384,9 +406,11 @@ export default function LiquidGlassButton({
           fontWeight: 600,
           letterSpacing: '-0.01em',
           fontSize: resolvedFontSize,
-          color: textColor || (surface === 'dark' ? '#ffffff' : '#111827'),
+          color: textColor || (surface === 'dark' || surface === 'accent' ? '#ffffff' : '#111827'),
           textShadow:
-            surface === 'dark'
+            surface === 'accent'
+              ? '0 1px 2px rgba(0,0,0,0.45)'
+              : surface === 'dark'
               ? '0 1px 3px rgba(0,0,0,0.6)'
               : '0 1px 2px rgba(255,255,255,0.6)',
           whiteSpace: 'nowrap',

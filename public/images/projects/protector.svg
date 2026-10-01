@@ -1,0 +1,98 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgProt" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#18130d" />
+      <stop offset="50%" stop-color="#241b12" />
+      <stop offset="100%" stop-color="#140f0b" />
+    </linearGradient>
+    <radialGradient id="ambientAmber" cx="20%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="ambientGold" cx="80%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#eab308" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#eab308" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="glassProt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.09" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#bgProt)" />
+  <rect width="1280" height="720" fill="url(#ambientAmber)" />
+  <rect width="1280" height="720" fill="url(#ambientGold)" />
+
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="120" x2="1280" y2="120" />
+    <line x1="0" y1="240" x2="1280" y2="240" />
+    <line x1="0" y1="360" x2="1280" y2="360" />
+    <line x1="0" y1="480" x2="1280" y2="480" />
+    <line x1="0" y1="600" x2="1280" y2="600" />
+    <line x1="200" y1="0" x2="200" y2="720" />
+    <line x1="400" y1="0" x2="400" y2="720" />
+    <line x1="600" y1="0" x2="600" y2="720" />
+    <line x1="800" y1="0" x2="800" y2="720" />
+    <line x1="1000" y1="0" x2="1000" y2="720" />
+  </g>
+
+  <g transform="translate(80, 90)">
+    <rect width="215" height="34" rx="17" fill="#d97706" fill-opacity="0.2" stroke="#f59e0b" stroke-width="1.5" />
+    <circle cx="20" cy="17" r="4.5" fill="#fbbf24" />
+    <text x="34" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#fde68a" letter-spacing="1.2">MOBILE · DISPATCH</text>
+
+    <text x="0" y="95" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif" font-size="52" font-weight="800" fill="#ffffff" letter-spacing="-1">Protector</text>
+    <text x="0" y="140" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif" font-size="19" font-weight="400" fill="#94a3b8">Personal Security &amp; Motorcade Booking Platform</text>
+    <text x="0" y="168" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif" font-size="15" font-weight="400" fill="#64748b">Flutter mobile client: phone OTP, escort selection, vehicle fleet &amp; admin controls</text>
+
+    <g transform="translate(0, 215)">
+      <rect width="200" height="90" rx="16" fill="url(#glassProt)" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">AUTH FLOW</text>
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#fbbf24">Phone OTP</text>
+    </g>
+
+    <g transform="translate(216, 215)">
+      <rect width="210" height="90" rx="16" fill="url(#glassProt)" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">DISPATCH UNITS</text>
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#f59e0b">Motorcade</text>
+    </g>
+
+    <g transform="translate(442, 215)">
+      <rect width="210" height="90" rx="16" fill="url(#glassProt)" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">TARGET OS</text>
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#fde68a">iOS &amp; Android</text>
+    </g>
+  </g>
+
+  <g transform="translate(740, 100)">
+    <rect width="460" height="490" rx="24" fill="#1f1811" stroke="#ffffff" stroke-opacity="0.1" />
+    <rect x="24" y="24" width="412" height="60" rx="14" fill="#2d2218" stroke="#ffffff" stroke-opacity="0.08" />
+    <circle cx="56" cy="54" r="16" fill="#f59e0b" fill-opacity="0.25" />
+    <path d="M50 54l4 4 8-8" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="86" y="48" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff">VIP Protection Confirmed</text>
+    <text x="86" y="68" font-family="-apple-system, sans-serif" font-size="12" font-weight="500" fill="#94a3b8">Armed Escort Unit #4 Assigned · In Transit</text>
+
+    <g transform="translate(24, 104)">
+      <rect width="196" height="150" rx="16" fill="#281e15" stroke="#ffffff" stroke-opacity="0.08" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8">ESCORT TIER</text>
+      <text x="20" y="76" font-family="-apple-system, sans-serif" font-size="28" font-weight="800" fill="#fbbf24">Executive</text>
+      <text x="20" y="112" font-family="-apple-system, sans-serif" font-size="12" font-weight="500" fill="#fde68a">Suit &amp; Tie · Armed</text>
+    </g>
+
+    <g transform="translate(240, 104)">
+      <rect width="196" height="150" rx="16" fill="#281e15" stroke="#ffffff" stroke-opacity="0.08" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8">VEHICLE CLASS</text>
+      <text x="20" y="76" font-family="-apple-system, sans-serif" font-size="28" font-weight="800" fill="#f59e0b">Armored</text>
+      <text x="20" y="112" font-family="-apple-system, sans-serif" font-size="12" font-weight="500" fill="#fed7aa">Ballistic Grade 7</text>
+    </g>
+
+    <rect x="24" y="274" width="412" height="186" rx="16" fill="#281e15" stroke="#ffffff" stroke-opacity="0.08" />
+    <text x="44" y="308" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#ffffff">DISPATCH CONTROLS</text>
+    <rect x="44" y="324" width="176" height="42" rx="10" fill="#3d2c1e" />
+    <text x="64" y="350" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#fbbf24">Live Telemetry →</text>
+    <rect x="236" y="324" width="176" height="42" rx="10" fill="#3d2c1e" />
+    <text x="256" y="350" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#f59e0b">Route Override →</text>
+    <rect x="44" y="380" width="368" height="56" rx="12" fill="#1b140e" />
+    <text x="64" y="414" font-family="-apple-system, sans-serif" font-size="12" font-weight="500" fill="#94a3b8">Flutter · Dart · Firebase Auth · Cloud Firestore · Google Maps SDK</text>
+  </g>
+</svg>

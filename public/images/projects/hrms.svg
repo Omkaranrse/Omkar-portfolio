@@ -1,0 +1,98 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgHrms" x1="0" y1="0" x2="1280" y2="720" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06181b" />
+      <stop offset="50%" stop-color="#0f2b30" />
+      <stop offset="100%" stop-color="#0a121d" />
+    </linearGradient>
+    <radialGradient id="ambientTeal" cx="20%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#14b8a6" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#14b8a6" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="ambientCyan" cx="80%" cy="70%" r="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="glassHrms" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.09" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="720" fill="url(#bgHrms)" />
+  <rect width="1280" height="720" fill="url(#ambientTeal)" />
+  <rect width="1280" height="720" fill="url(#ambientCyan)" />
+
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="120" x2="1280" y2="120" />
+    <line x1="0" y1="240" x2="1280" y2="240" />
+    <line x1="0" y1="360" x2="1280" y2="360" />
+    <line x1="0" y1="480" x2="1280" y2="480" />
+    <line x1="0" y1="600" x2="1280" y2="600" />
+    <line x1="200" y1="0" x2="200" y2="720" />
+    <line x1="400" y1="0" x2="400" y2="720" />
+    <line x1="600" y1="0" x2="600" y2="720" />
+    <line x1="800" y1="0" x2="800" y2="720" />
+    <line x1="1000" y1="0" x2="1000" y2="720" />
+  </g>
+
+  <g transform="translate(80, 90)">
+    <rect width="215" height="34" rx="17" fill="#0d9488" fill-opacity="0.2" stroke="#14b8a6" stroke-width="1.5" />
+    <circle cx="20" cy="17" r="4.5" fill="#2dd4bf" />
+    <text x="34" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#99f6e4" letter-spacing="1.2">MOBILE · SYSTEM DESIGN</text>
+
+    <text x="0" y="95" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', Inter, sans-serif" font-size="52" font-weight="800" fill="#ffffff" letter-spacing="-1">HRMS Mobile</text>
+    <text x="0" y="140" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif" font-size="19" font-weight="400" fill="#94a3b8">Enterprise Attendance &amp; Self-Service Workforce Platform</text>
+    <text x="0" y="168" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, sans-serif" font-size="15" font-weight="400" fill="#64748b">Cross-platform Flutter app: payslips, tax declarations, leave requests &amp; compliance</text>
+
+    <g transform="translate(0, 215)">
+      <rect width="200" height="90" rx="16" fill="url(#glassHrms)" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">CHECK-IN SPEED</text>
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#2dd4bf">&lt; 1.0s</text>
+    </g>
+
+    <g transform="translate(216, 215)">
+      <rect width="210" height="90" rx="16" fill="url(#glassHrms)" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">HR MODULES</text>
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#38bdf8">Attendance · Tax</text>
+    </g>
+
+    <g transform="translate(442, 215)">
+      <rect width="210" height="90" rx="16" fill="url(#glassHrms)" stroke="#ffffff" stroke-opacity="0.12" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8" letter-spacing="0.5">ARCHITECTURE</text>
+      <text x="20" y="68" font-family="-apple-system, sans-serif" font-size="24" font-weight="800" fill="#a7f3d0">Clean Arch</text>
+    </g>
+  </g>
+
+  <g transform="translate(740, 100)">
+    <rect width="460" height="490" rx="24" fill="#0b1b22" stroke="#ffffff" stroke-opacity="0.1" />
+    <rect x="24" y="24" width="412" height="60" rx="14" fill="#132a35" stroke="#ffffff" stroke-opacity="0.08" />
+    <circle cx="56" cy="54" r="16" fill="#14b8a6" fill-opacity="0.25" />
+    <path d="M50 54l4 4 8-8" stroke="#2dd4bf" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x="86" y="48" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff">Shift Checked-In Successfully</text>
+    <text x="86" y="68" font-family="-apple-system, sans-serif" font-size="12" font-weight="500" fill="#94a3b8">Verified at 09:02 AM · Geo-fenced</text>
+
+    <g transform="translate(24, 104)">
+      <rect width="196" height="150" rx="16" fill="#11242e" stroke="#ffffff" stroke-opacity="0.08" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8">LEAVE BALANCE</text>
+      <text x="20" y="80" font-family="-apple-system, sans-serif" font-size="36" font-weight="800" fill="#2dd4bf">18<tspan font-size="16" font-weight="500" fill="#64748b"> days</tspan></text>
+      <text x="20" y="116" font-family="-apple-system, sans-serif" font-size="12" font-weight="500" fill="#5eead4">Paid · Sick · Casual</text>
+    </g>
+
+    <g transform="translate(240, 104)">
+      <rect width="196" height="150" rx="16" fill="#11242e" stroke="#ffffff" stroke-opacity="0.08" />
+      <text x="20" y="36" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#94a3b8">TAX DECLARATIONS</text>
+      <text x="20" y="80" font-family="-apple-system, sans-serif" font-size="36" font-weight="800" fill="#38bdf8">100%</text>
+      <text x="20" y="116" font-family="-apple-system, sans-serif" font-size="12" font-weight="500" fill="#7dd3fc">Form-16 Ready</text>
+    </g>
+
+    <rect x="24" y="274" width="412" height="186" rx="16" fill="#11242e" stroke="#ffffff" stroke-opacity="0.08" />
+    <text x="44" y="308" font-family="-apple-system, sans-serif" font-size="13" font-weight="700" fill="#ffffff">QUICK ACTIONS</text>
+    <rect x="44" y="324" width="176" height="42" rx="10" fill="#183645" />
+    <text x="64" y="350" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#2dd4bf">Apply Leave →</text>
+    <rect x="236" y="324" width="176" height="42" rx="10" fill="#183645" />
+    <text x="256" y="350" font-family="-apple-system, sans-serif" font-size="12" font-weight="600" fill="#38bdf8">Download Payslip →</text>
+    <rect x="44" y="380" width="368" height="56" rx="12" fill="#0d1f27" />
+    <text x="64" y="414" font-family="-apple-system, sans-serif" font-size="12" font-weight="500" fill="#94a3b8">Flutter · Dart · Clean Architecture · BLoC · REST API</text>
+  </g>
+</svg>

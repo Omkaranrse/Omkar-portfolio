@@ -1,197 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import {
-  useState,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  startTransition,
-} from 'react';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Project } from '@/data/projects';
-
-// ── Math & Projection Engine (Framer Carousel Algorithm) ──
-const easeInOut = [0.65, 0, 0.35, 1] as const;
-const ratio = 9 / 16;
-const degrees = 180 / Math.PI;
-
-const shapeDirection = {
-  convex: -1,
-  concave: 1,
-  flat: 0,
-} as const;
-
-function project(
-  u: number,
-  half: number,
-  radius: number,
-  limit: number,
-  direction: number
-) {
-  if (direction === 0 || limit < 1e-4 || radius <= 0) return { x: u, z: 0 };
-  const side = u < 0 ? -1 : 1;
-  const magnitude = Math.abs(u);
-  let x: number;
-  let depth: number;
-
-  if (magnitude <= half) {
-    const angle = magnitude / radius;
-    x = radius * Math.sin(angle);
-    depth = radius * (1 - Math.cos(angle));
-  } else {
-    const overshoot = magnitude - half;
-    x = radius * Math.sin(limit) + overshoot * Math.cos(limit);
-    depth = radius * (1 - Math.cos(limit)) + overshoot * Math.sin(limit);
-  }
-
-  return {
-    x: side * x,
-    z: direction * Math.min(depth, half),
-  };
-}
-
-interface StripProps {
-  slide: CarouselSlideItem;
-  slot: number;
-  segments: number;
-  slideIndex: number;
-  heroIndex: number;
-  step: number;
-  width: number;
-  height: number;
-  half: number;
-  limit: number;
-  direction: number;
-  borderRadius: number;
-  x: any;
-  heroWidth: any;
-  heroHeight: any;
-  flatten: any;
-  onSelectProject?: (id: string) => void;
-}
-
-function Strip({
-  slide,
-  slot,
-  segments,
-  slideIndex,
-  heroIndex,
-  step,
-  width,
-  height,
-  half,
-  limit,
-  direction,
-  borderRadius,
-  x,
-  heroWidth,
-  heroHeight,
-  flatten,
-  onSelectProject,
-}: StripProps) {
-  const isHero = slideIndex === heroIndex;
-  const slideHeight = useTransform(heroHeight, (main: number) =>
-    isHero ? main : height
-  );
-
-  const solve = (offset: number, main: number, curl: number) => {
-    const curSlideWidth = isHero ? main : width;
-    const before =
-      slideIndex <= heroIndex
-        ? slideIndex * step
-        : slideIndex * step + (main - width);
-    const strip = curSlideWidth / segments;
-    const originLeft = offset + before - half;
-    const uLeft = originLeft + slot * strip;
-    const uRight = uLeft + strip;
-    const angle = Math.max(limit * curl, 0);
-    const radius = angle > 1e-4 ? half / angle : 0;
-    const left = project(uLeft, half, radius, angle, direction);
-    const right = project(uRight, half, radius, angle, direction);
-    const dx = right.x - left.x;
-    const dz = right.z - left.z;
-    const chord = Math.max(Math.hypot(dx, dz), 0.001);
-
-    return {
-      midX: (left.x + right.x) / 2,
-      midZ: (left.z + right.z) / 2,
-      rotate: Math.atan2(-dz, dx) * degrees,
-      chord,
-      strip,
-      curSlideWidth,
-      scale: chord / strip,
-    };
-  };
-
-  const transform = useTransform(
-    [x, heroWidth, flatten],
-    ([offset, main, curl]: number[]) => {
-      const s = solve(offset, main, curl);
-      return `translate(-50%, -50%) translateX(${s.midX}px) translateZ(${s.midZ}px) rotateY(${s.rotate}deg)`;
-    }
-  );
-
-  const paintedWidth = useTransform(
-    [x, heroWidth, flatten],
-    ([offset, main, curl]: number[]) => solve(offset, main, curl).chord + 1
-  );
-
-  const imgWidth = useTransform(
-    [x, heroWidth, flatten],
-    ([offset, main, curl]: number[]) => {
-      const s = solve(offset, main, curl);
-      return s.curSlideWidth * s.scale;
-    }
-  );
-
-  const imgLeft = useTransform(
-    [x, heroWidth, flatten],
-    ([offset, main, curl]: number[]) => {
-      const s = solve(offset, main, curl);
-      return -slot * s.strip * s.scale - 0.5;
-    }
-  );
-
-  return (
-    <motion.div
-      style={{
-        position: 'absolute',
-        left: '50%',
-        top: '50%',
-        width: paintedWidth,
-        height: slideHeight,
-        overflow: 'hidden',
-        transform,
-        willChange: 'transform',
-        backfaceVisibility: 'hidden',
-        cursor: slide.projectId ? 'pointer' : 'default',
-      }}
-      onClick={() => {
-        if (slide.projectId && onSelectProject) {
-          onSelectProject(slide.projectId);
-        }
-      }}
-    >
-      <motion.img
-        src={slide.src}
-        alt={slide.alt || ''}
-        draggable={false}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: imgLeft,
-          width: imgWidth,
-          height: slideHeight,
-          maxWidth: 'none',
-          objectFit: 'cover',
-          borderRadius,
-        }}
-      />
-    </motion.div>
-  );
-}
+import { useMotionValue, useSpring } from 'framer-motion';
+import LiquidGlassButton from './LiquidGlassButton';
+import { triggerRouteLoading } from '@/lib/routeLoading';
 
 export interface CarouselSlideItem {
   src: string;
@@ -200,6 +14,8 @@ export interface CarouselSlideItem {
   category?: string;
   projectId?: string;
   tagline?: string;
+  liveUrl?: string;
+  githubUrl?: string;
 }
 
 export interface CarouselPreloaderProps {
@@ -208,7 +24,7 @@ export interface CarouselPreloaderProps {
   slideWidth?: number;
   gap?: number;
   shape?: 'convex' | 'concave' | 'flat';
-  amount?: number; // curvature in degrees (default 38)
+  amount?: number; // curvature in degrees
   direction?: 'leftToRight' | 'rightToLeft';
   expandStyle?: 'flow' | 'fade';
   slideDuration?: number;
@@ -263,24 +79,83 @@ const DEFAULT_PROJECT_SLIDES: CarouselSlideItem[] = [
   },
 ];
 
+interface Card3DComputedState {
+  transform: string;
+  zIndex: number;
+  opacity: number;
+  brightness: number;
+  pointerEvents: 'auto' | 'none';
+}
+
+/**
+ * Computes smooth, continuous 3D cylindrical projection coordinates
+ * for any floating-point offset `diff = slideIndex - floatPosition`.
+ * Completely eliminates discrete jumping and delivers 120fps fluid gliding.
+ */
+function computeCard3DState(
+  diff: number,
+  cardWidth: number,
+  viewportWidth: number
+): Card3DComputedState {
+  const isTablet = viewportWidth < 960;
+  const isMobile = viewportWidth < 640;
+
+  // Responsive step between card centers along the horizontal arc
+  const stepX = isMobile
+    ? cardWidth * 0.85
+    : isTablet
+    ? cardWidth * 0.76
+    : cardWidth * 0.72;
+
+  const absDiff = Math.abs(diff);
+  const sign = diff >= 0 ? 1 : -1;
+
+  // 1. Horizontal arc projection with gentle non-linear depth compression
+  const tx = sign * stepX * Math.min(2.45, Math.pow(absDiff, 0.9));
+
+  // 2. Continuous angular rotation around Y-axis (curving inward towards center)
+  const maxRot = isMobile ? 18 : isTablet ? 22 : 26;
+  const rotRate = isMobile ? 10 : isTablet ? 13 : 15;
+  const rotY = -sign * Math.min(maxRot, Math.pow(absDiff, 0.94) * rotRate);
+
+  // 3. Z-depth displacement: active card (diff=0) comes forward, flanking cards curve backward
+  const frontZ = isMobile ? 35 : isTablet ? 75 : 110;
+  const backDepth = isMobile ? 70 : isTablet ? 110 : 155;
+  const z = frontZ - Math.min(backDepth * 1.5, Math.pow(absDiff, 1.08) * backDepth);
+
+  // 4. Subtle scale diminution in distance
+  const scale = Math.max(0.72, 1 - absDiff * 0.082);
+
+  // 5. Continuous natural opacity curve
+  const maxVisibleDiff = isMobile ? 1.6 : 2.5;
+  const opacity =
+    absDiff > maxVisibleDiff
+      ? 0
+      : Math.max(0, Math.min(1, 1 - Math.pow(absDiff / maxVisibleDiff, 1.85)));
+
+  // 6. Natural spatial brightness attenuation
+  const brightness = Math.max(0.65, Math.min(1, 1 - absDiff * 0.14));
+
+  // 7. Interactive pointer events: only clickable when adequately visible
+  const pointerEvents: 'auto' | 'none' = opacity > 0.35 ? 'auto' : 'none';
+
+  // 8. Dynamic z-index layering based on closeness to center
+  const zIndex = Math.max(1, Math.round(100 - absDiff * 20));
+
+  return {
+    transform: `translate3d(calc(-50% + ${tx.toFixed(1)}px), -50%, ${z.toFixed(1)}px) rotateY(${rotY.toFixed(2)}deg) scale(${scale.toFixed(3)})`,
+    zIndex,
+    opacity: Number(opacity.toFixed(3)),
+    brightness: Number(brightness.toFixed(3)),
+    pointerEvents,
+  };
+}
+
 export default function CarouselPreloader({
   slides = DEFAULT_PROJECT_SLIDES,
   mainImage = 1,
   slideWidth = 620,
-  gap = 28,
-  shape = 'convex',
-  amount = 36,
-  direction = 'leftToRight',
-  expandStyle = 'flow',
-  slideDuration = 1.8,
-  pauseDuration = 1.2,
-  expandDuration = 1.1,
-  backgroundColor = 'transparent',
   borderRadius = 16,
-  loop = false,
-  autoPlay = true,
-  mode = 'showcase',
-  onComplete,
   onProjectClick,
   scrollProgress,
   onNavigateToSlide,
@@ -288,394 +163,443 @@ export default function CarouselPreloader({
   className = '',
 }: CarouselPreloaderProps) {
   const router = useRouter();
-  const initialHeroIndex = Math.min(
+  const initialIndex = Math.min(
     Math.max(Math.round(mainImage) - 1, 0),
     slides.length - 1
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ width: 1200, height: 580 });
-  const [phase, setPhase] = useState<'slide' | 'expand'>('slide');
-  const [activeSlideIdx, setActiveSlideIdx] = useState(initialHeroIndex);
-  const [isClient, setIsClient] = useState(false);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const overlayRefs = useRef<(HTMLDivElement | null)[]>([]);
 
+  const [size, setSize] = useState({ width: 1200, height: 500 });
+  const [activeSlideIdx, setActiveSlideIdx] = useState(initialIndex);
+
+  // ── Framer Motion Smooth Spring Physics ──
+  // Continuous target position (float from 0 to slides.length - 1)
+  const targetPosition = useMotionValue(initialIndex);
+  // Damped spring: immediate responsiveness (<16ms) with zero overshoot jitter
+  const smoothPosition = useSpring(targetPosition, {
+    stiffness: 160,
+    damping: 24,
+    mass: 0.4,
+  });
+
+  // Touch and pointer swipe tracking refs
+  const pointerStartXRef = useRef(0);
+  const pointerStartPosRef = useRef(0);
+  const isPointerDownRef = useRef(false);
+
+  // Measure container dimensions
   useEffect(() => {
-    setIsClient(true);
-    const element = containerRef.current;
-    if (element) {
-      const rect = element.getBoundingClientRect();
+    const el = containerRef.current;
+    if (el) {
+      const rect = el.getBoundingClientRect();
       if (rect.width > 0 && rect.height > 0) {
         setSize({ width: rect.width, height: rect.height });
       }
     }
 
-    if (!element || typeof ResizeObserver === 'undefined') return;
+    if (!el || typeof ResizeObserver === 'undefined') return;
 
     const observer = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect;
       if (width > 0 && height > 0) {
-        startTransition(() => setSize({ width, height }));
+        setSize({ width, height });
       }
     });
-    observer.observe(element);
+    observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
-  // Fit 16:9 slide inside the container without edge collision
-  const width = Math.max(
-    1,
-    Math.min(slideWidth, size.width * 0.88, (size.height * 0.88) / ratio)
+  // Derived dimensions
+  const isTablet = size.width < 960;
+  const isMobile = size.width < 640;
+
+  const cardWidth = Math.round(
+    Math.min(
+      slideWidth,
+      isMobile
+        ? size.width * 0.86
+        : isTablet
+        ? size.width * 0.68
+        : size.width * 0.54
+    )
   );
-  const height = width * ratio;
-  const step = width + gap;
-  const trackWidth = slides.length * width + (slides.length - 1) * gap;
+  const cardHeight = Math.round(cardWidth * (9 / 16));
 
-  const currentRestX = size.width / 2 - (activeSlideIdx * step + width / 2);
-  const expandedX = -activeSlideIdx * step;
-  const startX = direction === 'leftToRight' ? -trackWidth : size.width;
+  // ── Direct 120fps GPU Transform Application ──
+  // Updates the card DOM elements directly without triggering React re-renders on every scroll tick
+  const applyTransforms = useCallback(
+    (pos: number) => {
+      slides.forEach((_, idx) => {
+        const el = cardRefs.current[idx];
+        if (!el) return;
+        const diff = idx - pos;
+        const state = computeCard3DState(diff, cardWidth, size.width);
+        el.style.transform = state.transform;
+        el.style.zIndex = String(state.zIndex);
+        el.style.opacity = String(state.opacity);
+        el.style.pointerEvents = state.pointerEvents;
 
-  const surface = shapeDirection[shape] ?? 0;
-  const limit = (Math.max(amount, 0) * Math.PI) / 180;
-  const segments =
-    surface === 0 || limit < 1e-4
-      ? 1
-      : Math.max(8, Math.min(24, Math.round(amount / 2.5)));
+        const overlay = overlayRefs.current[idx];
+        if (overlay) {
+          overlay.style.opacity = String(Math.max(0, 1 - state.brightness));
+        }
+      });
+    },
+    [slides, cardWidth, size.width]
+  );
 
-  const x = useMotionValue(currentRestX);
-  const heroWidth = useMotionValue(width);
-  const heroHeight = useMotionValue(height);
-  const flatten = useMotionValue(1);
-
-  const isScrollDriven = Boolean(scrollProgress && slides.length > 1);
-  const minX = size.width / 2 - (0 * step + width / 2);
-  const maxX = size.width / 2 - ((slides.length - 1) * step + width / 2);
-
-  // Synchronize carousel position with vertical page scroll
+  // Subscribe to continuous spring motion value to drive DOM transforms
   useEffect(() => {
-    if (!isScrollDriven || !scrollProgress) return;
-
-    const handleProgress = (latest: number) => {
-      const p = Math.max(0, Math.min(1, latest));
-      const targetX = minX + p * (maxX - minX);
-      x.set(targetX);
-
-      const computedIdx = Math.min(
+    const unsub = smoothPosition.on('change', (pos) => {
+      applyTransforms(pos);
+      const newActive = Math.min(
         slides.length - 1,
-        Math.max(0, Math.round(p * (slides.length - 1)))
+        Math.max(0, Math.round(pos))
       );
-      setActiveSlideIdx(computedIdx);
-    };
+      setActiveSlideIdx((prev) => (prev !== newActive ? newActive : prev));
+    });
 
-    const unsub = scrollProgress.on('change', handleProgress);
-    handleProgress(scrollProgress.get() || 0);
+    // Initial paint
+    applyTransforms(smoothPosition.get());
+    return () => unsub();
+  }, [smoothPosition, applyTransforms, slides.length]);
+
+  // Re-apply on container resize
+  useEffect(() => {
+    applyTransforms(smoothPosition.get());
+  }, [size, cardWidth, applyTransforms, smoothPosition]);
+
+  // Synchronize smoothly with vertical page scroll (if connected to Work scroll track)
+  useEffect(() => {
+    if (!scrollProgress) return;
+
+    const unsub = scrollProgress.on('change', (latest: number) => {
+      // If user is actively dragging the carousel, don't override with page scroll
+      if (isPointerDownRef.current) return;
+      const p = Math.max(0, Math.min(1, latest));
+      const target = p * (slides.length - 1);
+      targetPosition.set(target);
+    });
 
     return () => unsub();
-  }, [isScrollDriven, scrollProgress, minX, maxX, slides.length, x]);
+  }, [scrollProgress, slides.length, targetPosition]);
 
-  // Initial entrance animation (only if not scroll driven)
-  useEffect(() => {
-    if (!isClient || isScrollDriven) return;
-
-    x.set(startX);
-    heroWidth.set(width);
-    heroHeight.set(height);
-    flatten.set(1);
-    startTransition(() => setPhase('slide'));
-
-    const timers: NodeJS.Timeout[] = [];
-
-    const expand = () => {
-      startTransition(() => setPhase('expand'));
-      const transition = { duration: expandDuration, ease: easeInOut };
-      animate(x, expandedX, transition);
-      animate(heroWidth, size.width, transition);
-      animate(heroHeight, size.height, transition);
-      animate(flatten, 0, transition);
-
-      timers.push(
-        setTimeout(() => {
-          onComplete?.();
-        }, expandDuration * 1000)
-      );
-    };
-
-    if (autoPlay && mode === 'preloader') {
-      const slideAnim = animate(x, currentRestX, {
-        duration: slideDuration,
-        ease: easeInOut,
-        onComplete: () => {
-          timers.push(setTimeout(expand, pauseDuration * 1000));
-        },
-      });
-
-      return () => {
-        slideAnim.stop();
-        timers.forEach(clearTimeout);
-      };
-    } else {
-      // Smooth slide to centered project and stay in 3D Curved Showcase!
-      animate(x, currentRestX, { duration: slideDuration, ease: easeInOut });
-    }
-  }, [isClient, isScrollDriven, mode]);
-
-  // Navigate to slide (delegates to onNavigateToSlide to keep page scroll in sync)
-  const navigateToSlide = (idx: number) => {
-    const targetIdx = Math.max(0, Math.min(slides.length - 1, idx));
-    setActiveSlideIdx(targetIdx);
-    if (onNavigateToSlide) {
-      onNavigateToSlide(targetIdx);
-    } else {
-      const targetX = size.width / 2 - (targetIdx * step + width / 2);
-      animate(x, targetX, { duration: 0.7, ease: easeInOut });
-    }
-  };
-
-  const handleSelect = (id: string, index?: number) => {
-    if (typeof index === 'number' && index !== activeSlideIdx) {
-      navigateToSlide(index);
-    } else {
-      if (onProjectClick) {
-        onProjectClick(id);
-      } else if (id) {
-        router.push(`/projects/${id}`);
+  // Navigate to slide (updates continuous position and synchronizes vertical scroll)
+  const navigateToSlide = useCallback(
+    (idx: number) => {
+      const targetIdx = Math.max(0, Math.min(slides.length - 1, idx));
+      targetPosition.set(targetIdx);
+      if (onNavigateToSlide) {
+        onNavigateToSlide(targetIdx);
       }
+    },
+    [slides.length, targetPosition, onNavigateToSlide]
+  );
+
+  // Direct card select / navigation handler
+  const handleSelect = useCallback(
+    (projectId: string, index?: number) => {
+      if (typeof index === 'number' && index !== activeSlideIdx) {
+        navigateToSlide(index);
+      } else {
+        if (projectId === 'all-projects') {
+          triggerRouteLoading('/projects', 'Loading engineering directory...');
+          router.push('/projects');
+          return;
+        }
+        if (onProjectClick) {
+          triggerRouteLoading(`/projects/${projectId}`, 'Loading case study...');
+          onProjectClick(projectId);
+        } else {
+          triggerRouteLoading(`/projects/${projectId}`, 'Loading case study...');
+          router.push(`/projects/${projectId}`);
+        }
+      }
+    },
+    [activeSlideIdx, navigateToSlide, onProjectClick, router]
+  );
+
+  // Pointer drag swipe interactions with real-time continuous 1:1 tracking
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).closest('button, a')) return;
+    pointerStartXRef.current = e.clientX;
+    pointerStartPosRef.current = smoothPosition.get();
+    isPointerDownRef.current = true;
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // Fallback if pointer capture unsupported
     }
   };
 
-  const currentProject = slides[activeSlideIdx] || slides[0];
-  const fading = expandStyle === 'fade' && phase === 'expand';
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isPointerDownRef.current) return;
+    const dx = e.clientX - pointerStartXRef.current;
+    const dragDelta = -dx / (cardWidth * 0.72);
+    const clampedPos = Math.max(
+      -0.25,
+      Math.min(slides.length - 0.75, pointerStartPosRef.current + dragDelta)
+    );
+    targetPosition.set(clampedPos);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isPointerDownRef.current) return;
+    isPointerDownRef.current = false;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // Fallback
+    }
+    const current = smoothPosition.get();
+    const nearest = Math.min(
+      slides.length - 1,
+      Math.max(0, Math.round(current))
+    );
+    navigateToSlide(nearest);
+  };
+
+  // Keyboard navigation support
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (document.activeElement?.closest('.carousel-preloader-container')) {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          navigateToSlide(activeSlideIdx + 1);
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          navigateToSlide(activeSlideIdx - 1);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeSlideIdx, navigateToSlide]);
 
   return (
     <div
       ref={containerRef}
       className={`carousel-preloader-container ${className}`}
-      onWheel={(e) => {
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 10) {
-          window.scrollBy({ top: e.deltaX * 0.8 });
-        }
-      }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
       style={{
         ...style,
         position: 'relative',
         width: '100%',
         boxSizing: 'border-box',
         overflow: 'hidden',
-        backgroundColor,
-        perspective: size.width || 1200,
-        perspectiveOrigin: '50% 50%',
+        backgroundColor: 'transparent',
         minHeight: 380,
-        height: 'clamp(380px, 52vh, 560px)',
-        borderRadius: 20,
+        height: 'clamp(380px, 48vh, 520px)',
+        touchAction: 'pan-y',
+        cursor: 'grab',
       }}
       role="region"
       aria-label="3D Project Carousel Showcase"
     >
-      {/* Left edge depth-of-field fade */}
+      {/* ── 3D Curved Cards Spatial Stage ── */}
       <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '12%',
-          height: '100%',
-          background: 'linear-gradient(to right, var(--bg-warm, #f5f0e8) 0%, rgba(245,240,232,0.7) 40%, transparent 100%)',
-          zIndex: 5,
-          pointerEvents: 'none',
-        }}
-      />
-      {/* Right edge depth-of-field fade */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: '12%',
-          height: '100%',
-          background: 'linear-gradient(to left, var(--bg-warm, #f5f0e8) 0%, rgba(245,240,232,0.7) 40%, transparent 100%)',
-          zIndex: 5,
-          pointerEvents: 'none',
-        }}
-      />
-      <div
+        className="carousel-3d-stage"
         style={{
           position: 'absolute',
           inset: 0,
+          perspective: isMobile ? 1200 : 1600,
+          perspectiveOrigin: '50% 48%',
           transformStyle: 'preserve-3d',
+          pointerEvents: 'auto',
         }}
       >
-        {slides.map((slide, slideIndex) => (
-          <motion.div
-            key={slide.projectId || `slide-${slideIndex}`}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              transformStyle: 'preserve-3d',
-            }}
-            animate={{
-              opacity: fading && slideIndex !== activeSlideIdx ? 0 : 1,
-            }}
-            transition={{
-              duration: expandDuration * 0.6,
-              ease: 'easeOut',
-            }}
-          >
-            {Array.from({ length: segments }, (_, slot) => (
-              <Strip
-                key={slot}
-                slide={slide}
-                slot={slot}
-                segments={segments}
-                slideIndex={slideIndex}
-                heroIndex={activeSlideIdx}
-                step={step}
-                width={width}
-                height={height}
-                half={size.width / 2}
-                limit={limit}
-                direction={surface}
-                borderRadius={borderRadius}
-                x={x}
-                heroWidth={heroWidth}
-                heroHeight={heroHeight}
-                flatten={flatten}
-                onSelectProject={(id) => handleSelect(id, slideIndex)}
-              />
-            ))}
-          </motion.div>
-        ))}
+        {slides.map((slide, slideIndex) => {
+          const isActive = slideIndex === activeSlideIdx;
+          const initial3D = computeCard3DState(
+            slideIndex - initialIndex,
+            cardWidth,
+            size.width
+          );
+
+          return (
+            <div
+              key={slide.projectId || `slide-${slideIndex}`}
+              ref={(el) => {
+                cardRefs.current[slideIndex] = el;
+              }}
+              className={`carousel-3d-card ${isActive ? 'is-active' : ''}`}
+              data-route-href={
+                slide.projectId === 'all-projects' ? '/projects' : `/projects/${slide.projectId}`
+              }
+              onClick={() => handleSelect(slide.projectId!, slideIndex)}
+              style={{
+                position: 'absolute',
+                top: '46%',
+                left: '50%',
+                width: cardWidth,
+                height: cardHeight,
+                transform: initial3D.transform,
+                zIndex: initial3D.zIndex,
+                opacity: initial3D.opacity,
+                pointerEvents: initial3D.pointerEvents,
+                cursor: 'pointer',
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                transformStyle: 'preserve-3d',
+                willChange: 'transform, opacity',
+                // Instant hardware transform response (no CSS lag fighting with spring physics)
+                transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
+              }}
+              tabIndex={isActive ? 0 : -1}
+              role="button"
+              aria-label={`${slide.title || 'Project'} ${
+                isActive ? '(Active — click to view case study)' : '(Click to center)'
+              }`}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSelect(slide.projectId!, slideIndex);
+              }}
+            >
+              {/* Card Artwork Graphic */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '100%',
+                  borderRadius,
+                  overflow: 'hidden',
+                  background: '#0d1117',
+                  border: isActive
+                    ? '1.5px solid rgba(255, 255, 255, 0.22)'
+                    : '1px solid rgba(255, 255, 255, 0.1)',
+                  boxShadow: isActive
+                    ? '0 24px 64px -12px rgba(0, 0, 0, 0.55), 0 0 24px rgba(235, 76, 42, 0.12)'
+                    : '0 16px 36px -10px rgba(0, 0, 0, 0.42)',
+                  transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+                }}
+              >
+                <img
+                  src={slide.src}
+                  alt={slide.alt || slide.title || 'Project preview'}
+                  draggable={false}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                    pointerEvents: 'none',
+                  }}
+                />
+
+                {/* Hardware-composited black overlay for smooth depth lighting attenuation */}
+                <div
+                  ref={(el) => {
+                    overlayRefs.current[slideIndex] = el;
+                  }}
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundColor: '#000000',
+                    opacity: 0,
+                    pointerEvents: 'none',
+                    willChange: 'opacity',
+                  }}
+                />
+
+                {/* Subtle glass specular highlight along top edge */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '28%',
+                    background:
+                      'linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%)',
+                    pointerEvents: 'none',
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Floating Interactive Controls overlay */}
+      {/* ── Subtle Organic Left & Right Edge Blur Overlays ── */}
+      <div
+        aria-hidden="true"
+        className="carousel-edge-blur carousel-edge-blur-left"
+      />
+      <div
+        aria-hidden="true"
+        className="carousel-edge-blur carousel-edge-blur-right"
+      />
+
+      {/* ── View All Projects CTA Button ── */}
       <div
         className="carousel-glass-controls"
         style={{
           position: 'absolute',
-          bottom: 24,
+          bottom: 18,
           left: '50%',
           transform: 'translateX(-50%)',
           zIndex: 10,
           display: 'flex',
           alignItems: 'center',
-          gap: 10,
-          padding: '8px 16px',
-          background: 'rgba(255, 255, 255, 0.92)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(0, 0, 0, 0.1)',
-          borderRadius: 9999,
-          boxShadow: '0 12px 36px rgba(0, 0, 0, 0.14)',
-          maxWidth: '94%',
+          justifyContent: 'center',
+          background: 'none',
+          border: 'none',
+          boxShadow: 'none',
+          padding: 0,
         }}
       >
-        {/* Prev Arrow */}
-        <button
-          type="button"
-          aria-label="Previous project"
-          onClick={() => navigateToSlide(activeSlideIdx - 1)}
-          disabled={activeSlideIdx === 0}
-          style={{
-            background: activeSlideIdx === 0 ? 'rgba(0,0,0,0.04)' : '#f3f4f6',
-            color: activeSlideIdx === 0 ? '#9ca3af' : '#111827',
-            border: 'none',
-            borderRadius: '50%',
-            width: 32,
-            height: 32,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: activeSlideIdx === 0 ? 'not-allowed' : 'pointer',
-            transition: 'all 0.15s ease',
+        <LiquidGlassButton
+          href="/projects"
+          size="sm"
+          surface="accent"
+          material="frosted"
+          radius="9999px"
+          padding="8px 22px"
+          onClick={() => {
+            triggerRouteLoading('/projects', 'Loading engineering directory...');
           }}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-
-        {/* Project Selector Pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {slides.map((s, idx) => {
-            const isActive = idx === activeSlideIdx;
-            return (
-              <button
-                key={s.projectId || idx}
-                type="button"
-                onClick={() => navigateToSlide(idx)}
-                style={{
-                  background: isActive ? '#111827' : 'transparent',
-                  color: isActive ? '#ffffff' : '#4b5563',
-                  border: isActive ? 'none' : '1px solid rgba(0,0,0,0.08)',
-                  borderRadius: 9999,
-                  padding: '4px 10px',
-                  fontSize: '12px',
-                  fontFamily: 'var(--font-mono), monospace',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                0{idx + 1}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Next Arrow */}
-        <button
-          type="button"
-          aria-label="Next project"
-          onClick={() => navigateToSlide(activeSlideIdx + 1)}
-          disabled={activeSlideIdx === slides.length - 1}
           style={{
-            background: activeSlideIdx === slides.length - 1 ? 'rgba(0,0,0,0.04)' : '#f3f4f6',
-            color: activeSlideIdx === slides.length - 1 ? '#9ca3af' : '#111827',
-            border: 'none',
-            borderRadius: '50%',
-            width: 32,
-            height: 32,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: activeSlideIdx === slides.length - 1 ? 'not-allowed' : 'pointer',
-            transition: 'all 0.15s ease',
+            boxShadow:
+              '0 4px 20px rgba(234, 88, 12, 0.42), 0 0 14px rgba(235, 76, 42, 0.28)',
+            flexShrink: 0,
           }}
+          aria-label="View all projects"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-
-        <div style={{ width: 1, height: 18, background: 'rgba(0,0,0,0.12)', margin: '0 4px' }} />
-
-        {/* Active Project CTA */}
-        {currentProject?.projectId && (
-          <button
-            type="button"
-            onClick={() => handleSelect(currentProject.projectId!)}
+          <span
             style={{
-              background: '#ea580c',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: 9999,
-              padding: '6px 16px',
-              fontSize: '12px',
-              fontWeight: 600,
-              cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 5,
-              boxShadow: '0 2px 8px rgba(234, 88, 12, 0.35)',
-              transition: 'transform 0.15s ease',
+              gap: 8,
+              whiteSpace: 'nowrap',
+              fontWeight: 600,
+              fontSize: '13px',
+              color: '#ffffff',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.04)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
           >
-            <span style={{ whiteSpace: 'nowrap' }}>{currentProject.title}</span>
-            <span aria-hidden="true" style={{ fontSize: '13px' }}>→</span>
-          </button>
-        )}
+            <span>View All Projects</span>
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#ffffff"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              style={{ display: 'inline-block', flexShrink: 0 }}
+            >
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </span>
+        </LiquidGlassButton>
       </div>
     </div>
   );

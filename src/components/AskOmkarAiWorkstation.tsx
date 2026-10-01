@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import sceneImg from '@/images/home.png';
+import sceneImg from '@/images/home.webp';
 import WorkstationAtmosphere from './WorkstationAtmosphere';
 import type { DragonChatState } from './FlyingDragon';
 
@@ -67,7 +67,7 @@ export interface KeyDef {
 // Keyboard x is centered directly to the desktop screen (screen center = 28.9 + 42.8/2 = 50.3%, keyboard center = 29.05 + 42.5/2 = 50.3%)
 const SCENE = {
   screen: { x: 28.9, y: 19.4, w: 42.8, h: 37.4 },
-  keyboard: { x: 29.05, y: 72.0, w: 42.5, h: 16.5 },
+  keyboard: { x: 33.55, y: 77.0, w: 33.5, h: 8.5 },
 };
 
 // ── 02. 5-Row 75% Mechanical Keyboard Layout ──
@@ -1293,12 +1293,10 @@ export default function AskOmkarAiWorkstation({
               <div className="mobile-messenger-avatar-wrap">
                 <div className="mobile-messenger-avatar-disc">
                   <Image
-                    src="/images/avatar.png"
+                    src="/images/avatar.webp"
                     alt="Omkar Anarse"
                     width={46}
                     height={46}
-                    unoptimized
-                    priority
                     className="mobile-messenger-avatar-img"
                   />
                 </div>
@@ -1343,11 +1341,10 @@ export default function AskOmkarAiWorkstation({
                       {isAi && (
                         <div className="mobile-msg-mini-avatar">
                           <Image
-                            src="/images/avatar.png"
+                            src="/images/avatar.webp"
                             alt="Omkar"
                             width={22}
                             height={22}
-                            unoptimized
                           />
                         </div>
                       )}
@@ -1370,11 +1367,10 @@ export default function AskOmkarAiWorkstation({
                   <div className="mobile-msg-meta">
                     <div className="mobile-msg-mini-avatar">
                       <Image
-                        src="/images/avatar.png"
+                        src="/images/avatar.webp"
                         alt="Omkar"
                         width={22}
                         height={22}
-                        unoptimized
                       />
                     </div>
                     <span className="mobile-msg-time">typing...</span>

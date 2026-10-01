@@ -1,18 +1,46 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { projects, type Project } from '@/data/projects';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import LiquidGlassButton from '@/components/LiquidGlassButton';
+import { triggerRouteLoading } from '@/lib/routeLoading';
 
 type FilterCategory = 'All' | 'AI Systems' | 'Mobile' | 'System Design';
 
 export default function AllProjectsPage() {
+  const [projectList, setProjectList] = useState<Project[]>(projects);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<FilterCategory>('All');
+
+  // Background fetch to discover latest repositories from GitHub API route
+  useEffect(() => {
+    let isMounted = true;
+    async function loadGitHubProjects() {
+      try {
+        const res = await fetch('/api/projects');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (
+          isMounted &&
+          data.projects &&
+          Array.isArray(data.projects) &&
+          data.projects.length > 0
+        ) {
+          setProjectList(data.projects);
+        }
+      } catch {
+        // Silently use cached/static fallback dataset
+      }
+    }
+    loadGitHubProjects();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const getDomain = (project: Project): FilterCategory => {
     if (project.category.includes('AI')) return 'AI Systems';
@@ -25,7 +53,7 @@ export default function AllProjectsPage() {
   const filteredProjects = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
 
-    return projects.filter((project) => {
+    return projectList.filter((project) => {
       // 1. Category check
       if (activeCategory !== 'All' && getDomain(project) !== activeCategory) {
         return false;
@@ -43,7 +71,7 @@ export default function AllProjectsPage() {
 
       return titleMatch || descMatch || categoryMatch || roleMatch || stackMatch || focusMatch;
     });
-  }, [searchQuery, activeCategory]);
+  }, [projectList, searchQuery, activeCategory]);
 
   return (
     <>
@@ -51,22 +79,8 @@ export default function AllProjectsPage() {
 
       <main className="all-projects-page grid-bg">
         <div className="wrap" style={{ paddingTop: 110, paddingBottom: 80 }}>
-          {/* Breadcrumbs / Back Navigation */}
-          <div className="archive-back-row">
-            <Link href="/#work" className="archive-back-link">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-              <span>Back to Portfolio</span>
-            </Link>
-          </div>
-
           {/* Page Header */}
           <header className="archive-header">
-            <div className="archive-header-eyebrow-row">
-              <span className="archive-eyebrow">ENGINEERING DIRECTORY</span>
-              <span className="archive-count">0{projects.length} REPOSITORIES &amp; SYSTEMS</span>
-            </div>
             <h1 className="archive-title">All Projects &amp; Systems.</h1>
             <p className="archive-subtitle">
               A comprehensive technical archive of production systems, multi-agent AI pipelines, and mobile architectures built by Omkar Anarse.
@@ -115,8 +129,8 @@ export default function AllProjectsPage() {
                 const isActive = activeCategory === filter;
                 const count =
                   filter === 'All'
-                    ? projects.length
-                    : projects.filter((p) => getDomain(p) === filter).length;
+                    ? projectList.length
+                    : projectList.filter((p) => getDomain(p) === filter).length;
 
                 return (
                   <LiquidGlassButton
@@ -158,7 +172,7 @@ export default function AllProjectsPage() {
           {/* Results Summary Bar */}
           <div className="archive-status-row">
             <span className="archive-status-text">
-              Showing <strong style={{ color: 'var(--accent, #ea580c)' }}>{filteredProjects.length}</strong> of {projects.length} projects
+              Showing <strong style={{ color: 'var(--accent, #ea580c)' }}>{filteredProjects.length}</strong> of {projectList.length} projects
               {searchQuery && (
                 <span>
                   {' '}matching &ldquo;<strong>{searchQuery}</strong>&rdquo;
@@ -237,6 +251,9 @@ export default function AllProjectsPage() {
                         <Link
                           href={`/projects/${project.id}`}
                           className="archive-item-link-layer"
+                          onClick={() => {
+                            triggerRouteLoading(`/projects/${project.id}`, 'Loading case study...');
+                          }}
                           aria-label={`View ${project.title} Case Study`}
                         />
 

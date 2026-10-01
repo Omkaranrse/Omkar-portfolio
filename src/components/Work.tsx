@@ -1,12 +1,15 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { motion, useScroll } from 'framer-motion';
 import { projects, type Project } from '@/data/projects';
 
 import dynamic from 'next/dynamic';
 import ApertureCard from './ApertureCard';
 import LiquidGlassButton from './LiquidGlassButton';
+import { triggerRouteLoading } from '@/lib/routeLoading';
 import type { CarouselSlideItem } from './CarouselPreloader';
 
 const CarouselPreloader = dynamic(() => import('./CarouselPreloader'), {
@@ -22,11 +25,55 @@ const PROJECT_ARTWORK_MAP: Record<string, string> = {
   p3: '/images/projects/blog-agent.svg',
   p4: '/images/projects/hospital-clinic.svg',
   p5: '/images/projects/taskify.svg',
+  p6: '/images/projects/hrms.svg',
+  p7: '/images/projects/sahayak.svg',
+  p8: '/images/projects/realtime-chat.svg',
+  p9: '/images/projects/protector.svg',
+  p10: '/images/projects/blog-agent.svg',
+  p11: '/images/projects/attendephi.svg',
+  p12: '/images/projects/datamind.svg',
+  p13: '/images/projects/hospital-clinic.svg',
+  p14: '/images/projects/taskify.svg',
+};
+
+const getProjectArtwork = (project: Project): string => {
+  if (PROJECT_ARTWORK_MAP[project.id]) return PROJECT_ARTWORK_MAP[project.id];
+  if (project.media && project.media.length > 0 && project.media[0].src) {
+    return project.media[0].src;
+  }
+  return '/images/projects/datamind.svg';
 };
 
 export default function Work() {
+  const [totalProjectsCount, setTotalProjectsCount] = useState<number>(projects.length);
   const [activeFilter, setActiveFilter] = useState<FilterCategory>('All');
   const [viewMode, setViewMode] = useState<ViewMode>('carousel');
+
+  // Background fetch only to discover total count for the "All Projects (N)" badge and banner
+  useEffect(() => {
+    let isMounted = true;
+    async function loadProjectCount() {
+      try {
+        const res = await fetch('/api/projects');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (
+          isMounted &&
+          data.projects &&
+          Array.isArray(data.projects) &&
+          data.projects.length > 0
+        ) {
+          setTotalProjectsCount(data.projects.length);
+        }
+      } catch {
+        // Silently use cached/static fallback dataset
+      }
+    }
+    loadProjectCount();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const scrollTrackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -41,24 +88,37 @@ export default function Work() {
   };
 
   const FEATURED_LIMIT = 4;
-  const featuredBase = projects.slice(0, FEATURED_LIMIT);
+  // Core curated flagship case studies
+  const curatedFeatured = projects.slice(0, 5);
+  const top4Projects = curatedFeatured.slice(0, FEATURED_LIMIT);
 
   const filteredProjects =
     activeFilter === 'All'
-      ? featuredBase
-      : projects.filter((project) => getDomain(project) === activeFilter);
+      ? top4Projects
+      : curatedFeatured.filter((project) => getDomain(project) === activeFilter);
 
-  const activeSlides: CarouselSlideItem[] = filteredProjects.map((project) => ({
+  const allProjectsSlide: CarouselSlideItem = {
+    projectId: 'all-projects',
+    title: 'View All Projects',
+    category: 'ENGINEERING DIRECTORY',
+    tagline: `Explore complete directory of ${totalProjectsCount} projects & systems`,
+    src: '/images/projects/all-projects-card.svg',
+    alt: `Explore all ${totalProjectsCount} projects and systems`,
+    liveUrl: '/projects',
+  };
+
+  const projectSlides: CarouselSlideItem[] = filteredProjects.map((project) => ({
     projectId: project.id,
     title: project.title,
     category: project.category,
     tagline: project.shortDesc,
-    src:
-      PROJECT_ARTWORK_MAP[project.id] ||
-      project.media?.[0]?.src ||
-      '/images/projects/datamind.svg',
+    src: getProjectArtwork(project),
     alt: `${project.title} - ${project.shortDesc}`,
+    liveUrl: project.links.find((l) => l.label.toLowerCase().includes('live'))?.href,
+    githubUrl: project.links.find((l) => l.label.toLowerCase().includes('github'))?.href,
   }));
+
+  const activeSlides: CarouselSlideItem[] = [...projectSlides, allProjectsSlide];
 
   const filterOptions: FilterCategory[] = ['All', 'AI Systems', 'Mobile', 'System Design'];
 
@@ -108,14 +168,19 @@ export default function Work() {
             <header className="work-header reveal-text">
               <div className="work-header-top">
                 <span className="work-eyebrow">Featured Work</span>
-                <span className="work-count">0{FEATURED_LIMIT} CASE STUDIES</span>
+                <span className="work-count">
+                  0{top4Projects.length} CASE STUDIES
+                </span>
               </div>
               <div className="work-title-row">
                 <h2 className="work-title">Engineering projects &amp; systems.</h2>
-                <p className="work-subtitle">
+                <p className="work-subtitle desktop-only-text">
                   {isCarousel
                     ? 'Scroll down to rotate through projects in 3D curved depth, or switch to Grid view to browse all cards.'
                     : 'Hover over cards for 3D depth and click to read the complete technical case study and architecture breakdown.'}
+                </p>
+                <p className="work-subtitle mobile-only-text">
+                  Browse AI pipelines, mobile systems, and full-stack architecture case studies.
                 </p>
               </div>
 
@@ -127,8 +192,8 @@ export default function Work() {
                     const isActive = activeFilter === filter;
                     const count =
                       filter === 'All'
-                        ? FEATURED_LIMIT
-                        : projects.filter((p) => getDomain(p) === filter).length;
+                        ? top4Projects.length
+                        : curatedFeatured.filter((p) => getDomain(p) === filter).length;
                     return (
                       <LiquidGlassButton
                         key={filter}
@@ -166,7 +231,7 @@ export default function Work() {
                 </div>
 
                 {/* View Mode Switcher Toggle + All Projects Link */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <div className="work-actions-cluster" style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                   <div className="work-view-toggle" role="group" aria-label="Project presentation mode">
                     <button
                       type="button"
@@ -204,88 +269,201 @@ export default function Work() {
                     tint="rgba(235, 76, 42, 0.12)"
                     textColor="#111827"
                     icon="arrow"
+                    onClick={() => {
+                      triggerRouteLoading('/projects', 'Loading engineering directory...');
+                    }}
                   >
-                    <span>All Projects ({projects.length})</span>
+                    <span>All Projects ({totalProjectsCount})</span>
                   </LiquidGlassButton>
                 </div>
               </div>
             </header>
 
-            {/* ── View 1: 3D Curved Carousel with Scroll Animation ── */}
-            {isCarousel && (
-              <div className="work-carousel-wrap">
-                <CarouselPreloader
-                  key={`carousel-${activeFilter}`}
-                  slides={activeSlides}
-                  mainImage={1}
-                  shape="convex"
-                  amount={38}
-                  borderRadius={16}
-                  loop={false}
-                  scrollProgress={scrollYProgress}
-                  onNavigateToSlide={handleNavigateToSlide}
-                />
-              </div>
-            )}
-
-            {/* ── View 2: Aperture 3D Project Cards Grid ── */}
-            {viewMode === 'grid' && (
-              <>
-                <motion.div
-                  key={`grid-${activeFilter}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                  className="work-cards-grid reveal-stagger in"
-                >
-                  {filteredProjects.map((project, idx) => (
-                    <motion.div
-                      key={project.id}
-                      className="stagger-item in"
-                      initial={{ opacity: 0, y: 24, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      transition={{
-                        duration: 0.45,
-                        delay: idx * 0.08,
-                        ease: [0.16, 1, 0.3, 1],
+            {/* ── MOBILE VIEW: Normal Static Project Cards List (Zero 3D transforms, No carousel trap) ── */}
+            <div className="work-mobile-view">
+              {filteredProjects.map((project) => {
+                const primaryGithub = project.links.find((l) =>
+                  l.label.toLowerCase().includes('github')
+                );
+                return (
+                  <article key={`mobile-${project.id}`} className="work-mobile-card">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="work-mobile-card-link"
+                      onClick={() => {
+                        triggerRouteLoading(`/projects/${project.id}`, 'Loading case study...');
                       }}
-                      style={{
-                        '--stagger-index': Math.min(idx, 4),
-                        display: 'flex',
-                        flexDirection: 'column',
-                      } as React.CSSProperties}
+                      aria-label={`View ${project.title} technical case study`}
                     >
-                      <ApertureCard project={project} />
-                    </motion.div>
-                  ))}
-                </motion.div>
+                      {/* Project Image Preview */}
+                      <div className="work-mobile-card-media">
+                        <Image
+                          src={
+                            PROJECT_ARTWORK_MAP[project.id] ||
+                            project.media?.[0]?.src ||
+                            '/images/projects/datamind.svg'
+                          }
+                          alt={`${project.title} preview`}
+                          width={600}
+                          height={330}
+                          className="work-mobile-card-img"
+                        />
+                        <div className="work-mobile-card-badge">
+                          <span className="work-mobile-card-num">{project.number}</span>
+                          <span className="work-mobile-card-cat">{project.category}</span>
+                        </div>
+                      </div>
 
-                {/* ── See All Projects Section Banner ── */}
-                <div className="work-see-all-section">
-                  <div className="work-see-all-card">
-                    <div className="work-see-all-info">
-                      <span className="work-see-all-eyebrow">ENGINEERING REPOSITORY</span>
-                      <h3 className="work-see-all-title">Explore all {projects.length} projects &amp; systems</h3>
-                      <p className="work-see-all-desc">
-                        Browse the complete searchable archive of AI multi-agent pipelines, Flutter cross-platform applications, and system design specifications.
-                      </p>
-                    </div>
-                    <LiquidGlassButton
-                      href="/projects"
-                      size="md"
-                      surface="dark"
-                      material="frosted"
-                      tint="rgba(235, 76, 42, 0.28)"
-                      icon="arrow"
-                      textColor="#ffffff"
-                      padding="12px 28px"
-                    >
-                      See All Projects ({projects.length})
-                    </LiquidGlassButton>
-                  </div>
+                      {/* Project Card Body */}
+                      <div className="work-mobile-card-body">
+                        <div className="work-mobile-card-meta">
+                          <span className="work-mobile-card-year">{project.year}</span>
+                          <span className="work-mobile-card-role">{project.role}</span>
+                        </div>
+
+                        <h3 className="work-mobile-card-title">{project.title}</h3>
+                        <p className="work-mobile-card-desc">{project.shortDesc}</p>
+
+                        {/* Technology Tags */}
+                        <div className="work-mobile-card-tags">
+                          {project.focusPoints.slice(0, 4).map((tag) => (
+                            <span key={tag} className="work-mobile-card-tag">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Card Action Row */}
+                        <div className="work-mobile-card-footer">
+                          {primaryGithub ? (
+                            <span
+                              className="work-mobile-card-code"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                window.open(primaryGithub.href, '_blank', 'noopener,noreferrer');
+                              }}
+                            >
+                              Code ↗
+                            </span>
+                          ) : (
+                            <span className="work-mobile-card-indicator">
+                              Case Study
+                            </span>
+                          )}
+
+                          <span className="work-mobile-card-cta">
+                            Case Study <span>→</span>
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  </article>
+                );
+              })}
+
+              {/* Mobile See All Archive Banner */}
+              <div className="work-mobile-see-all">
+                <div className="work-mobile-see-all-info">
+                  <span className="work-see-all-eyebrow">ENGINEERING REPOSITORY</span>
+                  <h3 className="work-see-all-title">Explore all {totalProjectsCount} projects &amp; systems</h3>
+                  <p className="work-see-all-desc">
+                    Browse the complete searchable archive of AI multi-agent pipelines and Flutter cross-platform applications.
+                  </p>
                 </div>
-              </>
-            )}
+                <LiquidGlassButton
+                  href="/projects"
+                  size="md"
+                  surface="dark"
+                  material="frosted"
+                  tint="rgba(235, 76, 42, 0.28)"
+                  icon="arrow"
+                  textColor="#ffffff"
+                  padding="10px 22px"
+                >
+                  See All Projects ({totalProjectsCount})
+                </LiquidGlassButton>
+              </div>
+            </div>
+
+            {/* ── DESKTOP VIEW: Preserved 100% untouched (3D Curved Showcase & Cards Grid) ── */}
+            <div className="work-desktop-view">
+              {/* ── View 1: 3D Curved Carousel with Scroll Animation ── */}
+              {isCarousel && (
+                <div className="work-carousel-wrap">
+                  <CarouselPreloader
+                    key={`carousel-${activeFilter}`}
+                    slides={activeSlides}
+                    mainImage={1}
+                    shape="convex"
+                    amount={38}
+                    borderRadius={16}
+                    loop={false}
+                    scrollProgress={scrollYProgress}
+                    onNavigateToSlide={handleNavigateToSlide}
+                  />
+                </div>
+              )}
+
+              {/* ── View 2: Aperture 3D Project Cards Grid ── */}
+              {viewMode === 'grid' && (
+                <>
+                  <motion.div
+                    key={`grid-${activeFilter}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                    className="work-cards-grid reveal-stagger in"
+                  >
+                    {filteredProjects.map((project, idx) => (
+                      <motion.div
+                        key={project.id}
+                        className="stagger-item in"
+                        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{
+                          duration: 0.45,
+                          delay: idx * 0.08,
+                          ease: [0.16, 1, 0.3, 1],
+                        }}
+                        style={{
+                          '--stagger-index': Math.min(idx, 4),
+                          display: 'flex',
+                          flexDirection: 'column',
+                        } as React.CSSProperties}
+                      >
+                        <ApertureCard project={project} />
+                      </motion.div>
+                    ))}
+                  </motion.div>
+
+                  {/* ── See All Projects Section Banner ── */}
+                  <div className="work-see-all-section">
+                    <div className="work-see-all-card">
+                      <div className="work-see-all-info">
+                        <span className="work-see-all-eyebrow">ENGINEERING REPOSITORY</span>
+                        <h3 className="work-see-all-title">Explore all {totalProjectsCount} projects &amp; systems</h3>
+                        <p className="work-see-all-desc">
+                          Browse the complete searchable archive of AI multi-agent pipelines, Flutter cross-platform applications, and system design specifications.
+                        </p>
+                      </div>
+                      <LiquidGlassButton
+                        href="/projects"
+                        size="md"
+                        surface="dark"
+                        material="frosted"
+                        tint="rgba(235, 76, 42, 0.28)"
+                        icon="arrow"
+                        textColor="#ffffff"
+                        padding="12px 28px"
+                      >
+                        See All Projects ({totalProjectsCount})
+                      </LiquidGlassButton>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

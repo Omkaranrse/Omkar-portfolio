@@ -24,7 +24,56 @@ export default function Overview() {
           </p>
         </header>
 
-        {/* ── 01: 3D Stack Marquee (Full Screen Width, NO Background) ── */}
+        {/* ── Mobile Skills Flow (Clean, Compact, Zero Empty Space, Mobile Only) ── */}
+        <div className="skills-mobile-view">
+          <div className="skills-mobile-card">
+            <div className="skills-mobile-category">
+              <span className="skills-mobile-tag">AI &amp; Intelligent Systems</span>
+              <div className="skills-mobile-chips">
+                {['Python', 'LangChain', 'LangGraph', 'PyTorch', 'ChromaDB', 'Groq', 'Deep Learning'].map((s) => (
+                  <span key={s} className="skills-mobile-chip">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="skills-mobile-category">
+              <span className="skills-mobile-tag">Mobile Engineering</span>
+              <div className="skills-mobile-chips">
+                {['Flutter', 'Dart', 'Swift', 'Riverpod', 'Clean Architecture', 'State Management'].map((s) => (
+                  <span key={s} className="skills-mobile-chip">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="skills-mobile-category">
+              <span className="skills-mobile-tag">Web &amp; Backend Architecture</span>
+              <div className="skills-mobile-chips">
+                {['Next.js', 'React', 'TypeScript', 'FastAPI', 'PostgreSQL', 'Firebase', 'REST APIs'].map((s) => (
+                  <span key={s} className="skills-mobile-chip">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="skills-mobile-category">
+              <span className="skills-mobile-tag">Cloud &amp; Tooling</span>
+              <div className="skills-mobile-chips">
+                {['Docker', 'Git &amp; GitHub'].map((s) => (
+                  <span key={s} className="skills-mobile-chip">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── 01: 3D Stack Marquee (Full Screen Width, Desktop Only) ── */}
         <div className="skills-carousel-fullbleed reveal">
           <Logo3DCarousel
             items={techStack}
@@ -43,7 +92,7 @@ export default function Overview() {
           />
         </div>
 
-        {/* ── Interactive Gravity Pills ── */}
+        {/* ── Interactive Gravity Pills (Desktop Only) ── */}
         <div className="skills-bubblepit-block reveal">
           <div className="skills-block-header" style={{ justifyContent: 'center', marginBottom: 16 }}>
             <span className="skills-block-tag" style={{ fontSize: '0.8125rem', letterSpacing: '0.06em' }}>

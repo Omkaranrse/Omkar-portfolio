@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import Nav from '@/components/Nav';
 import AskOmkarAiWorkstation, { ChatMessage } from '@/components/AskOmkarAiWorkstation';
 import SocialRail from '@/components/SocialRail';
-import PageLoadingScreen from '@/components/PageLoadingScreen';
+import { triggerRouteReady, updateRouteLoadingMessage } from '@/lib/routeLoading';
 
 function getTimeBasedGreeting(): string {
   const hour = new Date().getHours();
@@ -33,24 +33,22 @@ Feel free to ask me anything about my projects, architecture decisions, tech sta
 export default function AskAiPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(() => [getInitialOmkarMessage()]);
   const [isThinking, setIsThinking] = useState(false);
-  const [isPageReady, setIsPageReady] = useState(false);
-  const [loadingMessage, setLoadingMessage] = useState('Initializing 3D Neural Workstation...');
 
   useEffect(() => {
-    // Stage 1 (0ms - 900ms): Initializing scene & Three.js canvas
+    // Stage 1 (600ms): Inform user of spatial models loading
     const t1 = setTimeout(() => {
-      setLoadingMessage('Loading Spatial 3D GLB Models...');
-    }, 900);
+      updateRouteLoadingMessage('Loading Spatial 3D GLB Models...');
+    }, 600);
 
-    // Stage 2 (900ms - 1750ms): Compiling shaders & warming up workstation
+    // Stage 2 (1200ms): Inform user of workstation atmosphere warming up
     const t2 = setTimeout(() => {
-      setLoadingMessage('Warming Up Workstation Atmosphere...');
-    }, 1750);
+      updateRouteLoadingMessage('Warming Up Workstation Atmosphere...');
+    }, 1200);
 
-    // Stage 3 (2400ms): Fully ready, smoothly reveal workstation
+    // Stage 3 (1700ms): Fully ready in background, dismiss the single loading screen smoothly
     const t3 = setTimeout(() => {
-      setIsPageReady(true);
-    }, 2400);
+      triggerRouteReady();
+    }, 1700);
 
     return () => {
       clearTimeout(t1);
@@ -165,11 +163,6 @@ export default function AskAiPage() {
 
   return (
     <div className="ask-ai-page-root">
-      <PageLoadingScreen
-        isVisible={!isPageReady}
-        message={loadingMessage}
-        minDuration={2200}
-      />
       <Nav />
       <h1 className="sr-only">Ask anything about Omkar</h1>
       <AskOmkarAiWorkstation

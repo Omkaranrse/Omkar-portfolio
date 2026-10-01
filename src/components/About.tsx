@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import aboutPhoto from '@/images/portrait.jpg';
+import aboutPhoto from '@/images/portrait.webp';
 
 export default function About() {
   const processSteps = [

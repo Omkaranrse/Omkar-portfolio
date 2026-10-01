@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import avatarImg from '@/images/portrait.jpg';
+import avatarImg from '@/images/portrait-avatar.webp';
 
 // ─────────────────────────────────────────────────────────
 // SocialDock — macOS Big Sur / Sonoma Authentic Dock

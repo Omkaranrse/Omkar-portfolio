@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import Image from 'next/image';
-import avatarImg from '@/images/portrait.jpg';
+import avatarImg from '@/images/portrait-avatar.webp';
 
 export interface RailSocialItem {
   id: string;

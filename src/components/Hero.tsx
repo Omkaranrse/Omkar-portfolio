@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import heroPhoto from '@/images/hero.png';
+import heroPhoto from '@/images/hero.webp';
 import FluidGlassButton from './FluidGlassButton';
 import FlyingBirds from './FlyingBirds';
+import { triggerRouteLoading } from '@/lib/routeLoading';
 
 export default function Hero() {
   const [liveTime, setLiveTime] = useState<string>('');
@@ -64,7 +65,8 @@ export default function Hero() {
           fill
           sizes="100vw"
           priority
-          unoptimized
+          fetchPriority="high"
+          quality={88}
           className="hero-bg-img"
         />
       </div>
@@ -107,7 +109,7 @@ export default function Hero() {
           </div>
 
           {/* 04: Interactive Fluid Glass Shader CTAs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 10, flexWrap: 'wrap' }}>
+          <div className="hero-cta-group" style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 10, flexWrap: 'wrap' }}>
             <FluidGlassButton
               href="/ask-ai"
               text="Ask to AI"
@@ -117,6 +119,9 @@ export default function Hero() {
               padding="13px 26px"
               fontSize="15px"
               fontWeight={600}
+              onClick={() => {
+                triggerRouteLoading('/ask-ai', 'Initializing 3D AI workstation & spatial models...');
+              }}
             />
 
             <FluidGlassButton

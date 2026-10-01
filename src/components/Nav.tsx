@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import avatarImg from '@/images/portrait.jpg';
+import avatarImg from '@/images/portrait-avatar.webp';
 import LiquidGlassButton from './LiquidGlassButton';
 
 export default function Nav() {

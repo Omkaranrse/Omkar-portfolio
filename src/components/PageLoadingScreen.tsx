@@ -104,11 +104,11 @@ export default function PageLoadingScreen({
               }}
             >
               <Image
-                src="/images/loading.png"
+                src="/images/loading.webp"
                 alt="Omkar Anarse — Loading"
                 fill
+                sizes="(max-width: 768px) 85vw, 440px"
                 priority
-                unoptimized
                 style={{
                   objectFit: 'contain',
                 }}

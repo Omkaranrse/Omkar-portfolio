@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
 import type { Project } from '@/data/projects';
 import LiquidGlassButton from './LiquidGlassButton';
+import { triggerRouteLoading } from '@/lib/routeLoading';
 
 const Z_TRANSITION = { duration: 0.35, ease: 'easeOut' } as const;
 const Z_REST = 0.01;
@@ -113,6 +114,7 @@ export default function ApertureCard({ project }: ApertureCardProps) {
       return;
     }
 
+    triggerRouteLoading(url, 'Loading case study...');
     router.push(url);
   };
 
@@ -143,6 +145,7 @@ export default function ApertureCard({ project }: ApertureCardProps) {
         onAuxClick={handleAuxClick}
         tabIndex={0}
         role="link"
+        data-route-href={`/projects/${project.id}`}
         aria-label={`View ${project.title} case study`}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
@@ -375,7 +378,10 @@ export default function ApertureCard({ project }: ApertureCardProps) {
               tint="rgba(235, 76, 42, 0.35)"
               textColor="#ffffff"
               padding="7px 16px"
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerRouteLoading(`/projects/${project.id}`, 'Loading case study...');
+              }}
             >
               Case Study
             </LiquidGlassButton>

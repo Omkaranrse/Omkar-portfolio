@@ -1,4 +1,4 @@
-import avatarImg from '@/images/portrait.jpg';
+import avatarImg from '@/images/portrait-avatar.webp';
 import { StaticImageData } from 'next/image';
 
 export interface ExperienceItem {

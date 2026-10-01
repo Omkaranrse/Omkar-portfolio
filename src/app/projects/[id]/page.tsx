@@ -21,7 +21,7 @@ interface ProjectPageProps {
   }>;
 }
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   return projects.map((project) => ({
@@ -84,7 +84,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <div
           className="fixed inset-0 pointer-events-none opacity-30 mix-blend-multiply z-0 bg-repeat"
           style={{
-            backgroundImage: "url('/textures/crumpled-paper.jpg')",
+            backgroundImage: "url('/textures/crumpled-paper.webp')",
             backgroundSize: '800px 800px',
           }}
           aria-hidden="true"

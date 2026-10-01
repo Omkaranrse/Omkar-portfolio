@@ -253,12 +253,10 @@ export default function FloatingAvatarChatWidget() {
                 }}
               >
                 <Image
-                  src="/images/avatar.png"
+                  src="/images/avatar.webp"
                   alt="Omkar Anarse"
                   width={36}
                   height={36}
-                  unoptimized
-                  priority
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               </div>
@@ -407,12 +405,10 @@ export default function FloatingAvatarChatWidget() {
               }}
             >
               <Image
-                src="/images/avatar.png"
+                src="/images/avatar.webp"
                 alt="Omkar Anarse"
                 width={46}
                 height={46}
-                unoptimized
-                priority
                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
               />
             </div>
@@ -517,11 +513,10 @@ export default function FloatingAvatarChatWidget() {
                 }}
               >
                 <Image
-                  src="/images/avatar.png"
+                  src="/images/avatar.webp"
                   alt="Omkar"
                   width={30}
                   height={30}
-                  unoptimized
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               </div>
@@ -589,11 +584,10 @@ export default function FloatingAvatarChatWidget() {
                 }}
               >
                 <Image
-                  src="/images/avatar.png"
+                  src="/images/avatar.webp"
                   alt="Omkar"
                   width={30}
                   height={30}
-                  unoptimized
                   style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               </div>
@@ -862,6 +856,7 @@ Ask me anything or select a topic below!`}
           type="button"
           onClick={isOpen ? handleClose : handleOpen}
           aria-label={isOpen ? 'Close chat' : 'Open Omkar AI Chat'}
+          className="floating-avatar-launcher-btn"
           style={{
             width: 62,
             height: 62,
@@ -917,12 +912,10 @@ Ask me anything or select a topic below!`}
             }}
           >
             <Image
-              src="/images/avatar.png"
+              src="/images/avatar.webp"
               alt="Omkar Anarse AI"
               width={54}
               height={54}
-              unoptimized
-              priority
               style={{
                 width: 52,
                 height: 52,
@@ -1005,18 +998,26 @@ Ask me anything or select a topic below!`}
           to   { transform: translateY(0) scale(1); opacity: 1; }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 767px) {
           .fixed-telegram-widget-root {
-            bottom: 16px !important;
+            bottom: calc(16px + env(safe-area-inset-bottom, 12px)) !important;
             right: 16px !important;
+          }
+          .floating-avatar-launcher-btn {
+            width: 52px !important;
+            height: 52px !important;
           }
           .widget-chat-drawer {
             width: calc(100vw - 32px) !important;
             max-width: 360px !important;
+            bottom: 66px !important;
+            right: 0 !important;
           }
           .widget-preview-popup {
             width: calc(100vw - 32px) !important;
             max-width: 310px !important;
+            bottom: 66px !important;
+            right: 0 !important;
           }
         }
       `}</style>

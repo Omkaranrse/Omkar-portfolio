@@ -198,73 +198,6 @@ export const projects: Project[] = [
     ],
   },
   {
-    id: 'p4',
-    number: '04.',
-    title: 'Hospital & Clinic Platform',
-    shortDesc: 'Three linked Flutter apps — patient, doctor, and admin — sharing one backend and covering the full clinical loop.',
-    category: 'MOBILE ENGINEERING · CROSS-PLATFORM',
-    year: '2024',
-    role: 'Mobile Engineer · Flutter',
-    meta: 'Flutter • three linked apps',
-    paragraphs: [
-      'Patient, doctor, and admin experiences sharing one backend and domain model, covering the full clinical loop from appointment through billing and follow-up.',
-      'Built with Clean Architecture and a feature-first structure, plus a centralized design-token layer so light and dark themes stay consistent across all three surfaces.',
-    ],
-    problem: 'Healthcare apps are usually siloed: the patient-facing app has no connection to what the doctor sees, and admin tooling is built separately. This creates inconsistency, data drift, and duplicated logic. The platform solves this with one shared domain model across all three roles.',
-    approach: [
-      'Map the full clinical loop: appointment → consultation → billing → follow-up',
-      'Define the unified domain model for patient, doctor, and admin roles',
-      'Structure the Flutter project with Clean Architecture and feature-first folders',
-      'Build centralized design-token layer for consistent theming across apps',
-      'Implement multi-role routing so each app surface only sees its allowed screens',
-      'Integrate Firebase for auth, real-time data, and notifications',
-    ],
-    architecture: [
-      { label: 'Patient App', note: 'Flutter' },
-      { label: 'Doctor App', note: 'Flutter' },
-      { label: 'Admin App', note: 'Flutter' },
-      { label: 'Riverpod', note: 'State management' },
-      { label: 'Clean Architecture', note: 'Feature-first structure' },
-      { label: 'Firebase', note: 'Auth + Firestore + FCM' },
-      { label: 'Shared Domain Model', note: 'Single source of truth' },
-    ],
-    techDecisions: [
-      { why: 'Why Flutter?', answer: 'One codebase for three linked apps with a native-feel UI on both iOS and Android. Critical when each role needs a distinct experience but shares the same domain model.' },
-      { why: 'Why Riverpod?', answer: 'Compile-safe, testable, and avoids the global state anti-patterns of provider. Works well with Clean Architecture\'s dependency injection structure.' },
-      { why: 'Why Clean Architecture?', answer: 'Three separate apps with shared business logic. Clean Architecture\'s strict layer separation meant the domain layer could be reused without coupling UI concerns.' },
-      { why: 'Why a centralized token layer?', answer: 'Three apps, two themes each. Without a single source for colours, spacing, and typography, visual drift across surfaces becomes unmanageable at scale.' },
-    ],
-    challenges: [
-      { title: 'Multi-role routing', detail: 'Ensuring each app surface only exposes its permitted routes — and that deep links from notifications route correctly per role — required a custom route guard system.' },
-      { title: 'Shared domain model', detail: 'Defining Appointment, Patient, and Consultation models that served all three apps without leaking role-specific concerns into the core domain took significant iteration.' },
-      { title: 'Theme consistency', detail: 'Keeping light and dark themes visually consistent across three separate Flutter apps with different layouts required centralizing all tokens before building any screens.' },
-    ],
-    result: 'A working cross-platform healthcare system covering the complete clinical workflow. All three apps share one backend, one domain model, and one token system — reducing duplication and keeping the experiences coherent.',
-    focusPoints: ['Clean Architecture', 'Multi-role routing', 'Design tokens'],
-    stack: ['Flutter', 'Dart', 'Riverpod', 'Clean Architecture', 'Firebase'],
-    links: [
-      { label: 'GitHub', href: 'https://github.com/Omkaranrse/aarogya' },
-    ],
-    stage: 'Build',
-    thumbColor: '#3d5a99',
-    thumbLabel: 'HC',
-    tagLabel: 'HOSPITAL PLATFORM',
-    metrics: [
-      { label: 'Linked Surfaces', value: '3 Apps' },
-      { label: 'Code Reusability', value: '70% Core Model' },
-      { label: 'Theme Tokens', value: '100% Shared' },
-      { label: 'Crash-Free Sessions', value: '99.8%' },
-    ],
-    edges: [
-      { from: 'Patient App', to: 'Riverpod' },
-      { from: 'Doctor App', to: 'Riverpod' },
-      { from: 'Admin App', to: 'Riverpod' },
-      { from: 'Riverpod', to: 'Clean Architecture' },
-      { from: 'Clean Architecture', to: 'Shared Domain Model' },
-      { from: 'Shared Domain Model', to: 'Firebase' },
-    ],
-  },
-  {
     id: 'p3',
     number: '03.',
     title: 'Blog Research Agent',
@@ -334,6 +267,73 @@ export const projects: Project[] = [
     ],
   },
   {
+    id: 'p4',
+    number: '04.',
+    title: 'Hospital & Clinic Platform',
+    shortDesc: 'Three linked Flutter apps — patient, doctor, and admin — sharing one backend and covering the full clinical loop.',
+    category: 'MOBILE ENGINEERING · CROSS-PLATFORM',
+    year: '2024',
+    role: 'Mobile Engineer · Flutter',
+    meta: 'Flutter • three linked apps',
+    paragraphs: [
+      'Patient, doctor, and admin experiences sharing one backend and domain model, covering the full clinical loop from appointment through billing and follow-up.',
+      'Built with Clean Architecture and a feature-first structure, plus a centralized design-token layer so light and dark themes stay consistent across all three surfaces.',
+    ],
+    problem: 'Healthcare apps are usually siloed: the patient-facing app has no connection to what the doctor sees, and admin tooling is built separately. This creates inconsistency, data drift, and duplicated logic. The platform solves this with one shared domain model across all three roles.',
+    approach: [
+      'Map the full clinical loop: appointment → consultation → billing → follow-up',
+      'Define the unified domain model for patient, doctor, and admin roles',
+      'Structure the Flutter project with Clean Architecture and feature-first folders',
+      'Build centralized design-token layer for consistent theming across apps',
+      'Implement multi-role routing so each app surface only sees its allowed screens',
+      'Integrate Firebase for auth, real-time data, and notifications',
+    ],
+    architecture: [
+      { label: 'Patient App', note: 'Flutter' },
+      { label: 'Doctor App', note: 'Flutter' },
+      { label: 'Admin App', note: 'Flutter' },
+      { label: 'Riverpod', note: 'State management' },
+      { label: 'Clean Architecture', note: 'Feature-first structure' },
+      { label: 'Firebase', note: 'Auth + Firestore + FCM' },
+      { label: 'Shared Domain Model', note: 'Single source of truth' },
+    ],
+    techDecisions: [
+      { why: 'Why Flutter?', answer: 'One codebase for three linked apps with a native-feel UI on both iOS and Android. Critical when each role needs a distinct experience but shares the same domain model.' },
+      { why: 'Why Riverpod?', answer: 'Compile-safe, testable, and avoids the global state anti-patterns of provider. Works well with Clean Architecture\'s dependency injection structure.' },
+      { why: 'Why Clean Architecture?', answer: 'Three separate apps with shared business logic. Clean Architecture\'s strict layer separation meant the domain layer could be reused without coupling UI concerns.' },
+      { why: 'Why a centralized token layer?', answer: 'Three apps, two themes each. Without a single source for colours, spacing, and typography, visual drift across surfaces becomes unmanageable at scale.' },
+    ],
+    challenges: [
+      { title: 'Multi-role routing', detail: 'Ensuring each app surface only exposes its permitted routes — and that deep links from notifications route correctly per role — required a custom route guard system.' },
+      { title: 'Shared domain model', detail: 'Defining Appointment, Patient, and Consultation models that served all three apps without leaking role-specific concerns into the core domain took significant iteration.' },
+      { title: 'Theme consistency', detail: 'Keeping light and dark themes visually consistent across three separate Flutter apps with different layouts required centralizing all tokens before building any screens.' },
+    ],
+    result: 'A working cross-platform healthcare system covering the complete clinical workflow. All three apps share one backend, one domain model, and one token system — reducing duplication and keeping the experiences coherent.',
+    focusPoints: ['Clean Architecture', 'Multi-role routing', 'Design tokens'],
+    stack: ['Flutter', 'Dart', 'Riverpod', 'Clean Architecture', 'Firebase'],
+    links: [
+      { label: 'GitHub', href: 'https://github.com/Omkaranrse/aarogya' },
+    ],
+    stage: 'Build',
+    thumbColor: '#3d5a99',
+    thumbLabel: 'HC',
+    tagLabel: 'HOSPITAL PLATFORM',
+    metrics: [
+      { label: 'Linked Surfaces', value: '3 Apps' },
+      { label: 'Code Reusability', value: '70% Core Model' },
+      { label: 'Theme Tokens', value: '100% Shared' },
+      { label: 'Crash-Free Sessions', value: '99.8%' },
+    ],
+    edges: [
+      { from: 'Patient App', to: 'Riverpod' },
+      { from: 'Doctor App', to: 'Riverpod' },
+      { from: 'Admin App', to: 'Riverpod' },
+      { from: 'Riverpod', to: 'Clean Architecture' },
+      { from: 'Clean Architecture', to: 'Shared Domain Model' },
+      { from: 'Shared Domain Model', to: 'Firebase' },
+    ],
+  },
+  {
     id: 'p5',
     number: '05.',
     title: 'Taskify',
@@ -394,6 +394,526 @@ export const projects: Project[] = [
       { from: 'Projects', to: 'Memberships' },
       { from: 'Tasks', to: 'State Machine' },
       { from: 'State Machine', to: 'API Contracts' },
+    ],
+  },
+  {
+    id: 'p-hrms',
+    number: '06.',
+    title: 'HRMS Mobile Platform',
+    shortDesc:
+      'Cross-platform Flutter HRMS app featuring employee self-service for attendance tracking, leave applications, payslip access, tax declarations, and HR requests.',
+    category: 'MOBILE ENGINEERING · SYSTEM DESIGN',
+    year: '2024',
+    role: 'Mobile Systems Engineer · Flutter',
+    meta: 'Production mobile app • Flutter & Dart',
+    paragraphs: [
+      'Engineered a comprehensive employee self-service mobile app streamlining corporate HR operations across attendance check-in, leave approval workflows, monthly payslips, and tax declarations.',
+      'Constructed with strict Clean Architecture separation, feature-first directories, and immutable state management for enterprise-scale reliability.',
+    ],
+    problem:
+      'Fragmented HR portals force employees to juggle separate legacy web tools for attendance, payroll, and tax deductions. The HRMS mobile app unifies the entire corporate workflow under one clean, responsive mobile interface.',
+    approach: [
+      'Map full self-service lifecycle: geofenced check-in → leave request → payslip download → tax filing',
+      'Design domain-driven models for Employee, AttendanceRecord, LeaveQuota, and PayrollStatement',
+      'Implement offline caching and optimistic UI updates for field employees',
+      'Standardize theme tokens for flawless light and dark mode compliance across devices',
+    ],
+    architecture: [
+      { label: 'Flutter Client', note: 'Cross-platform UI' },
+      { label: 'State Layer', note: 'BLoC / Riverpod' },
+      { label: 'Domain Entities', note: 'Clean Architecture core' },
+      { label: 'Network Client', note: 'REST + JWT' },
+      { label: 'Local Cache', note: 'Secure encrypted storage' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why Flutter for HRMS?',
+        answer:
+          'Enables a unified cross-platform codebase across iOS and Android with single-source design tokens, eliminating cross-device payroll display inconsistencies.',
+      },
+      {
+        why: 'Why Clean Architecture?',
+        answer:
+          'Decouples HR business rules from network protocols and UI widgets, allowing backend migrations without touching UI screens.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'Dynamic Payslip Rendering',
+        detail:
+          'Engineered on-device cryptographic PDF generation and secure preview allowing employees to view and download salary breakdowns with zero server rendering lag.',
+      },
+    ],
+    result:
+      'A fully functional enterprise HR mobile client reducing self-service administrative overhead and providing instant mobile access to salary and attendance records.',
+    focusPoints: ['Clean Architecture', 'Employee Self-Service', 'Cross-Platform Flutter'],
+    stack: ['Flutter', 'Dart', 'Clean Architecture', 'BLoC', 'REST API', 'Design Tokens'],
+    links: [{ label: 'GitHub', href: 'https://github.com/Omkaranrse/HRMS' }],
+    stage: 'Result',
+    thumbColor: '#0d9488',
+    thumbLabel: 'HR',
+    tagLabel: 'HRMS PLATFORM',
+    media: [{ src: '/images/projects/hrms.svg', alt: 'HRMS Mobile Platform preview', kind: 'screenshot' }],
+    metrics: [
+      { label: 'Check-in Speed', value: '< 1.0s' },
+      { label: 'HR Modules', value: 'Attendance · Tax' },
+      { label: 'Architecture', value: 'Clean Arch' },
+      { label: 'Platform', value: 'iOS & Android' },
+    ],
+    edges: [
+      { from: 'Flutter Client', to: 'State Layer' },
+      { from: 'State Layer', to: 'Domain Entities' },
+      { from: 'Domain Entities', to: 'Network Client' },
+    ],
+  },
+  {
+    id: 'p-sahayak',
+    number: '07.',
+    title: 'Sahayak Scheme Assistant',
+    shortDesc:
+      'Citizen welfare scheme eligibility and intake assistant built with Next.js 14 App Router, multi-step profile validation, and multilingual localization.',
+    category: 'AI SYSTEMS · FULL STACK',
+    year: '2024',
+    role: 'Full Stack AI Engineer',
+    meta: 'Live Production Demo • Vercel Edge',
+    paragraphs: [
+      'Developed a government scheme eligibility engine helping citizens discover, verify qualifications for, and apply to national and state welfare programs.',
+      'Designed with Next.js 14 App Router, accessible form controls, skeleton loading states, and full EN / HI / MR translations via a dedicated language context provider.',
+    ],
+    problem:
+      'Millions of citizens miss out on government subsidies and welfare schemes due to confusing eligibility criteria and language barriers. Sahayak provides a simple 3-step intake wizard in their native language.',
+    approach: [
+      'Create 3-step intake form with instant field validation and responsive step indicators',
+      'Build eligibility rules engine scoring profiles against government criteria',
+      'Implement multilingual context provider supporting English, Hindi, and Marathi',
+      'Deploy full scheme detail modal with required document checklists',
+    ],
+    architecture: [
+      { label: 'Next.js 14 UI', note: 'App Router + Tailwind' },
+      { label: 'Language Provider', note: 'Multilingual dictionary' },
+      { label: 'Eligibility Engine', note: 'Profile criteria matcher' },
+      { label: 'Document Checklist', note: 'Verification requirements' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why Next.js App Router?',
+        answer:
+          'Provides fast server-rendered landing pages with instant client-side transitions for the multi-step intake wizard.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'Multilingual State Consistency',
+        detail:
+          'Structured localized JSON dictionaries with fallback handling to guarantee unbroken UI text across complex scheme criteria in Hindi and Marathi.',
+      },
+    ],
+    result:
+      'A deployed, interactive citizen assistant currently live on Vercel, enabling instant scheme discovery and eligibility verification across three languages.',
+    focusPoints: ['Next.js 14', 'Multilingual i18n', 'Civic Tech & AI'],
+    stack: ['Next.js 14', 'TypeScript', 'Tailwind CSS', 'App Router', 'i18n Localization'],
+    links: [
+      { label: 'Live Demo', href: 'https://sahayak-demo.vercel.app' },
+      { label: 'GitHub', href: 'https://github.com/Omkaranrse/Sahayak_demo' },
+    ],
+    stage: 'Result',
+    thumbColor: '#4f46e5',
+    thumbLabel: 'SH',
+    tagLabel: 'SAHAYAK',
+    media: [{ src: '/images/projects/sahayak.svg', alt: 'Sahayak Scheme Assistant preview', kind: 'screenshot' }],
+    metrics: [
+      { label: 'Localization', value: 'EN · HI · MR' },
+      { label: 'Intake Process', value: '3-Step Wizard' },
+      { label: 'Matching Accuracy', value: '100% Rules' },
+      { label: 'Deployment', value: 'Vercel Edge' },
+    ],
+    edges: [
+      { from: 'Next.js 14 UI', to: 'Language Provider' },
+      { from: 'Language Provider', to: 'Eligibility Engine' },
+      { from: 'Eligibility Engine', to: 'Document Checklist' },
+    ],
+  },
+  {
+    id: 'p-realtime-chat',
+    number: '08.',
+    title: 'Realtime Chat Engine',
+    shortDesc:
+      'Production-grade WebSocket messaging platform with JWT authentication in handshake, cursor-based pagination, MongoDB persistence, and Docker orchestration.',
+    category: 'SYSTEM DESIGN · FULL STACK',
+    year: '2024',
+    role: 'Backend & Systems Engineer',
+    meta: 'Full Stack MERN • Socket.IO & Docker',
+    paragraphs: [
+      'Architected a low-latency real-time communication platform built on the MERN stack and Socket.IO, eliminating message spoofing by resolving sender identity strictly from cryptographically verified handshake tokens.',
+      'Engineered cursor-based pagination for high-volume chat rooms, maintaining seamless 60fps infinite scroll without re-rendering entire histories.',
+    ],
+    problem:
+      'Standard chat demos suffer from spoofed usernames, memory leaks on infinite histories, and loose socket connections. This system hardens the architecture with JWT verification prior to connection acceptance and multi-container Docker compose orchestration.',
+    approach: [
+      'Implement JWT token handshake validation in Socket.IO io.use() middleware',
+      'Bind message dispatch strictly to verified token identity',
+      'Build cursor-based paginated history retrieval (/api/messages?before=timestamp)',
+      'Orchestrate client (Nginx), server (Node.js), and database (MongoDB) via Docker Compose',
+    ],
+    architecture: [
+      { label: 'React Client', note: 'Socket client + Nginx' },
+      { label: 'Socket.IO', note: 'Bi-directional events' },
+      { label: 'Node/Express', note: 'REST + auth middleware' },
+      { label: 'MongoDB', note: 'Indexed message store' },
+      { label: 'Docker Compose', note: 'Multi-service container' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why JWT in handshake?',
+        answer:
+          'Verifies identity before accepting the WebSocket connection, preventing unauthorized clients from opening rooms or intercepting events.',
+      },
+      {
+        why: 'Why cursor-based pagination?',
+        answer:
+          'Offset pagination drifts when new messages arrive. Cursor timestamps provide consistent historical chunks without duplication.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'Socket Identity Spoofing',
+        detail:
+          'Completely removed user-supplied sender fields from socket payloads, resolving identity exclusively on the server from the decoded JWT session.',
+      },
+    ],
+    result:
+      'A robust, containerized chat architecture with verified auth, resilient reconnects, and efficient cursor pagination ready for production deployment.',
+    focusPoints: ['WebSocket Security', 'Cursor Pagination', 'Docker Containerization'],
+    stack: ['Node.js', 'Express', 'Socket.IO', 'React', 'MongoDB', 'Docker', 'JWT'],
+    links: [{ label: 'GitHub', href: 'https://github.com/Omkaranrse/realtime-chat' }],
+    stage: 'Result',
+    thumbColor: '#0284c7',
+    thumbLabel: 'RC',
+    tagLabel: 'REALTIME CHAT',
+    media: [{ src: '/images/projects/realtime-chat.svg', alt: 'Realtime Chat Engine preview', kind: 'screenshot' }],
+    metrics: [
+      { label: 'Protocol', value: 'WebSockets (Socket.IO)' },
+      { label: 'Auth Validation', value: 'Handshake Verified' },
+      { label: 'Pagination', value: 'Cursor Infinite' },
+      { label: 'Containerization', value: 'Docker Compose' },
+    ],
+    edges: [
+      { from: 'React Client', to: 'Socket.IO' },
+      { from: 'Socket.IO', to: 'Node/Express' },
+      { from: 'Node/Express', to: 'MongoDB' },
+    ],
+  },
+  {
+    id: 'p-protector',
+    number: '09.',
+    title: 'Protector VIP Escort',
+    shortDesc:
+      'On-demand personal protection services and motorcade booking app built with Flutter, featuring phone OTP verification, escort tier selection, and admin dispatch.',
+    category: 'MOBILE ENGINEERING · FLUTTER',
+    year: '2024',
+    role: 'Mobile Engineer · Flutter',
+    meta: 'Flutter Mobile • Security Dispatch',
+    paragraphs: [
+      'Engineered an on-demand personal security booking app in Flutter, guiding high-profile clients through protection tier selection, armed escort specifications, vehicle motorcades, and real-time pickup details.',
+      'Equipped with an administrative oversight dashboard, booking confirmation audit trails, and phone number OTP verification.',
+    ],
+    problem:
+      'Executive security booking is traditionally handled through cumbersome phone calls and manual contracts. Protector modernizes the entire workflow into a confidential, transparent mobile booking application.',
+    approach: [
+      'Build telephone OTP authentication pipeline with automatic credential detection',
+      'Create multi-step protection booking flow: protectee details, dress code, pickup timing',
+      'Design vehicle fleet and motorcade tier selection catalog',
+      'Develop administrative booking review portal with real-time status updates',
+    ],
+    architecture: [
+      { label: 'Flutter App', note: 'Client booking UI' },
+      { label: 'OTP Service', note: 'Phone auth verification' },
+      { label: 'Booking Engine', note: 'Escort & fleet scheduler' },
+      { label: 'Firestore', note: 'Real-time booking store' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why Flutter?',
+        answer:
+          'Delivers high-polish, confidential security workflows with native performance and custom theme styling on both iOS and Android.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'Multi-parameter Booking State',
+        detail:
+          'Preserved complex booking configurations (vehicles, personnel count, pickup logistics) across navigation stacks using robust state management.',
+      },
+    ],
+    result:
+      'A production-ready Flutter VIP protection booking system with end-to-end OTP onboarding, fleet selection, and administrative order management.',
+    focusPoints: ['Mobile Booking Systems', 'Flutter & Dart', 'Security Workflows'],
+    stack: ['Flutter', 'Dart', 'Firebase Auth', 'Cloud Firestore', 'OTP Verification'],
+    links: [{ label: 'GitHub', href: 'https://github.com/Omkaranrse/protector' }],
+    stage: 'Result',
+    thumbColor: '#d97706',
+    thumbLabel: 'PR',
+    tagLabel: 'PROTECTOR',
+    media: [{ src: '/images/projects/protector.svg', alt: 'Protector VIP Escort preview', kind: 'screenshot' }],
+    metrics: [
+      { label: 'Auth Flow', value: 'Phone OTP' },
+      { label: 'Dispatch Tier', value: 'Motorcade & Escort' },
+      { label: 'State Mgmt', value: 'BLoC / Riverpod' },
+      { label: 'Platforms', value: 'iOS & Android' },
+    ],
+    edges: [
+      { from: 'Flutter App', to: 'OTP Service' },
+      { from: 'OTP Service', to: 'Booking Engine' },
+      { from: 'Booking Engine', to: 'Firestore' },
+    ],
+  },
+  {
+    id: 'p-copilot',
+    number: '10.',
+    title: 'AI Code Copilot',
+    shortDesc:
+      'Autonomous Python coding assistant and code generation agent exploring LLM-based refactoring, AST parsing, and terminal workflow acceleration.',
+    category: 'AI SYSTEMS · DEVELOPER TOOLS',
+    year: '2024',
+    role: 'AI Systems Engineer',
+    meta: 'Open Source Python Agent',
+    paragraphs: [
+      'An autonomous code assistance engine in Python that parses Abstract Syntax Trees (AST) and generates contextual refactoring recommendations and test harnesses.',
+    ],
+    problem:
+      'Developers spend excessive time writing boilerplate tests and diagnosing syntactical regressions during rapid prototyping.',
+    approach: [
+      'Implement AST code parser for Python source files',
+      'Build prompt chaining architecture for code synthesis and unit testing',
+      'Add CLI interface for local developer usage',
+    ],
+    architecture: [
+      { label: 'CLI Interface', note: 'Terminal client' },
+      { label: 'AST Parser', note: 'Python ast module' },
+      { label: 'LLM Engine', note: 'Code generation' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why Python AST?',
+        answer: 'Provides deterministic syntax validation before presenting AI code suggestions.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'Token limits on large files',
+        detail: 'Implemented sliding window chunking over class and function boundaries.',
+      },
+    ],
+    result: 'A functional terminal code copilot accelerating testing and refactoring workflows.',
+    focusPoints: ['AST Parsing', 'Prompt Engineering', 'Python CLI'],
+    stack: ['Python', 'LLMs', 'AST Parsing', 'Developer Tools'],
+    links: [{ label: 'GitHub', href: 'https://github.com/Omkaranrse/ai-code-copilot' }],
+    stage: 'Result',
+    thumbColor: '#059669',
+    thumbLabel: 'CP',
+    tagLabel: 'AI COPILOT',
+    metrics: [
+      { label: 'Language', value: 'Python' },
+      { label: 'Focus', value: 'Code Generation' },
+    ],
+  },
+  {
+    id: 'p-quiz',
+    number: '11.',
+    title: 'QuizItt Mobile',
+    shortDesc:
+      'Interactive mobile quiz and assessment platform built with Flutter and Dart, featuring timed challenges, real-time score calculation, and progress dashboards.',
+    category: 'MOBILE ENGINEERING · FLUTTER',
+    year: '2024',
+    role: 'Mobile Engineer · Flutter',
+    meta: 'Flutter Assessment App',
+    paragraphs: [
+      'A gamified mobile quiz application with dynamic question categories, timed countdowns, and instant scorecard metrics.',
+    ],
+    problem:
+      'Self-assessment tools often feel dry and lack engagement cues needed for consistent learning habits.',
+    approach: [
+      'Design responsive quiz interface with smooth animations in Flutter',
+      'Implement stateful timer engine with score multipliers',
+      'Build result analytics dashboard with topic breakdowns',
+    ],
+    architecture: [
+      { label: 'Flutter UI', note: 'Quiz screens' },
+      { label: 'State Engine', note: 'Score & timer' },
+      { label: 'Local Store', note: 'Score history' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why Flutter?',
+        answer: 'Smooth 60fps timer animations and cross-platform consistency.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'Timer drift',
+        detail: 'Used high-resolution periodic ticker with timestamp synchronization.',
+      },
+    ],
+    result: 'An interactive quiz app with fluid micro-interactions and accurate scoring.',
+    focusPoints: ['Flutter UI', 'State Management', 'Gamification'],
+    stack: ['Flutter', 'Dart', 'State Management', 'Gamification'],
+    links: [{ label: 'GitHub', href: 'https://github.com/Omkaranrse/quiz_itt' }],
+    stage: 'Result',
+    thumbColor: '#7c3aed',
+    thumbLabel: 'QZ',
+    tagLabel: 'QUIZITT',
+    metrics: [
+      { label: 'Framework', value: 'Flutter' },
+      { label: 'Features', value: 'Timed Assessments' },
+    ],
+  },
+  {
+    id: 'p-gemini-chat',
+    number: '12.',
+    title: 'Gemini Multimodal AI',
+    shortDesc:
+      'Native iOS multimodal assistant utilizing Google Gemini API for simultaneous image analysis, voice recognition, and streaming generative responses in SwiftUI.',
+    category: 'AI SYSTEMS · MOBILE',
+    year: '2024',
+    role: 'iOS Engineer · AI Integration',
+    meta: 'SwiftUI & Google Gemini',
+    paragraphs: [
+      'A native iOS application harnessing Google Gemini multimodal capabilities for real-time camera image query understanding, visual reasoning, and conversational search.',
+    ],
+    problem:
+      'Mobile AI assistants typically handle only text, ignoring the rich visual context captured by on-device cameras.',
+    approach: [
+      'Integrate Gemini 1.5 Flash API with streaming token rendering',
+      'Build photo capture and compression pipeline in SwiftUI',
+      'Design conversational card layout with markdown rendering',
+    ],
+    architecture: [
+      { label: 'SwiftUI View', note: 'iOS client' },
+      { label: 'Camera Layer', note: 'AVFoundation' },
+      { label: 'Gemini API', note: 'Multimodal model' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why SwiftUI?',
+        answer: 'Native Apple platform performance with modern reactive state management.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'Image payload latency',
+        detail: 'Optimized JPEG compression and downscaling to maintain sub-second upload times.',
+      },
+    ],
+    result: 'A responsive iOS visual AI companion with real-time streaming responses.',
+    focusPoints: ['SwiftUI', 'Google Gemini', 'Computer Vision'],
+    stack: ['Swift', 'SwiftUI', 'Google Gemini API', 'Combine', 'iOS'],
+    links: [{ label: 'GitHub', href: 'https://github.com/Omkaranrse/GeminiMultimodelChat' }],
+    stage: 'Result',
+    thumbColor: '#2563eb',
+    thumbLabel: 'GM',
+    tagLabel: 'GEMINI AI',
+    metrics: [
+      { label: 'Platform', value: 'iOS / SwiftUI' },
+      { label: 'AI Model', value: 'Google Gemini' },
+    ],
+  },
+  {
+    id: 'p-crypto',
+    number: '13.',
+    title: 'Crypto Tracker & Analytics',
+    shortDesc:
+      'Real-time cryptocurrency portfolio tracker and market analysis app built with SwiftUI, featuring live price charts, coin search, and portfolio analytics.',
+    category: 'PRODUCT ENGINEERING · SYSTEM DESIGN',
+    year: '2024',
+    role: 'iOS Engineer',
+    meta: 'Native iOS Market App',
+    paragraphs: [
+      'A financial market tracking application providing live cryptocurrency rates, interactive sparkline charts, and portfolio profit-and-loss calculation in SwiftUI.',
+    ],
+    problem:
+      'Complex crypto exchanges overwhelm casual users who simply want real-time price monitoring and clear portfolio valuation.',
+    approach: [
+      'Connect live market REST APIs with background periodic refreshes',
+      'Build interactive Swift Charts with gesture scrubbing',
+      'Implement local portfolio holdings ledger with CoreData',
+    ],
+    architecture: [
+      { label: 'SwiftUI Views', note: 'Interactive charts' },
+      { label: 'Network Client', note: 'Combine & URLSession' },
+      { label: 'Storage', note: 'CoreData' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why Swift Charts?',
+        answer: 'Declarative, high-performance charting integrated natively with SwiftUI.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'API rate limits',
+        detail: 'Added smart in-memory caching with TTL expiration to prevent hitting public market API throttles.',
+      },
+    ],
+    result: 'A polished iOS financial tracker with real-time telemetry and clean UI.',
+    focusPoints: ['SwiftUI Charts', 'Financial APIs', 'CoreData'],
+    stack: ['Swift', 'SwiftUI', 'CoinGecko API', 'Combine', 'Charts'],
+    links: [{ label: 'GitHub', href: 'https://github.com/Omkaranrse/Crypto-App' }],
+    stage: 'Result',
+    thumbColor: '#d97706',
+    thumbLabel: 'CR',
+    tagLabel: 'CRYPTO APP',
+    metrics: [
+      { label: 'Data Source', value: 'Live Market Feeds' },
+      { label: 'Framework', value: 'SwiftUI Charts' },
+    ],
+  },
+  {
+    id: 'p-inotebook',
+    number: '14.',
+    title: 'iNotebook Cloud Notes',
+    shortDesc:
+      'Full-stack cloud note-taking platform built with the MERN stack, featuring JWT authentication, category tagging, and CRUD operations.',
+    category: 'PRODUCT ENGINEERING · FULL STACK',
+    year: '2024',
+    role: 'Full Stack Engineer',
+    meta: 'MERN Stack Cloud App',
+    paragraphs: [
+      'A cloud-backed personal note management system with secure user registration, token-based session management, and instant note search.',
+    ],
+    problem: 'Simple notes need instant synchronization without friction or heavyweight setup.',
+    approach: [
+      'Build Express REST API with MongoDB persistence',
+      'Implement Bcrypt password hashing and JWT sessions',
+      'Create responsive React client with live search',
+    ],
+    architecture: [
+      { label: 'React Client', note: 'Web frontend' },
+      { label: 'Express API', note: 'REST endpoints' },
+      { label: 'MongoDB', note: 'Document database' },
+    ],
+    techDecisions: [
+      {
+        why: 'Why MongoDB?',
+        answer: 'Flexible JSON document structure suited for variable note lengths and tags.',
+      },
+    ],
+    challenges: [
+      {
+        title: 'User data isolation',
+        detail: 'Enforced JWT token middleware validating note ownership on every update and deletion request.',
+      },
+    ],
+    result: 'A reliable cloud notes platform with clean authorization and instant search.',
+    focusPoints: ['MERN Stack', 'JWT Authentication', 'CRUD API'],
+    stack: ['React', 'Node.js', 'Express', 'MongoDB', 'JWT'],
+    links: [{ label: 'GitHub', href: 'https://github.com/Omkaranrse/iNotebook-React-2' }],
+    stage: 'Result',
+    thumbColor: '#6366f1',
+    thumbLabel: 'IN',
+    tagLabel: 'INOTEBOOK',
+    metrics: [
+      { label: 'Stack', value: 'MERN Stack' },
+      { label: 'Auth', value: 'JWT & Bcrypt' },
     ],
   },
 ];
