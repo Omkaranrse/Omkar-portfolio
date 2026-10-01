@@ -77,37 +77,114 @@ function getAuthoritativeKnowledge(): string {
 function retrieveAuthoritativeContext(query: string, knowledge: string): RetrievalResult {
   const q = query.trim().toLowerCase();
 
-  // Out-of-bounds checks: only explicit non-portfolio spam or personal private domains
-  const outOfScopeKeywords = [
-    'ceo of google',
-    'president',
-    'weather',
-    'bitcoin',
-    'crypto',
-    'stock market',
-    'recipe',
-    'football',
-    'cricket score',
-    'movie',
-    'religion',
-    'girlfriend',
-    'boyfriend',
-    'dating',
-    'relationship',
-    'family members',
-    'age',
-    'birthday',
-    'birthdate',
+  // ── 0. Portfolio Intent & Domain Validation ──
+  // Check if query is explicitly asking about Omkar's work, projects, stack, or background.
+  const portfolioKeywords = [
+    'datamind',
+    'langgraph',
+    'agent',
+    'pipeline',
+    'attendephi',
+    'aarogya',
+    'hospital',
+    'clinic',
+    'taskify',
+    'flutter',
+    'dart',
+    'metaphi',
+    'my job park',
+    'project',
+    'experience',
+    'stack',
+    'skill',
+    'technolog',
+    'resume',
+    'cv',
+    'education',
+    'degree',
+    'college',
+    'mca',
+    'bsc',
+    'contact',
+    'email',
+    'phone',
+    'whatsapp',
+    'hire',
+    'omkar',
+    'anarse',
+    'rag',
+    'chromadb',
+    'fastapi',
+    'next.js',
+    'react',
+    'clean architecture',
+    'riverpod',
   ];
 
-  for (const oos of outOfScopeKeywords) {
-    if (q.includes(oos)) {
-      return {
-        hasMatch: false,
-        context: '',
-        source: '',
-      };
+  const hasPortfolioIntent = portfolioKeywords.some((kw) => q.includes(kw));
+
+  // Only check out-of-scope spam if NO portfolio intent is found
+  if (!hasPortfolioIntent) {
+    const outOfScopePatterns = [
+      /\b(ceo of google|president|weather|bitcoin|crypto|cryptocurrency|stock market|recipe|football|cricket score|religion)\b/i,
+      /\b(girlfriend|boyfriend|dating|relationship|family members|marital|married)\b/i,
+      /\b(how old are you|what('?s| is) your age|your age|birthday|birthdate)\b/i,
+    ];
+
+    for (const pattern of outOfScopePatterns) {
+      if (pattern.test(q)) {
+        return {
+          hasMatch: false,
+          context: '',
+          source: '',
+        };
+      }
     }
+  }
+
+  // ── Priority 1: DataMind AI & LangGraph Multi-Agent Systems ──
+  if (
+    q.includes('datamind') ||
+    (q.includes('csv') && q.includes('query')) ||
+    (q.includes('conversational') && q.includes('data'))
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Project · DataMind AI',
+      context: `DataMind AI (Flagship Project):
+- Description: Conversational data query engine allowing users to upload arbitrary unstructured datasets (CSV, JSON, SQL) and query them in plain language without manual dashboards or charts.
+- LangGraph Multi-Agent Architecture: Implements a state-machine reasoning agent with conditional branching (query clarification, retrieval, schema validation, synthesis, and execution) rather than a rigid linear chain. Includes query-rewriting nodes before vector search to prevent hallucinations and boost retrieval accuracy to 94.6%.
+- Hybrid RAG & Vector Store: ChromaDB vector store indexing table schemas, column types, and data semantics for grounded generation.
+- Full Stack: Next.js 15 streaming interface with real-time SSE token delivery, FastAPI asynchronous backend with production multi-tenant authentication, and sub-second inference via Groq Llama 3 models.
+- Impact: Sub-1.2s query latency, 38% token cost reduction, and completely eliminating manual dashboard configuration.`,
+      deterministicAnswer:
+        `**DataMind AI** is my flagship AI engineering platform that lets users upload arbitrary datasets (CSV, JSON, SQL) and interact with them through a conversational query layer — completely eliminating manual dashboards and charts.
+
+### LangGraph Multi-Agent Architecture:
+• **State-Machine Reasoning Loop**: Built with **LangGraph**, the agent conditionally branches based on query ambiguity — routing between query clarification, schema retrieval, query re-ranking, and response synthesis instead of running a fixed chain.
+• **Query-Rewriting Node**: Before performing semantic vector search, a specialized LangGraph node rewrites ambiguous user queries against schema definitions, achieving **94.6% retrieval accuracy**.
+• **Hybrid RAG with ChromaDB**: Indexes dataset schemas, column semantics, and sample values in **ChromaDB** so the LLM reasons strictly over user data without hallucinating column names or SQL syntax.
+• **High-Throughput Backend & Streaming**: Asynchronous **FastAPI** server coupled with a **Next.js 15** streaming interface (using SSE) powered by **Groq** high-speed LLM inference (< 1.2s total query latency).`,
+    };
+  }
+
+  // ── Priority 2: Blog Research Agent (LangGraph Multi-Agent Pipeline) ──
+  if (
+    q.includes('blog') ||
+    q.includes('research agent') ||
+    (q.includes('multi-agent') && q.includes('research'))
+  ) {
+    return {
+      hasMatch: true,
+      source: 'Project · Blog Research Agent',
+      context: `Blog Research Agent: An autonomous LangGraph multi-agent pipeline that coordinates parallel research nodes, drafts content, conducts automated fact verification, and tracks production quality with full observability.`,
+      deterministicAnswer:
+        `I built the **Blog Research Agent**, an autonomous LangGraph multi-agent pipeline designed to automate technical research and content generation:
+
+• **Parallel Research Nodes**: Dispatches parallel LangGraph worker nodes to explore distinct sub-topics and gather authoritative citations.
+• **Automated Fact Verification**: A dedicated evaluation node validates drafts against retrieved source material before final compilation.
+• **Stateful Execution & Observability**: Complete visibility into node transitions, token usage, and quality checkpoints.`,
+    };
   }
 
   // 1. Resume / CV Download
@@ -521,27 +598,6 @@ Feel free to ask me anything about my projects, architecture decisions, tech sta
     };
   }
 
-  // 16. DataMind AI
-  if (q.includes('datamind') || (q.includes('csv') && q.includes('query'))) {
-    return {
-      hasMatch: true,
-      source: 'Projects · AI Engineering',
-      context: `DataMind AI: Upload any data (CSV, JSON, SQL) and interact with it through a conversational AI query layer — no dashboards, no manual charts. Features: Next.js 15, FastAPI, LangGraph multi-step reasoning agent, RAG pipeline with ChromaDB vector store, Groq LLM inference, PostgreSQL.`,
-      deterministicAnswer:
-        'I built **DataMind AI**, my flagship AI platform that lets users upload arbitrary datasets (CSV, JSON, SQL) and query them conversationally without manual dashboards. It features a FastAPI backend, ChromaDB vector store, and a LangGraph multi-step reasoning agent for conditional branching.',
-    };
-  }
-
-  // 17. Blog Research Agent
-  if (q.includes('blog') || (q.includes('agent') && !q.includes('mobile') && !q.includes('metaphi'))) {
-    return {
-      hasMatch: true,
-      source: 'Projects · Multi-Agent AI',
-      context: `Blog Research Agent: A LangGraph multi-agent pipeline that autonomously researches, drafts, evaluates quality, and tracks blog content. Key details: Multi-agent coordination with LangGraph, parallel research node execution, automated fact checking, and end-to-end observability.`,
-      deterministicAnswer:
-        'I built the **Blog Research Agent**, an autonomous LangGraph multi-agent pipeline that coordinates parallel research nodes, drafts content, conducts automated fact verification, and tracks production quality with full observability.',
-    };
-  }
 
   // 18. Hospital & Clinic Platform / Aarogya
   if (q.includes('hospital') || q.includes('clinic') || q.includes('aarogya') || (q.includes('doctor') && q.includes('app'))) {
@@ -624,13 +680,15 @@ Feel free to ask me anything about my projects, architecture decisions, tech sta
     };
   }
 
-  // 22. Tech Stack / Technologies / Skills
+  // 22. Tech Stack / Technologies / Skills / Languages
   if (
     q.includes('technolog') ||
     q.includes('tech stack') ||
     q.includes('skill') ||
     q.includes('stack') ||
-    q.includes('tools')
+    q.includes('tools') ||
+    q.includes('language') ||
+    q.includes('programming')
   ) {
     return {
       hasMatch: true,
@@ -784,6 +842,50 @@ I am open to full-time roles, contracts, and high-impact engineering collaborati
       deterministicAnswer:
         `I am currently available on **immediate / short notice** and actively open to full-time AI/mobile engineering roles, contract projects, and high-impact product collaborations.`,
     };
+  }
+
+  // ── Fallback: Dynamic Section Retrieval from portfolio-knowledge.txt ──
+  if (knowledge) {
+    const sections = knowledge.split(/(?=\n## )/);
+    const stopWords = new Set([
+      'tell', 'me', 'about', 'what', 'is', 'are', 'your', 'you', 'the', 'and', 'for', 'with',
+      'how', 'can', 'does', 'have', 'has', 'built', 'work', 'done', 'this', 'that', 'from',
+      'in', 'on', 'at', 'to', 'a', 'an', 'of', 'do', 'i', 'my', 'please'
+    ]);
+    const queryTokens = q
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .filter((t) => t.length > 2 && !stopWords.has(t));
+
+    let bestSection = '';
+    let maxMatches = 0;
+
+    for (const section of sections) {
+      const sectionLower = section.toLowerCase();
+      let matches = 0;
+      for (const token of queryTokens) {
+        if (sectionLower.includes(token)) {
+          matches++;
+        }
+      }
+      if (matches > maxMatches) {
+        maxMatches = matches;
+        bestSection = section;
+      }
+    }
+
+    if (maxMatches >= 2 && bestSection) {
+      const firstLine = bestSection.trim().split('\n')[0] || '';
+      const sectionTitle = firstLine.replace(/^##\s*/, '').trim() || 'Portfolio Knowledge';
+      const cleanContent = bestSection.trim().replace(/^## .*\n*/, '');
+
+      return {
+        hasMatch: true,
+        source: sectionTitle,
+        context: bestSection.trim(),
+        deterministicAnswer: `Here is the relevant information from my portfolio knowledge base regarding **${sectionTitle}**:\n\n${cleanContent}`,
+      };
+    }
   }
 
   // Fallback: No relevant portfolio context found

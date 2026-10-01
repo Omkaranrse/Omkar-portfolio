@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMotionValue, useSpring } from 'framer-motion';
 import LiquidGlassButton from './LiquidGlassButton';
@@ -169,7 +170,7 @@ export default function CarouselPreloader({
   );
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const overlayRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const [size, setSize] = useState({ width: 1200, height: 500 });
@@ -187,8 +188,12 @@ export default function CarouselPreloader({
 
   // Touch and pointer swipe tracking refs
   const pointerStartXRef = useRef(0);
+  const pointerStartYRef = useRef(0);
   const pointerStartPosRef = useRef(0);
   const isPointerDownRef = useRef(false);
+  const isDraggingRef = useRef(false);
+  const dragJustEndedRef = useRef(false);
+  const capturedPointerIdRef = useRef<number | null>(null);
 
   // Measure container dimensions
   useEffect(() => {
@@ -302,21 +307,25 @@ export default function CarouselPreloader({
   // Direct card select / navigation handler
   const handleSelect = useCallback(
     (projectId: string, index?: number) => {
+      if (dragJustEndedRef.current) return;
+
       if (typeof index === 'number' && index !== activeSlideIdx) {
         navigateToSlide(index);
+        return;
+      }
+
+      const targetUrl = projectId === 'all-projects' ? '/projects' : `/projects/${projectId}`;
+      const msg =
+        projectId === 'all-projects'
+          ? 'Loading engineering directory...'
+          : 'Loading case study...';
+
+      triggerRouteLoading(targetUrl, msg);
+
+      if (projectId !== 'all-projects' && onProjectClick) {
+        onProjectClick(projectId);
       } else {
-        if (projectId === 'all-projects') {
-          triggerRouteLoading('/projects', 'Loading engineering directory...');
-          router.push('/projects');
-          return;
-        }
-        if (onProjectClick) {
-          triggerRouteLoading(`/projects/${projectId}`, 'Loading case study...');
-          onProjectClick(projectId);
-        } else {
-          triggerRouteLoading(`/projects/${projectId}`, 'Loading case study...');
-          router.push(`/projects/${projectId}`);
-        }
+        router.push(targetUrl);
       }
     },
     [activeSlideIdx, navigateToSlide, onProjectClick, router]
@@ -324,42 +333,70 @@ export default function CarouselPreloader({
 
   // Pointer drag swipe interactions with real-time continuous 1:1 tracking
   const handlePointerDown = (e: React.PointerEvent) => {
-    if ((e.target as HTMLElement).closest('button, a')) return;
+    if ((e.target as HTMLElement).closest('.carousel-glass-controls, button')) return;
     pointerStartXRef.current = e.clientX;
+    pointerStartYRef.current = e.clientY;
     pointerStartPosRef.current = smoothPosition.get();
     isPointerDownRef.current = true;
-    try {
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    } catch {
-      // Fallback if pointer capture unsupported
-    }
+    isDraggingRef.current = false;
+    capturedPointerIdRef.current = null;
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isPointerDownRef.current) return;
     const dx = e.clientX - pointerStartXRef.current;
-    const dragDelta = -dx / (cardWidth * 0.72);
-    const clampedPos = Math.max(
-      -0.25,
-      Math.min(slides.length - 0.75, pointerStartPosRef.current + dragDelta)
-    );
-    targetPosition.set(clampedPos);
+    const dy = e.clientY - pointerStartYRef.current;
+
+    // Only engage drag if pointer moved beyond threshold (prevents swallowing clicks)
+    if (!isDraggingRef.current) {
+      if (Math.abs(dx) > 12 && Math.abs(dx) > Math.abs(dy)) {
+        isDraggingRef.current = true;
+        try {
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+          capturedPointerIdRef.current = e.pointerId;
+        } catch {
+          // Fallback if pointer capture unsupported
+        }
+      }
+    }
+
+    if (isDraggingRef.current) {
+      const dragDelta = -dx / (cardWidth * 0.72);
+      const clampedPos = Math.max(
+        -0.25,
+        Math.min(slides.length - 0.75, pointerStartPosRef.current + dragDelta)
+      );
+      targetPosition.set(clampedPos);
+    }
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (!isPointerDownRef.current) return;
     isPointerDownRef.current = false;
-    try {
-      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {
-      // Fallback
+
+    if (isDraggingRef.current) {
+      isDraggingRef.current = false;
+      dragJustEndedRef.current = true;
+      setTimeout(() => {
+        dragJustEndedRef.current = false;
+      }, 150);
+
+      if (capturedPointerIdRef.current !== null) {
+        try {
+          (e.currentTarget as HTMLElement).releasePointerCapture(capturedPointerIdRef.current);
+        } catch {
+          // Fallback
+        }
+        capturedPointerIdRef.current = null;
+      }
+
+      const current = smoothPosition.get();
+      const nearest = Math.min(
+        slides.length - 1,
+        Math.max(0, Math.round(current))
+      );
+      navigateToSlide(nearest);
     }
-    const current = smoothPosition.get();
-    const nearest = Math.min(
-      slides.length - 1,
-      Math.max(0, Math.round(current))
-    );
-    navigateToSlide(nearest);
   };
 
   // Keyboard navigation support
@@ -422,21 +459,47 @@ export default function CarouselPreloader({
             size.width
           );
 
+          const targetUrl =
+            slide.projectId === 'all-projects' ? '/projects' : `/projects/${slide.projectId}`;
+
           return (
-            <div
+            <Link
               key={slide.projectId || `slide-${slideIndex}`}
               ref={(el) => {
                 cardRefs.current[slideIndex] = el;
               }}
+              href={isActive ? targetUrl : '#'}
               className={`carousel-3d-card ${isActive ? 'is-active' : ''}`}
-              data-route-href={
-                slide.projectId === 'all-projects' ? '/projects' : `/projects/${slide.projectId}`
-              }
-              onClick={() => handleSelect(slide.projectId!, slideIndex)}
+              data-route-href={isActive ? targetUrl : undefined}
+              onClick={(e) => {
+                if (dragJustEndedRef.current) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  return;
+                }
+                if (!isActive) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  navigateToSlide(slideIndex);
+                  return;
+                }
+                triggerRouteLoading(
+                  targetUrl,
+                  slide.projectId === 'all-projects'
+                    ? 'Loading engineering directory...'
+                    : 'Loading case study...'
+                );
+                if (slide.projectId && slide.projectId !== 'all-projects' && onProjectClick) {
+                  e.preventDefault();
+                  onProjectClick(slide.projectId);
+                }
+              }}
               style={{
                 position: 'absolute',
                 top: '46%',
                 left: '50%',
+                display: 'block',
+                textDecoration: 'none',
                 width: cardWidth,
                 height: cardHeight,
                 transform: initial3D.transform,
@@ -452,13 +515,9 @@ export default function CarouselPreloader({
                 transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
               }}
               tabIndex={isActive ? 0 : -1}
-              role="button"
               aria-label={`${slide.title || 'Project'} ${
                 isActive ? '(Active — click to view case study)' : '(Click to center)'
               }`}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSelect(slide.projectId!, slideIndex);
-              }}
             >
               {/* Card Artwork Graphic */}
               <div
@@ -522,7 +581,7 @@ export default function CarouselPreloader({
                   }}
                 />
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
