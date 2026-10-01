@@ -402,7 +402,7 @@ export default function LiquidGlassButton({
         style={{
           position: 'relative',
           zIndex: 2,
-          fontFamily: 'Poppins, -apple-system, BlinkMacSystemFont, sans-serif',
+          fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
           fontWeight: 600,
           letterSpacing: '-0.01em',
           fontSize: resolvedFontSize,

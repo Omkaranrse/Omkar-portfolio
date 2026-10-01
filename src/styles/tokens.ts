@@ -20,8 +20,8 @@ export const tokens = {
     accentBorder: 'rgba(235, 76, 42, 0.25)',
   },
   fonts: {
-    display: "'Poppins', -apple-system, BlinkMacSystemFont, sans-serif",
-    sans: "'Poppins', -apple-system, BlinkMacSystemFont, sans-serif",
+    display: "var(--font-poppins), 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif",
+    sans: "var(--font-poppins), 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif",
     mono: "'JetBrains Mono', monospace",
   },
   radius: {

@@ -12,10 +12,6 @@ export default function Contact() {
         <header className="contact-section-header reveal-text">
           <div className="contact-eyebrow-row">
             <span className="contact-eyebrow">CONTACT</span>
-            <span className="contact-status-annotation" aria-label="Status: Open to selected opportunities">
-              <span className="contact-status-dot" aria-hidden="true" />
-              <span>OPEN TO SELECTED OPPORTUNITIES</span>
-            </span>
           </div>
 
           <h2 className="contact-title velocity-heading">Let&apos;s build something useful.</h2>

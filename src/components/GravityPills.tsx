@@ -106,7 +106,7 @@ export default function GravityPills({
   containerBg = 'transparent',
   enableBoundaries = true,
   enableTopCollision = true,
-  fontFamily = '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontFamily = 'Poppins, sans-serif',
   style,
 }: GravityPillsProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

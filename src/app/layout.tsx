@@ -52,6 +52,14 @@ const jsonLd = {
 
 import FloatingAvatarChatWidget from '@/components/FloatingAvatarChatWidget';
 import RouteLoadingHandler from '@/components/RouteLoadingHandler';
+import { Poppins } from 'next/font/google';
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-poppins',
+  display: 'swap',
+});
 
 export default function RootLayout({
   children,
@@ -59,7 +67,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={poppins.variable}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -76,7 +84,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>
+      <body className={poppins.className}>
         <a href="#main" className="skip-link">
           Skip to content
         </a>

@@ -209,7 +209,7 @@ export default function FloatingAvatarChatWidget() {
         bottom: 24,
         right: 24,
         zIndex: 99999,
-        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif',
+        fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
       }}
     >
       {/* ── 01. Thought Popup Speech Card (Appears above the head) ── */}

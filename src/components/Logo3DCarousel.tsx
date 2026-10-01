@@ -390,7 +390,7 @@ export default function Logo3DCarousel({
             <span
               style={{
                 fontFamily:
-                  '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                  "var(--font-poppins), 'Poppins', sans-serif",
                 fontWeight: 600,
                 fontSize: 17,
                 lineHeight: 1,

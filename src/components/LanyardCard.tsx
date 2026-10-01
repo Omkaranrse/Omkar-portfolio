@@ -212,7 +212,7 @@ export default function LanyardCard({
                 transformOrigin: 'left center',
                 color: '#ffffff',
                 whiteSpace: 'nowrap',
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                 fontSize: '48px',
                 fontWeight: 900,
                 letterSpacing: '-0.03em',
@@ -269,7 +269,7 @@ export default function LanyardCard({
             <div>
               <span
                 style={{
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                   fontSize: '1.15rem',
                   fontWeight: 700,
                   color: '#ffffff',
@@ -368,7 +368,7 @@ export default function LanyardCard({
             >
               <span
                 style={{
-                  fontFamily: 'Poppins, sans-serif',
+                  fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                   fontSize: '1rem',
                   fontWeight: 800,
                   color: '#111827',
@@ -395,7 +395,7 @@ export default function LanyardCard({
 
             <div
               style={{
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                 fontSize: '0.8125rem',
                 fontWeight: 600,
                 color: 'var(--accent)',

@@ -42,7 +42,7 @@ export default function Hero() {
             right: 'clamp(20px, 4vw, 48px)',
             zIndex: 20,
             fontFamily:
-              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif',
+              "var(--font-poppins), 'Poppins', sans-serif",
             fontSize: '0.9375rem',
             fontWeight: 500,
             color: '#000000',

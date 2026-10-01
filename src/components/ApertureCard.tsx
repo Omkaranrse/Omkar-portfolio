@@ -274,7 +274,7 @@ export default function ApertureCard({ project }: ApertureCardProps) {
               style={{
                 ...ANTI_FLICKER_STYLE,
                 filter: titleBlur,
-                fontFamily: 'Poppins, sans-serif',
+                fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
                 fontSize: '1.35rem',
                 fontWeight: 700,
                 color: '#ffffff',

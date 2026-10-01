@@ -140,7 +140,7 @@ const SOCIAL_ITEMS: DockSocialItem[] = [
               fontSize: '7.5px',
               fontWeight: 800,
               letterSpacing: '0.4px',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
             }}
           >
             <span>RESUME</span>

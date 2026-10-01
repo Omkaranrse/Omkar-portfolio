@@ -122,7 +122,7 @@ export const RAIL_SOCIAL_ITEMS: RailSocialItem[] = [
               fontSize: '5.5px',
               fontWeight: 800,
               letterSpacing: '0.3px',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
+              fontFamily: "var(--font-poppins), 'Poppins', sans-serif",
             }}
           >
             <span>RESUME</span>
