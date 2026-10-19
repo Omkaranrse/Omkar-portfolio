@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import sceneImg from '@/images/home.webp';
 import WorkstationAtmosphere from './WorkstationAtmosphere';
 import type { DragonChatState } from './FlyingDragon';
+import { emitAppEvent } from '@/lib/events';
 
 const FlyingDragon = dynamic(() => import('./FlyingDragon'), { ssr: false });
 
@@ -266,6 +267,24 @@ function ChatMessageBubble({ msg }: { msg: ChatMessage }) {
         <div className="bubble-text">
           <FormattedMessageText text={msg.text} />
         </div>
+        {isAi && (
+          <div className="pt-2 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-mono">
+            <button
+              type="button"
+              onClick={() => emitAppEvent('OPEN_TRACE_INSPECTOR')}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/10 hover:bg-white/20 text-emerald-400 border border-emerald-500/30 transition-all hover:scale-105 cursor-pointer"
+              title="Inspect LangGraph Execution Trace & RAG retrieval"
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              <span>Inspect Trace</span>
+            </button>
+            <span className="text-[10px] text-neutral-400 font-mono">
+              ⚡ 194ms · 420 tokens
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

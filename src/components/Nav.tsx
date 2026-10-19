@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import avatarImg from '@/images/portrait-avatar.webp';
 import LiquidGlassButton from './LiquidGlassButton';
+import { Search } from 'lucide-react';
+import { emitAppEvent } from '@/lib/events';
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
@@ -78,6 +80,18 @@ export default function Nav() {
                 </a>
               </li>
             ))}
+            <li>
+              <button
+                type="button"
+                onClick={() => emitAppEvent('TOGGLE_COMMAND_PALETTE')}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-neutral-200 border border-white/15 text-[11px] font-mono transition-all hover:scale-105 mr-1"
+                title="Open Command Palette (⌘K)"
+              >
+                <Search className="w-3.5 h-3.5 text-neutral-400" />
+                <span className="hidden lg:inline text-neutral-300">Search</span>
+                <kbd className="px-1 py-0.2 rounded bg-black/40 text-[9px] text-neutral-400 border border-white/10">⌘K</kbd>
+              </button>
+            </li>
             <li>
               <LiquidGlassButton
                 href="/Omkar.pdf"

@@ -14,6 +14,7 @@ import {
   TechStackMarquee,
   ProjectPager,
 } from '@/components/project-detail';
+import InteractiveArchGraph from '@/components/InteractiveArchGraph';
 
 interface ProjectPageProps {
   params: Promise<{
@@ -191,6 +192,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               nodes={project.architecture}
               edges={project.edges}
             />
+
+            {/* Interactive System Topology & Trade-Off Graph */}
+            <InteractiveArchGraph />
 
             {/* Tech decisions */}
             <div className="space-y-4">
