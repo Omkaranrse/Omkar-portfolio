@@ -7,7 +7,6 @@ import { projects, type Project } from '@/data/projects';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import LiquidGlassButton from '@/components/LiquidGlassButton';
-import MobileDeviceEmulator from '@/components/MobileDeviceEmulator';
 import { triggerRouteLoading } from '@/lib/routeLoading';
 
 type FilterCategory = 'All' | 'AI Systems' | 'Mobile' | 'System Design';
@@ -87,39 +86,6 @@ export default function AllProjectsPage() {
               A comprehensive technical archive of production systems, multi-agent AI pipelines, and mobile architectures built by Omkar Anarse.
             </p>
           </header>
-
-          {/* Interactive Flutter Mobile Simulator Showcase */}
-          <section className="mb-12 p-6 md:p-8 rounded-3xl bg-[#0b0e17]/95 border border-white/15 backdrop-blur-2xl shadow-2xl text-white">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-              <div className="max-w-xl space-y-4 text-left">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/15 border border-sky-500/30 text-sky-400 text-xs font-mono">
-                  <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
-                  LIVE INTERACTIVE FLUTTER WORKSTATION
-                </div>
-                <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-                  Simulate Production Flutter Architecture Directly In-Browser
-                </h2>
-                <p className="text-sm text-neutral-300 leading-relaxed">
-                  Test live state management models, Clean Architecture data flows, and hardware-accelerated mobile interactions. Tap between <strong>Smart Presence</strong> (QR radar &amp; geofence check-in), <strong>Clinical Suite</strong> (Patient/Doctor linked state), and <strong>HRMS Portal</strong> (BLoC leave approval).
-                </p>
-                <div className="flex flex-wrap gap-2 text-xs font-mono text-neutral-400 pt-1">
-                  <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-sky-300">
-                    60 FPS Hardware UI
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-emerald-300">
-                    Riverpod + BLoC
-                  </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-purple-300">
-                    Clean Architecture
-                  </span>
-                </div>
-              </div>
-
-              <div className="shrink-0 flex justify-center w-full lg:w-auto">
-                <MobileDeviceEmulator />
-              </div>
-            </div>
-          </section>
 
           {/* Interactive Filter & Search Bar */}
           <div className="archive-toolbar">

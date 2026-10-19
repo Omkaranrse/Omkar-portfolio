@@ -166,10 +166,6 @@ const jsonLd = {
 
 import FloatingAvatarChatWidget from '@/components/FloatingAvatarChatWidget';
 import RouteLoadingHandler from '@/components/RouteLoadingHandler';
-import CommandPalette from '@/components/CommandPalette';
-import EngineeringTelemetryHud from '@/components/EngineeringTelemetryHud';
-import AiExecutionTraceDrawer from '@/components/AiExecutionTraceDrawer';
-import MobileDeviceEmulator from '@/components/MobileDeviceEmulator';
 import { Poppins } from 'next/font/google';
 
 const poppins = Poppins({
@@ -209,10 +205,6 @@ export default function RootLayout({
         {children}
         <FloatingAvatarChatWidget />
         <RouteLoadingHandler />
-        <CommandPalette />
-        <EngineeringTelemetryHud />
-        <AiExecutionTraceDrawer />
-        <MobileDeviceEmulator isModal />
       </body>
     </html>
   );
