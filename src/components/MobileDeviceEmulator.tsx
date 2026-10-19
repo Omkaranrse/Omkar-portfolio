@@ -29,18 +29,39 @@ type AppId = 'attendance' | 'healthcare' | 'hrms';
 
 interface MobileDeviceEmulatorProps {
   isModal?: boolean;
+  isOpen?: boolean;
   onClose?: () => void;
   defaultApp?: AppId;
 }
 
 export default function MobileDeviceEmulator({
   isModal = false,
+  isOpen,
   onClose,
   defaultApp = 'attendance',
 }: MobileDeviceEmulatorProps) {
   const [activeApp, setActiveApp] = useState<AppId>(defaultApp);
   const [currentTime, setCurrentTime] = useState('9:41');
   const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const effectiveIsOpen = isOpen !== undefined ? isOpen : isOpenModal;
+
+  const handleClose = () => {
+    setIsOpenModal(false);
+    onClose?.();
+  };
+
+  // Close on Escape key when open
+  useEffect(() => {
+    if (!effectiveIsOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [effectiveIsOpen]);
 
   // App 1: Attendance state
   const [isCheckedIn, setIsCheckedIn] = useState(false);
@@ -417,7 +438,9 @@ export default function MobileDeviceEmulator({
   );
 
   // If rendered as modal (e.g. triggered from ⌘K)
-  if (isModal || isOpenModal) {
+  if (isModal) {
+    if (!effectiveIsOpen) return null;
+
     return (
       <AnimatePresence>
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
@@ -425,27 +448,31 @@ export default function MobileDeviceEmulator({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => {
-              setIsOpenModal(false);
-              onClose?.();
-            }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md"
+            onClick={handleClose}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
           />
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="relative z-10"
+            initial={{ opacity: 0, scale: 0.92, y: 14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 14 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="relative z-10 flex flex-col items-center"
           >
-            <button
-              onClick={() => {
-                setIsOpenModal(false);
-                onClose?.();
-              }}
-              className="absolute -top-3 -right-3 p-2 bg-neutral-900 border border-white/20 text-white rounded-full shadow-lg hover:bg-neutral-800 transition-colors z-40"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            {/* Top Close Control Bar */}
+            <div className="w-full flex items-center justify-between pb-3 px-1">
+              <span className="text-xs font-mono text-neutral-300 font-semibold tracking-wider uppercase">
+                Flutter Mobile Simulator
+              </span>
+              <button
+                type="button"
+                onClick={handleClose}
+                className="px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white border border-rose-500/40 rounded-full font-mono text-xs flex items-center gap-1.5 transition-all shadow-lg cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+                <span>Close (ESC)</span>
+              </button>
+            </div>
+
             {content}
           </motion.div>
         </div>
