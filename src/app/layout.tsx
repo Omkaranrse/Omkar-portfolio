@@ -9,17 +9,71 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Omkar — AI & Mobile Systems',
+  metadataBase: new URL('https://omkar-anarse.vercel.app'),
+  title: {
+    default: 'Omkar Anarse — Flutter Developer & Full Stack Engineer',
+    template: '%s | Omkar Anarse',
+  },
   description:
-    'MCA student building toward AI/ML engineering — RAG pipelines, LangGraph agents, and Flutter/Swift mobile apps.',
+    'Omkar Anarse is a Flutter Developer and Full Stack Engineer building high-performance cross-platform mobile apps (Flutter, Dart), AI systems (LangGraph, RAG), and modern web platforms (Next.js, React).',
+  keywords: [
+    'Omkar Anarse',
+    'Flutter Developer',
+    'Full Stack Engineer',
+    'Full Stack Developer',
+    'Flutter Developer India',
+    'Flutter Developer Mumbai',
+    'Mobile Application Developer',
+    'Cross-Platform App Developer',
+    'Dart Developer',
+    'Next.js Developer',
+    'React Developer',
+    'AI Systems Engineer',
+    'FastAPI Developer',
+    'Software Engineer Portfolio',
+    'Omkaranrse',
+  ],
+  authors: [{ name: 'Omkar Anarse', url: 'https://omkar-anarse.vercel.app' }],
+  creator: 'Omkar Anarse',
+  publisher: 'Omkar Anarse',
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    title: 'Omkar — AI & Mobile Systems',
+    title: 'Omkar Anarse — Flutter Developer & Full Stack Engineer',
     description:
-      'MCA student building toward AI/ML engineering — RAG pipelines, LangGraph agents, and Flutter/Swift mobile apps.',
-    type: 'website',
+      'Portfolio of Omkar Anarse: Flutter Developer and Full Stack Engineer building high-performance mobile apps, AI pipelines, and modern web platforms.',
+    url: 'https://omkar-anarse.vercel.app',
+    siteName: 'Omkar Anarse Portfolio',
+    locale: 'en_US',
+    type: 'profile',
+    images: [
+      {
+        url: '/images/avatar.png',
+        width: 800,
+        height: 800,
+        alt: 'Omkar Anarse — Flutter Developer & Full Stack Engineer',
+      },
+    ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
+    title: 'Omkar Anarse — Flutter Developer & Full Stack Engineer',
+    description:
+      'Portfolio of Omkar Anarse: Flutter Developer and Full Stack Engineer.',
+    images: ['/images/avatar.png'],
+    creator: '@Omkaranrse',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   icons: {
     icon: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>",
@@ -28,25 +82,82 @@ export const metadata: Metadata = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Omkar Anarse',
-  jobTitle: 'AI & Mobile Systems Engineer',
-  description:
-    'MCA student building toward AI/ML engineering — RAG pipelines, LangGraph agents, and Flutter/Swift mobile apps.',
-  url: 'https://omkaranarse.dev',
-  sameAs: [
-    'https://github.com/Omkaranrse',
-    'https://linkedin.com/in/omkar-anarse',
-  ],
-  knowsAbout: [
-    'Artificial Intelligence',
-    'Machine Learning',
-    'Flutter',
-    'iOS Development',
-    'FastAPI',
-    'Next.js',
-    'LangGraph',
-    'RAG',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': 'https://omkar-anarse.vercel.app/#website',
+      url: 'https://omkar-anarse.vercel.app',
+      name: 'Omkar Anarse — Flutter Developer & Full Stack Engineer',
+      description:
+        'Official portfolio of Omkar Anarse: Flutter Developer and Full Stack Engineer.',
+      inLanguage: 'en-US',
+      publisher: {
+        '@id': 'https://omkar-anarse.vercel.app/#person',
+      },
+    },
+    {
+      '@type': 'ProfilePage',
+      '@id': 'https://omkar-anarse.vercel.app/#profilepage',
+      url: 'https://omkar-anarse.vercel.app',
+      name: 'Omkar Anarse — Flutter Developer & Full Stack Engineer Portfolio',
+      isPartOf: {
+        '@id': 'https://omkar-anarse.vercel.app/#website',
+      },
+      mainEntity: {
+        '@id': 'https://omkar-anarse.vercel.app/#person',
+      },
+      description:
+        'Official developer portfolio and case studies of Omkar Anarse, specializing in Flutter mobile app engineering, full-stack web development, and AI agent systems.',
+    },
+    {
+      '@type': 'Person',
+      '@id': 'https://omkar-anarse.vercel.app/#person',
+      name: 'Omkar Anarse',
+      alternateName: ['Omkar', 'Omkaranrse', 'Omkar Anarse Developer'],
+      url: 'https://omkar-anarse.vercel.app',
+      image: 'https://omkar-anarse.vercel.app/images/avatar.png',
+      jobTitle: [
+        'Flutter Developer',
+        'Full Stack Engineer',
+        'Mobile Application Developer',
+        'AI Systems Engineer',
+      ],
+      description:
+        'Omkar Anarse is a Flutter Developer and Full Stack Engineer building high-performance cross-platform mobile apps (Flutter, Dart), AI systems (LangGraph, RAG, FastAPI), and modern web platforms (Next.js, React).',
+      sameAs: [
+        'https://github.com/Omkaranrse',
+        'https://www.linkedin.com/in/omkar-anarse',
+      ],
+      knowsAbout: [
+        'Flutter',
+        'Dart',
+        'Full Stack Development',
+        'Mobile Application Development',
+        'Clean Architecture',
+        'Riverpod',
+        'BLoC',
+        'Next.js',
+        'React',
+        'TypeScript',
+        'FastAPI',
+        'Python',
+        'Firebase',
+        'REST APIs',
+        'Artificial Intelligence',
+        'LangGraph',
+        'RAG',
+      ],
+      worksFor: [
+        {
+          '@type': 'Organization',
+          name: 'Metaphi',
+        },
+      ],
+      alumniOf: {
+        '@type': 'EducationalOrganization',
+        name: 'University of Mumbai',
+      },
+    },
   ],
 };
 

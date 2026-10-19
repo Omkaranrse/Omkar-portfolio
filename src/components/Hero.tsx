@@ -98,13 +98,13 @@ export default function Hero() {
 
           {/* 02: Main Headline */}
           <h1 className="hero-editorial-headline">
-            AI, WEB &amp; MOBILE SYSTEMS.
+            FLUTTER &amp; FULL STACK DEVELOPER.
           </h1>
 
           {/* 03: Supporting Statement */}
           <div className="hero-editorial-copy">
             <p className="hero-editorial-lead">
-              Full-stack developer building AI, web, and mobile apps that actually ship and solve real-world problems.
+              Building high-performance Flutter mobile apps, intelligent AI systems, and scalable full-stack web platforms.
             </p>
           </div>
 

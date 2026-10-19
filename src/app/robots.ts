@@ -5,7 +5,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      disallow: ['/api/'],
     },
-    sitemap: 'https://omkaranarse.dev/sitemap.xml',
+    sitemap: 'https://omkar-anarse.vercel.app/sitemap.xml',
   };
 }

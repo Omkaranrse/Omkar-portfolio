@@ -10,10 +10,14 @@ export const metadata: Metadata = {
   title: 'Engineering Projects & Systems — Omkar Anarse',
   description:
     'Featured projects and technical systems built by Omkar Anarse — RAG pipelines, LangGraph multi-agent systems, Flutter cross-platform mobile apps, and full-stack software.',
+  alternates: {
+    canonical: '/work',
+  },
   openGraph: {
     title: 'Engineering Projects & Systems — Omkar Anarse',
     description:
       'Featured projects and technical systems built by Omkar Anarse — AI systems, Flutter mobile apps, and distributed platforms.',
+    url: 'https://omkar-anarse.vercel.app/work',
   },
 };
 

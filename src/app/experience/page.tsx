@@ -10,10 +10,14 @@ export const metadata: Metadata = {
   title: 'Professional Experience — Omkar Anarse',
   description:
     'Work history and engineering roles of Omkar Anarse — Flutter Developer at Metaphi and My Job Park, building scalable mobile and AI client architectures.',
+  alternates: {
+    canonical: '/experience',
+  },
   openGraph: {
     title: 'Professional Experience — Omkar Anarse',
     description:
       'Work history and engineering roles of Omkar Anarse — Flutter Developer at Metaphi and My Job Park.',
+    url: 'https://omkar-anarse.vercel.app/experience',
   },
 };
 
